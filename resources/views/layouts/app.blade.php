@@ -29,7 +29,7 @@
 <body class="bg-gray-50">
     @include('components.navbar')
 
-    <div class="flex">
+    <div class="flex pt-20">
         @if(auth()->check())
             @if(auth()->user()->isBoss())
                 @include('components.sidebar-boss')
@@ -38,7 +38,7 @@
             @endif
         @endif
 
-        <main class="flex-1 p-4 md:p-8">
+        <main class="flex-1 p-4 md:p-8 md:ml-64">
             @if($errors->any())
                 <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
                     <ul class="list-disc ml-5">

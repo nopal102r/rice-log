@@ -138,9 +138,10 @@
         function loadNotifications() {
             $.get('/api/notifications', function (data) {
                 const count = data.notifications.length;
-                $('#notification-count').text(count);
-
+                const badge = $('#notification-count');
+                
                 if (count > 0) {
+                    badge.text(count).removeClass('hidden');
                     let html = '';
                     data.notifications.forEach(notif => {
                         html += `
@@ -152,6 +153,8 @@
                         `;
                     });
                     $('#notification-list').html(html);
+                } else {
+                    badge.addClass('hidden');
                 }
             });
         }
