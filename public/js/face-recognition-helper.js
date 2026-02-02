@@ -151,11 +151,23 @@
                             canvasElement.height,
                         );
                         try {
-                            const displaySize = { width: canvasElement.width, height: canvasElement.height };
+                            const displaySize = {
+                                width: canvasElement.width,
+                                height: canvasElement.height,
+                            };
                             faceapi.matchDimensions(canvasElement, displaySize);
-                            const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                            faceapi.draw.drawDetections(canvasElement, resizedDetections);
-                            faceapi.draw.drawFaceLandmarks(canvasElement, resizedDetections);
+                            const resizedDetections = faceapi.resizeResults(
+                                detections,
+                                displaySize,
+                            );
+                            faceapi.draw.drawDetections(
+                                canvasElement,
+                                resizedDetections,
+                            );
+                            faceapi.draw.drawFaceLandmarks(
+                                canvasElement,
+                                resizedDetections,
+                            );
                         } catch (drawErr) {
                             console.warn("draw error", drawErr);
                         }
