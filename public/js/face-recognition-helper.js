@@ -45,7 +45,7 @@
                 // Ensure face-api present
                 if (typeof faceapi === "undefined") {
                     await this.loadScript(
-                        "https://cdn.jsdelivr.net/gh/vladmandic/face-api@0.8.5/dist/face-api.min.js",
+                        "https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js",
                     );
                     console.log("FaceRecognitionHelper: face-api loaded");
                 }
@@ -142,7 +142,7 @@
                         .withFaceLandmarks(true)
                         .withFaceExpressions()
                         .withFaceDescriptors();
-                    if (canvasElement) {
+                    if (canvasElement && detections && detections.length > 0) {
                         const ctx = canvasElement.getContext("2d");
                         ctx.clearRect(
                             0,
@@ -151,14 +151,11 @@
                             canvasElement.height,
                         );
                         try {
-                            faceapi.draw.drawDetections(
-                                canvasElement,
-                                detections.map((d) => d),
-                            );
-                            faceapi.draw.drawFaceLandmarks(
-                                canvasElement,
-                                detections.map((d) => d.landmarks),
-                            );
+                            const displaySize = { width: canvasElement.width, height: canvasElement.height };
+                            faceapi.matchDimensions(canvasElement, displaySize);
+                            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                            faceapi.draw.drawDetections(canvasElement, resizedDetections);
+                            faceapi.draw.drawFaceLandmarks(canvasElement, resizedDetections);
                         } catch (drawErr) {
                             console.warn("draw error", drawErr);
                         }

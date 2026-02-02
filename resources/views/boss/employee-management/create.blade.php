@@ -3,8 +3,8 @@
 @section('title', 'Tambah Karyawan Baru')
 
 @section('extra-css')
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4"></script>
-    <script src="https://cdn.jsdelivr.net/gh/vladmandic/face-api@0.8.5/dist/face-api.min.js"></script>
+    <script async defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4"></script>
+    <script async defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script src="{{ asset('js/face-recognition-helper.js') }}"></script>
 @endsection
 
@@ -202,7 +202,7 @@
         let faceDescriptorsData = null;
 
         // Wait for tfjs and face-api to be available
-        function waitForFaceApi(callback, attempts = 50) {
+        function waitForFaceApi(callback, attempts = 150) {
             if (typeof tf !== 'undefined' && typeof faceapi !== 'undefined') {
                 console.log('✓ tfjs and faceapi are loaded');
                 callback();
@@ -210,8 +210,8 @@
                 console.log('Waiting for tfjs/faceapi... attempts left:', attempts);
                 setTimeout(() => waitForFaceApi(callback, attempts - 1), 100);
             } else {
-                console.error('❌ tfjs or faceapi failed to load after 5 seconds');
-                document.getElementById('faceEnrollmentStatus').innerHTML = '<p class="text-red-600 font-bold"><i class="fas fa-exclamation-circle mr-2"></i> TensorFlow.js or face-api failed to load</p>';
+                console.error('❌ tfjs or faceapi failed to load after 15 seconds');
+                document.getElementById('faceEnrollmentStatus').innerHTML = '<p class="text-red-600 font-bold"><i class="fas fa-exclamation-circle mr-2"></i> TensorFlow.js or face-api failed to load - check network tab</p>';
             }
         }
 
@@ -289,25 +289,27 @@
                         try {
                             console.log('Capture button clicked');
                             const video = document.getElementById('enrollmentVideo');
+                            console.log('Video element:', video);
+                            console.log('Video playing:', video.playing);
+                            console.log('Video dimensions:', video.videoWidth, 'x', video.videoHeight);
 
                             console.log('Getting face descriptors from video...');
                             // Get face descriptors
                             const descriptors = await FaceRecognitionHelper.getFaceDescriptors(video);
-                            console.log('Descriptors found:', descriptors.length);
+                            console.log('Descriptors returned:', descriptors);
+                            console.log('Descriptors length:', descriptors ? descriptors.length : 0);
 
-                            if (descriptors.length === 0) {
-                                console.warn('No face detected - but capturing anyway for manual verification');
+                            if (!descriptors || descriptors.length === 0) {
+                                Swal.fire('Peringatan', 'Tidak ada wajah yang terdeteksi. Coba lagi atau skip step ini.', 'warning');
+                                console.warn('No face detected');
+                                return;
                             }
 
-                            // Store descriptors if found
-                            if (descriptors.length > 0) {
-                                faceDescriptorsData = descriptors[0];
-                                document.getElementById('face_descriptors').value = JSON.stringify(descriptors[0]);
-                                console.log('Face descriptors stored');
-                            } else {
-                                console.log('No descriptors - will proceed without face data');
-                                document.getElementById('face_descriptors').value = '';
-                            }
+                            // Store descriptors
+                            faceDescriptorsData = descriptors[0];
+                            document.getElementById('face_descriptors').value = JSON.stringify(descriptors[0]);
+                            console.log('Face descriptors stored successfully');
+                            console.log('Stored data length:', descriptors[0].length);
 
                             document.getElementById('faceEnrollmentSuccess').style.display = 'block';
                             document.getElementById('captureEnrollmentBtn').style.display = 'none';
@@ -317,9 +319,10 @@
                                 document.getElementById('stopEnrollmentCameraBtn').click();
                             }, 500);
 
-                            Swal.fire('Info', 'Foto berhasil diambil! Anda bisa lanjut submit form.', 'success');
+                            Swal.fire('Sukses', 'Foto wajah berhasil diambil! Anda bisa lanjut submit form.', 'success');
                         } catch (error) {
                             console.error('Capture error:', error);
+                            console.error('Error stack:', error.stack);
                             Swal.fire('Error', 'Gagal mengambil foto: ' + error.message, 'error');
                         }
                     });
@@ -415,6 +418,7 @@
                         });
                     });
                 }
-            });  // End waitForFaceApi callback`r`n        }); // End DOMContentLoaded
+            });  // End waitForFaceApi callback
+        }); // End DOMContentLoaded
     </script>
 @endsection
