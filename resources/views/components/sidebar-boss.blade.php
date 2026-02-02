@@ -1,4 +1,5 @@
-<aside class="w-64 bg-gray-900 text-white min-h-screen p-4 hidden md:block fixed left-0 top-20 bottom-0 overflow-y-auto z-30">
+<aside
+    class="w-64 bg-gray-900 text-white min-h-screen p-4 hidden md:block fixed left-0 top-20 bottom-0 overflow-y-auto z-30">
     <nav class="space-y-2">
         <a href="{{ route('boss.dashboard') }}"
             class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.dashboard') ? 'bg-blue-600' : '' }}">

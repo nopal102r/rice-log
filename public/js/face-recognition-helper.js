@@ -142,7 +142,11 @@
                             .detectAllFaces(videoElement, options)
                             .withFaceLandmarks(true)
                             .withFaceDescriptors();
-                        if (canvasElement && detections && detections.length > 0) {
+                        if (
+                            canvasElement &&
+                            detections &&
+                            detections.length > 0
+                        ) {
                             try {
                                 const ctx = canvasElement.getContext("2d");
                                 ctx.clearRect(
@@ -172,7 +176,10 @@
                             onDetectionChange(found, detections);
                     } catch (tfErr) {
                         // Suppress TensorFlow errors but continue detection loop
-                        console.warn("TF detection error (suppressed):", tfErr.message);
+                        console.warn(
+                            "TF detection error (suppressed):",
+                            tfErr.message,
+                        );
                     }
                 } catch (err) {
                     console.error("detection loop error", err);

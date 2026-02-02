@@ -139,18 +139,18 @@
             $.get('/api/notifications', function (data) {
                 const count = data.notifications.length;
                 const badge = $('#notification-count');
-                
+
                 if (count > 0) {
                     badge.text(count).removeClass('hidden');
                     let html = '';
                     data.notifications.forEach(notif => {
                         html += `
-                            <div class="border-b py-2 px-4 last:border-b-0">
-                                <p class="font-bold text-sm">${notif.title}</p>
-                                <p class="text-xs text-gray-600">${notif.message}</p>
-                                <p class="text-xs text-gray-400 mt-1">${notif.created_at}</p>
-                            </div>
-                        `;
+                                <div class="border-b py-2 px-4 last:border-b-0">
+                                    <p class="font-bold text-sm">${notif.title}</p>
+                                    <p class="text-xs text-gray-600">${notif.message}</p>
+                                    <p class="text-xs text-gray-400 mt-1">${notif.created_at}</p>
+                                </div>
+                            `;
                     });
                     $('#notification-list').html(html);
                 } else {
