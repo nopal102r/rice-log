@@ -38,13 +38,7 @@
             try {
                 if (window.faceapi && this.modelsLoaded) return true;
 
-                // Ensure tfjs present
-                if (typeof tf === "undefined") {
-                    await this.loadScript(
-                        "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4",
-                    );
-                    console.log("FaceRecognitionHelper: tfjs loaded");
-                }
+
                 // Ensure face-api present
                 if (typeof faceapi === "undefined") {
                     await this.loadScript(
@@ -266,7 +260,7 @@
 
                 // Use SSD MobileNet v1 if available, otherwise Tiny Face Detector
                 let options;
-                if (faceapi.nets.ssdMobilenetv1?.isLoaded?.()) {
+                if (faceapi.nets.ssdMobilenetv1?.isLoaded) {
                     options = new faceapi.SsdMobilenetv1Options();
                 } else {
                     options = new faceapi.TinyFaceDetectorOptions();
@@ -274,7 +268,7 @@
 
                 const results = await faceapi
                     .detectAllFaces(input, options)
-                    .withFaceLandmarks(true)
+                    .withFaceLandmarks(faceapi.nets.faceLandmark68TinyNet.isLoaded)
                     .withFaceDescriptors();
 
                 if (!results) return [];

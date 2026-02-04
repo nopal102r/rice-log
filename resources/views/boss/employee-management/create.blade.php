@@ -3,7 +3,7 @@
 @section('title', 'Tambah Karyawan Baru')
 
 @section('extra-css')
-    <script async defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4"></script>
+
     <script async defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script src="{{ asset('js/face-recognition-helper.js') }}"></script>
 @endsection
@@ -203,7 +203,7 @@
 
         // Wait for tfjs and face-api to be available
         function waitForFaceApi(callback, attempts = 150) {
-            if (typeof tf !== 'undefined' && typeof faceapi !== 'undefined') {
+            if (typeof faceapi !== 'undefined') {
                 console.log('✓ tfjs and faceapi are loaded');
                 callback();
             } else if (attempts > 0) {

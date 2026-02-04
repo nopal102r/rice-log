@@ -5,7 +5,7 @@
 @section('extra-css')
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
-    <script async src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4"></script>
+
     <script src="{{ asset('js/face-api.js/dist/face-api.min.js') }}"></script>
     <script src="{{ asset('js/face-recognition-helper.js') }}"></script>
     <style>
