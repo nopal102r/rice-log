@@ -1,36 +1,39 @@
+/**
+ * Face Recognition Helper
+ * Handles face detection, enrollment, and verification using face-api.js
+ */
 (function (window) {
-    // Minimal face recognition helper that dynamically loads tfjs and face-api if needed
     const FaceRecognitionHelper = {
         modelsLoaded: false,
-        videoStream: null,
+        detectionRunning: false,
         detectionInterval: null,
-        detectionActive: false,
+        detectionMode: "tinyFaceDetector", // Force tiny for better real-time detection
 
+        /**
+         * Load script dynamically
+         */
         loadScript: function (src) {
             return new Promise((resolve, reject) => {
-                // Check if already loaded
-                const existing = Array.from(
-                    document.getElementsByTagName("script"),
-                ).find((s) => s.src && s.src.indexOf(src) !== -1);
-                if (existing) {
-                    existing.addEventListener("load", () => resolve());
-                    if (
-                        existing.readyState === "complete" ||
-                        existing.readyState === "loaded"
-                    )
-                        resolve();
+                if (document.querySelector(`script[src="${src}"]`)) {
+                    resolve();
                     return;
                 }
-                const s = document.createElement("script");
-                s.src = src;
-                s.async = false;
-                s.defer = false;
-                s.onload = () => resolve();
-                s.onerror = (e) => reject(new Error("Failed to load " + src));
-                document.head.appendChild(s);
+
+                const script = document.createElement("script");
+                script.src = src;
+                script.async = true;
+                script.defer = true;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
             });
         },
 
+        /**
+         * Initialize face recognition models
+         * @param {string} modelPath - Path to models directory
+         * @returns {Promise<boolean>}
+         */
         initModels: async function (modelPath) {
             try {
                 if (window.faceapi && this.modelsLoaded) return true;
@@ -53,165 +56,229 @@
                 // Use provided modelPath or default
                 const base = modelPath || window.location.origin + "/models/";
 
-                // load smallest models needed
-                await faceapi.nets.tinyFaceDetector.loadFromUri(base);
-                await faceapi.nets.faceLandmark68TinyNet
-                    .loadFromUri(base)
-                    .catch(() =>
-                        faceapi.nets.faceLandmark68Net.loadFromUri(base),
+                // load models needed for face recognition
+                console.log("Loading face detection models from:", base);
+
+                // Load Tiny Face Detector FIRST (better for real-time detection)
+                try {
+                    await faceapi.nets.tinyFaceDetector.loadFromUri(base);
+                    console.log("✓ Tiny Face Detector loaded");
+                    this.detectionMode = "tinyFaceDetector";
+                } catch (e) {
+                    console.log(
+                        "Tiny Face Detector not available, trying SSD MobileNet v1...",
                     );
+                    try {
+                        await faceapi.nets.ssdMobilenetv1.loadFromUri(base);
+                        console.log("✓ SSD MobileNet v1 detector loaded");
+                        this.detectionMode = "ssdMobilenetv1";
+                    } catch (e2) {
+                        console.error("❌ Both detectors failed to load!");
+                        throw new Error("No face detector models available");
+                    }
+                }
+
+                // Load face landmarks (try Tiny first, fallback to standard)
+                try {
+                    await faceapi.nets.faceLandmark68TinyNet.loadFromUri(base);
+                    console.log("✓ Face Landmark 68 Tiny loaded");
+                } catch (e) {
+                    console.log(
+                        "Face Landmark 68 Tiny not available, loading standard...",
+                    );
+                    await faceapi.nets.faceLandmark68Net.loadFromUri(base);
+                    console.log("✓ Face Landmark 68 standard loaded");
+                }
+
+                // Load face recognition model
                 await faceapi.nets.faceRecognitionNet.loadFromUri(base);
-                await faceapi.nets.faceExpressionNet
-                    .loadFromUri(base)
-                    .catch(() => {});
+                console.log("✓ Face Recognition Net loaded");
 
                 this.modelsLoaded = true;
+                console.log("✓ Face recognition models loaded successfully");
                 return true;
             } catch (err) {
-                console.error("initModels error", err);
+                console.error("❌ Error loading models:", err);
                 return false;
             }
         },
 
-        startCamera: async function (videoElement, width = 640, height = 480) {
-            if (!videoElement) throw new Error("No video element provided");
+        /**
+         * Start camera stream
+         * @param {HTMLVideoElement} videoElement - Video element
+         * @returns {Promise<void>}
+         */
+        startCamera: async function (videoElement) {
             try {
+                if (!videoElement) throw new Error("No video element provided");
+
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { width, height },
+                    video: { facingMode: "user" },
                     audio: false,
                 });
-                this.videoStream = stream;
+
                 videoElement.srcObject = stream;
-                await videoElement.play().catch(() => {});
-                return true;
-            } catch (err) {
-                console.error("startCamera error", err);
-                throw err;
-            }
-        },
 
-        stopCamera: function () {
-            if (this.videoStream) {
-                this.videoStream.getTracks().forEach((t) => t.stop());
-                this.videoStream = null;
-            }
-        },
-
-        startDetection: function (
-            videoElement,
-            canvasElement,
-            onDetectionChange,
-        ) {
-            if (typeof faceapi === "undefined") {
-                console.warn(
-                    "startDetection: faceapi not loaded, attempting to init models",
-                );
-                // Try to initialize models (will also load face-api if missing)
-                // Note: initModels requires a model path; use default models folder
-                return this.initModels().then((success) => {
-                    if (!success) throw new Error("faceapi failed to load");
-                    return this.startDetection(
-                        videoElement,
-                        canvasElement,
-                        onDetectionChange,
-                    );
+                return new Promise((resolve) => {
+                    videoElement.onloadedmetadata = () => {
+                        videoElement.play();
+                        resolve();
+                    };
                 });
+            } catch (err) {
+                console.error("Camera error:", err);
+                throw new Error(
+                    "Tidak bisa membuka kamera. Pastikan browser memiliki akses ke kamera.",
+                );
             }
-            if (this.detectionActive) return;
-            this.detectionActive = true;
+        },
+
+        /**
+         * Stop camera stream
+         * @param {HTMLVideoElement} videoElement - Video element (optional)
+         */
+        stopCamera: function (videoElement) {
+            if (videoElement && videoElement.srcObject) {
+                const stream = videoElement.srcObject;
+                const tracks = stream.getTracks();
+                tracks.forEach((track) => track.stop());
+                videoElement.srcObject = null;
+            }
+        },
+
+        /**
+         * Start real-time face detection
+         * @param {HTMLVideoElement} videoElement - Video element
+         * @param {HTMLCanvasElement} canvasElement - Canvas element for drawing
+         * @param {Function} callback - Callback when face is detected/lost
+         */
+        startDetection: function (videoElement, canvasElement, callback) {
+            if (this.detectionRunning) return;
+
+            if (!videoElement || !canvasElement) {
+                console.error("Video or canvas element not found");
+                return;
+            }
+
+            this.detectionRunning = true;
 
             const displaySize = {
-                width: videoElement.videoWidth || videoElement.clientWidth,
-                height: videoElement.videoHeight || videoElement.clientHeight,
+                width: videoElement.width || videoElement.offsetWidth,
+                height: videoElement.height || videoElement.offsetHeight,
             };
-            if (canvasElement) {
-                canvasElement.width = displaySize.width;
-                canvasElement.height = displaySize.height;
-            }
 
-            const options = new faceapi.TinyFaceDetectorOptions({
-                inputSize: 224,
-                scoreThreshold: 0.5,
-            });
+            faceapi.matchDimensions(canvasElement, displaySize);
 
-            const loop = async () => {
-                if (!this.detectionActive) return;
+            const detectFaces = async () => {
+                if (!this.detectionRunning) return;
+
                 try {
-                    try {
-                        const detections = await faceapi
-                            .detectAllFaces(videoElement, options)
-                            .withFaceLandmarks(true)
-                            .withFaceDescriptors();
-                        if (
-                            canvasElement &&
-                            detections &&
-                            detections.length > 0
-                        ) {
-                            try {
-                                const ctx = canvasElement.getContext("2d");
-                                ctx.clearRect(
-                                    0,
-                                    0,
-                                    canvasElement.width,
-                                    canvasElement.height,
-                                );
-                                // Just draw simple rectangles for now, skip faceapi draw functions
-                                detections.forEach((detection) => {
-                                    const box = detection.detection.box;
-                                    ctx.strokeStyle = "#00ff00";
-                                    ctx.lineWidth = 2;
-                                    ctx.strokeRect(
-                                        box.x,
-                                        box.y,
-                                        box.width,
-                                        box.height,
-                                    );
-                                });
-                            } catch (drawErr) {
-                                // Silently ignore drawing errors
-                            }
+                    // Get detection options based on detector type
+                    let detectionOptions;
+                    if (this.detectionMode === "tinyFaceDetector") {
+                        // Tiny Face Detector options - tuned for real-time detection
+                        detectionOptions = new faceapi.TinyFaceDetectorOptions({
+                            inputSize: 416, // Larger input = more accurate but slower
+                            scoreThreshold: 0.5, // Lower = more detections (more sensitive)
+                        });
+                    } else {
+                        // SSD MobileNet options
+                        detectionOptions = new faceapi.SsdMobilenetv1Options({
+                            minConfidence: 0.5, // Lower threshold for better detection
+                        });
+                    }
+
+                    const detections = await faceapi
+                        .detectAllFaces(videoElement, detectionOptions)
+                        .withFaceLandmarks()
+                        .withFaceDescriptors();
+
+                    const resizedDetections = faceapi.resizeResults(
+                        detections,
+                        displaySize,
+                    );
+
+                    // Clear canvas
+                    const ctx = canvasElement.getContext("2d");
+                    ctx.clearRect(
+                        0,
+                        0,
+                        canvasElement.width,
+                        canvasElement.height,
+                    );
+
+                    // Draw detections
+                    resizedDetections.forEach((detection) => {
+                        const box = detection.detection.box;
+                        ctx.strokeStyle = "#00FF00";
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(box.x, box.y, box.width, box.height);
+
+                        // Draw landmarks
+                        if (detection.landmarks) {
+                            ctx.fillStyle = "#FF0000";
+                            const points = detection.landmarks.positions;
+                            points.forEach((point) => {
+                                ctx.beginPath();
+                                ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+                                ctx.fill();
+                            });
                         }
-                        const found = detections && detections.length > 0;
-                        if (typeof onDetectionChange === "function")
-                            onDetectionChange(found, detections);
-                    } catch (tfErr) {
-                        // Suppress TensorFlow errors but continue detection loop
-                        console.warn(
-                            "TF detection error (suppressed):",
-                            tfErr.message,
-                        );
+                    });
+
+                    // Callback with detection status
+                    if (callback) {
+                        callback(resizedDetections.length > 0);
                     }
                 } catch (err) {
-                    console.error("detection loop error", err);
+                    console.error("Detection error:", err);
                 }
-                this.detectionInterval = setTimeout(loop, 300);
+
+                this.detectionInterval = requestAnimationFrame(detectFaces);
             };
 
-            loop();
+            detectFaces();
         },
 
+        /**
+         * Stop real-time face detection
+         */
         stopDetection: function () {
-            this.detectionActive = false;
-            if (this.detectionInterval) clearTimeout(this.detectionInterval);
-            this.detectionInterval = null;
+            this.detectionRunning = false;
+            if (this.detectionInterval) {
+                cancelAnimationFrame(this.detectionInterval);
+                this.detectionInterval = null;
+            }
         },
 
+        /**
+         * Get face descriptors from video/image element
+         * @param {HTMLVideoElement|HTMLImageElement} input - Video or image element
+         * @returns {Promise<Float32Array[]>} - Array of face descriptors
+         */
         getFaceDescriptors: async function (input) {
-            // input can be video element, image element, or canvas
-            if (typeof faceapi === "undefined") {
-                console.warn(
-                    "getFaceDescriptors: faceapi not loaded, attempting to init models",
-                );
-                const ok = await this.initModels();
-                if (!ok) throw new Error("faceapi not loaded");
-            }
+            if (!input) throw new Error("No input element");
+
             try {
-                const options = new faceapi.TinyFaceDetectorOptions();
+                if (!window.faceapi || !this.modelsLoaded) {
+                    if (!window.faceapi) return [];
+                }
+
+                // Use SSD MobileNet v1 if available, otherwise Tiny Face Detector
+                let options;
+                if (faceapi.nets.ssdMobilenetv1?.isLoaded?.()) {
+                    options = new faceapi.SsdMobilenetv1Options();
+                } else {
+                    options = new faceapi.TinyFaceDetectorOptions();
+                }
+
                 const results = await faceapi
                     .detectAllFaces(input, options)
                     .withFaceLandmarks(true)
                     .withFaceDescriptors();
+
                 if (!results) return [];
+
                 return results.map((r) => r.descriptor);
             } catch (err) {
                 console.error("getFaceDescriptors error", err);
@@ -219,17 +286,106 @@
             }
         },
 
+        /**
+         * Capture face image from video element
+         * @param {HTMLVideoElement} videoElement - Video element
+         * @returns {Promise<Blob>}
+         */
         captureFace: async function (videoElement) {
             if (!videoElement) throw new Error("No video element");
+
             const canvas = document.createElement("canvas");
             canvas.width = videoElement.videoWidth || videoElement.clientWidth;
             canvas.height =
                 videoElement.videoHeight || videoElement.clientHeight;
+
             const ctx = canvas.getContext("2d");
             ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
             return new Promise((resolve) =>
                 canvas.toBlob(resolve, "image/jpeg"),
             );
+        },
+
+        /**
+         * Compare two face descriptors
+         * Calculates euclidean distance between descriptors
+         * @param {Float32Array} descriptor1 - First face descriptor
+         * @param {Float32Array} descriptor2 - Second face descriptor
+         * @returns {number} - Distance between descriptors (lower = more similar)
+         */
+        compareFaceDescriptors: function (descriptor1, descriptor2) {
+            if (!descriptor1 || !descriptor2) return Infinity;
+
+            let sum = 0;
+            for (let i = 0; i < descriptor1.length; i++) {
+                const diff = descriptor1[i] - descriptor2[i];
+                sum += diff * diff;
+            }
+            return Math.sqrt(sum);
+        },
+
+        /**
+         * Verify if a captured face matches enrolled face
+         * @param {Float32Array} capturedDescriptor - Face descriptor from camera
+         * @param {Float32Array} enrolledDescriptor - Stored face descriptor
+         * @param {number} threshold - Matching threshold (default 0.6)
+         * @returns {boolean} - True if match, false otherwise
+         */
+        verifyFace: function (
+            capturedDescriptor,
+            enrolledDescriptor,
+            threshold = 0.6,
+        ) {
+            if (!capturedDescriptor || !enrolledDescriptor) return false;
+
+            const distance = this.compareFaceDescriptors(
+                capturedDescriptor,
+                enrolledDescriptor,
+            );
+            console.log("Face distance:", distance, "Threshold:", threshold);
+
+            return distance < threshold;
+        },
+
+        /**
+         * Verify multiple face samples against enrolled descriptor
+         * Uses average distance for better accuracy
+         * @param {Float32Array[]} capturedDescriptors - Array of captured descriptors
+         * @param {Float32Array} enrolledDescriptor - Stored face descriptor
+         * @param {number} threshold - Matching threshold
+         * @returns {boolean}
+         */
+        verifyFaceMultiple: function (
+            capturedDescriptors,
+            enrolledDescriptor,
+            threshold = 0.6,
+        ) {
+            if (
+                !capturedDescriptors ||
+                capturedDescriptors.length === 0 ||
+                !enrolledDescriptor
+            ) {
+                return false;
+            }
+
+            // Calculate average distance from multiple samples
+            let totalDistance = 0;
+            capturedDescriptors.forEach((descriptor) => {
+                totalDistance += this.compareFaceDescriptors(
+                    descriptor,
+                    enrolledDescriptor,
+                );
+            });
+            const avgDistance = totalDistance / capturedDescriptors.length;
+
+            console.log(
+                "Average face distance:",
+                avgDistance,
+                "Threshold:",
+                threshold,
+            );
+            return avgDistance < threshold;
         },
     };
 
