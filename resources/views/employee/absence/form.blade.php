@@ -6,7 +6,7 @@
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
 
-    <script src="{{ asset('js/face-api.js/dist/face-api.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script src="{{ asset('js/face-recognition-helper.js') }}"></script>
     <style>
         #videoContainer {
