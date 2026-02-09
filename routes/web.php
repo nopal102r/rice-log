@@ -55,7 +55,7 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
 
     // Employee Management
     Route::resource('employees', EmployeeManagementController::class);
-    Route::patch('/employees/{user}/toggle-status', [EmployeeManagementController::class, 'toggleStatus'])->name('employees.toggle-status');
+    Route::patch('/employees/{employee}/toggle-status', [\App\Http\Controllers\EmployeeManagementController::class, 'toggleStatus'])->name('employees.toggle-status');
     Route::get('/boss-management/create', [EmployeeManagementController::class, 'createBoss'])->name('boss-management.create');
     Route::post('/boss-management', [EmployeeManagementController::class, 'storeBoss'])->name('boss-management.store');
 
@@ -90,5 +90,9 @@ Route::middleware(['auth'])->group(function () {
         }
         return redirect()->route('employee.dashboard');
     })->name('dashboard');
+
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index']);
+    Route::post('/notifications/{notification}/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead']);
 });
 

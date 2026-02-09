@@ -15,14 +15,24 @@
                 <span>Daftar Karyawan</span>
             </a>
             <a href="{{ route('boss.leave-approval.index') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.leave-approval.*') ? 'bg-blue-600' : '' }}">
-                <i class="fas fa-calendar-check"></i>
-                <span>Persetujuan Cuti</span>
+                class="flex items-center justify-between px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.leave-approval.*') ? 'bg-blue-600' : '' }}">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Persetujuan Cuti</span>
+                </div>
+                @if(($pendingLeaveCount ?? 0) > 0)
+                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
+                @endif
             </a>
             <a href="{{ route('boss.deposit-approval.index') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.deposit-approval.*') ? 'bg-blue-600' : '' }}">
-                <i class="fas fa-check-circle"></i>
-                <span>Verifikasi Setor</span>
+                class="flex items-center justify-between px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.deposit-approval.*') ? 'bg-blue-600' : '' }}">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Verifikasi Setor</span>
+                </div>
+                @if(($pendingDepositCount ?? 0) > 0)
+                    <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
+                @endif
             </a>
             <a href="{{ route('boss.reports.index') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.reports.index') ? 'bg-blue-600' : '' }}">

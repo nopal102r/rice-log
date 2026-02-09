@@ -12,79 +12,95 @@
 
         <!-- Key Metrics -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="card-hover bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-xs font-bold uppercase">Total Karyawan</p>
-                        <p class="text-3xl font-bold text-gray-800">{{ $totalEmployees }}</p>
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                        <i class="fas fa-users text-blue-600"></i>
                     </div>
-                    <i class="fas fa-users text-blue-500 text-3xl opacity-20"></i>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-[10px] font-black uppercase tracking-widest">Total Karyawan</p>
+                    <p class="text-3xl font-black text-gray-900 leading-none">{{ $totalEmployees }}</p>
                 </div>
             </div>
 
-            <div class="card-hover bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-xs font-bold uppercase">Karyawan Aktif</p>
-                        <p class="text-3xl font-bold text-gray-800">{{ $activeEmployees }}</p>
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-600"></i>
                     </div>
-                    <i class="fas fa-check-circle text-green-500 text-3xl opacity-20"></i>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-[10px] font-black uppercase tracking-widest">Karyawan Aktif</p>
+                    <p class="text-3xl font-black text-gray-900 leading-none">{{ $activeEmployees }}</p>
                 </div>
             </div>
 
-            <div class="card-hover bg-white rounded-lg shadow p-6 border-l-4 border-orange-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-xs font-bold uppercase">Omset Sales (Bulan Ini)</p>
-                        <p class="text-2xl font-bold text-gray-800">Rp {{ number_format($totalMonthlyIncome, 0, ',', '.') }}
-                        </p>
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">
+                        <i class="fas fa-money-bill-trend-up text-orange-600"></i>
                     </div>
-                    <i class="fas fa-money-bill-trend-up text-orange-500 text-3xl opacity-20"></i>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-[10px] font-black uppercase tracking-widest">Omset Sales</p>
+                    <p class="text-2xl font-black text-gray-900 leading-none">Rp {{ number_format($totalMonthlyIncome, 0, ',', '.') }}</p>
                 </div>
             </div>
 
-            <div class="card-hover bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-gray-500 text-xs font-bold uppercase">Estimasi Gaji (Bulan Ini)</p>
-                        <p class="text-2xl font-bold text-gray-800">Rp {{ number_format($totalMonthlySalaryExpense, 0, ',', '.') }}
-                        </p>
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+                        <i class="fas fa-hand-holding-dollar text-red-600"></i>
                     </div>
-                    <i class="fas fa-hand-holding-dollar text-red-500 text-3xl opacity-20"></i>
+                </div>
+                <div>
+                    <p class="text-gray-500 text-[10px] font-black uppercase tracking-widest">Estimasi Gaji</p>
+                    <p class="text-2xl font-black text-gray-900 leading-none">Rp {{ number_format($totalMonthlySalaryExpense, 0, ',', '.') }}</p>
                 </div>
             </div>
         </div>
 
         <!-- Quick Actions -->
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8 text-center">
             <a href="{{ route('boss.employees.create') }}"
-                class="card-hover bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-6 flex items-center justify-center gap-3 hover:shadow-lg">
-                <i class="fas fa-user-plus text-2xl"></i>
-                <span class="font-bold">Tambah Karyawan</span>
+                class="bg-white border-2 border-blue-100 hover:border-blue-500 hover:bg-blue-50 text-blue-600 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all group">
+                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <span class="text-[11px] font-black uppercase tracking-widest">Karyawan</span>
             </a>
 
             <a href="{{ route('boss.boss-management.create') }}"
-                class="card-hover bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-lg p-6 flex items-center justify-center gap-3 hover:shadow-lg">
-                <i class="fas fa-user-tie text-2xl"></i>
-                <span class="font-bold">Tambah Bos</span>
+                class="bg-white border-2 border-indigo-100 hover:border-indigo-500 hover:bg-indigo-50 text-indigo-600 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all group">
+                <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <span class="text-[11px] font-black uppercase tracking-widest">Tambah Bos</span>
             </a>
 
             <a href="{{ route('boss.leave-approval.index') }}"
-                class="card-hover bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-6 flex items-center justify-center gap-3 hover:shadow-lg">
-                <i class="fas fa-calendar-check text-2xl"></i>
-                <span class="font-bold">Persetujuan Cuti</span>
+                class="bg-white border-2 border-green-100 hover:border-green-500 hover:bg-green-50 text-green-600 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all group">
+                <div class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-all">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <span class="text-[11px] font-black uppercase tracking-widest">Cuti</span>
             </a>
 
             <a href="{{ route('boss.deposit-approval.index') }}"
-                class="card-hover bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-6 flex items-center justify-center gap-3 hover:shadow-lg">
-                <i class="fas fa-check-circle text-2xl"></i>
-                <span class="font-bold">Verifikasi Setor</span>
+                class="bg-white border-2 border-purple-100 hover:border-purple-500 hover:bg-purple-50 text-purple-600 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all group">
+                <div class="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-all">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <span class="text-[11px] font-black uppercase tracking-widest">Verifikasi</span>
             </a>
 
             <a href="{{ route('boss.payroll-settings.index') }}"
-                class="card-hover bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg p-6 flex items-center justify-center gap-3 hover:shadow-lg">
-                <i class="fas fa-cog text-2xl"></i>
-                <span class="font-bold">Pengaturan</span>
+                class="bg-white border-2 border-red-100 hover:border-red-500 hover:bg-red-50 text-red-600 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all group">
+                <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-all">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <span class="text-[11px] font-black uppercase tracking-widest">Pengaturan</span>
             </a>
         </div>
 
@@ -190,9 +206,7 @@
                             <th class="px-4 py-2 text-left text-gray-700 font-bold">Nama</th>
                             <th class="px-4 py-2 text-left text-gray-700 font-bold">Umur</th>
                             <th class="px-4 py-2 text-left text-gray-700 font-bold">Status</th>
-                            <th class="px-4 py-2 text-center text-gray-700 font-bold">Hadir</th>
-                            <th class="px-4 py-2 text-center text-gray-700 font-bold">Kg Setor</th>
-                            <th class="px-4 py-2 text-right text-gray-700 font-bold">Gaji (Rp)</th>
+                            <th class="px-4 py-2 text-center text-gray-700 font-bold">Aktifitas</th>
                             <th class="px-4 py-2 text-center text-gray-700 font-bold">Aksi</th>
                         </tr>
                     </thead>
@@ -203,25 +217,29 @@
                                 <td class="px-4 py-2 text-gray-700">{{ $item['user']->getAge() }} tahun</td>
                                 <td class="px-4 py-2">
                                     <span
-                                        class="px-2 py-1 rounded text-xs font-bold {{ $item['summary']->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ $item['summary']->status === 'active' ? 'Aktif' : 'Tidak Aktif' }}
+                                        class="px-2 py-1 rounded text-xs font-bold {{ $item['user']->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                        {{ $item['user']->status === 'active' ? 'Aktif' : 'Tidak Aktif' }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-2 text-center font-bold">{{ $item['summary']->days_present }}</td>
-                                <td class="px-4 py-2 text-center font-bold text-orange-600">
-                                    {{ $item['summary']->total_kg_deposited }}</td>
-                                <td class="px-4 py-2 text-right font-bold text-green-600">Rp
-                                    {{ number_format($item['summary']->total_salary, 0, ',', '.') }}</td>
+                                <td class="px-4 py-2 text-center">
+                                    <span
+                                        class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest
+                                        {{ $item['activity'] === 'hadir' ? 'bg-green-100 text-green-700' : 
+                                           ($item['activity'] === 'sakit' ? 'bg-orange-100 text-orange-700' : 
+                                           ($item['activity'] === 'izin' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-400')) }}">
+                                        {{ $item['activity'] }}
+                                    </span>
+                                </td>
                                 <td class="px-4 py-2 text-center">
                                     <a href="{{ route('boss.employees.show', $item['user']->id) }}"
-                                        class="text-blue-600 hover:text-blue-800 font-bold text-sm">
-                                        <i class="fas fa-eye"></i> Detail
+                                        class="inline-flex items-center justify-center p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition shadow-sm">
+                                        <i class="fas fa-eye mr-1"></i> Detail
                                     </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-4 text-gray-400">Belum ada data karyawan</td>
+                                <td colspan="5" class="text-center py-4 text-gray-400">Belum ada data karyawan</td>
                             </tr>
                         @endforelse
                     </tbody>
