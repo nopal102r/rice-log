@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Absence;
 use App\Models\PayrollSetting;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -13,7 +14,7 @@ class AbsenceController extends Controller
     /**
      * Show absence entry page (check-in/check-out).
      */
-    public function show(Request $request, $type): View
+    public function show(Request $request, $type): View|RedirectResponse
     {
         $user = auth()->user();
         $settings = PayrollSetting::getCurrent();

@@ -150,6 +150,13 @@ class EmployeeManagementController extends Controller
             'status' => 'active',
         ]);
 
+        \Log::info('Creating employee: ' . $employee->id);
+        if (!empty($validated['face_descriptors'])) {
+            \Log::info('Face descriptors received for employee ' . $employee->id);
+        } else {
+            \Log::warning('No face descriptors received for employee ' . $employee->id);
+        }
+
         // If face descriptors provided, enroll the face
         if (!empty($validated['face_descriptors'])) {
             $employee->enrollFace($validated['face_descriptors']);

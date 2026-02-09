@@ -19,21 +19,22 @@
         video {
             width: 100%;
             border-radius: 12px;
-            display: none;
+            display: block; /* Ensure it takes up space */
         }
 
         #canvasContainer {
-            position: relative;
+            position: absolute; /* Changed from relative to absolute */
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
+            height: 100%;
+            pointer-events: none; /* Let clicks pass through to video/buttons if needed */
         }
 
         canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: none;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
         }
 
         .distance-warning {
@@ -90,7 +91,8 @@
             <input type="hidden" name="type" value="{{ $type }}">
             <input type="hidden" name="latitude" id="latitude">
             <input type="hidden" name="longitude" id="longitude">
-            <input type="hidden" name="face_image" id="face_image">
+             {{-- Input type file is required to use .files property, hide it with CSS --}}
+            <input type="file" name="face_image" id="face_image" style="display: none;" accept="image/*">
 
             <!-- Status Selection (only for check-in) -->
             @if($type === 'masuk')
@@ -153,7 +155,7 @@
                     </p>
 
                     <div id="videoContainer" class="mb-4">
-                        <video id="video" playsinline autoplay></video>
+                        <video id="video" playsinline autoplay muted></video>
                         <div id="canvasContainer">
                             <canvas id="canvas"></canvas>
                         </div>
@@ -165,7 +167,7 @@
 
                     <div class="flex gap-2 justify-center mb-4">
                         <button type="button" id="startCameraBtn"
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded" style="display: none;">
                             <i class="fas fa-video mr-2"></i> Mulai Kamera
                         </button>
                         <button type="button" id="captureBtn"
@@ -206,12 +208,17 @@
         const googleMapsApiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Ganti dengan API key Anda
         const officeLocation = @json($officeLocation);
         const maxDistance = {{ $maxDistance }};
+        // Pass enrolled face data to the view
+        const enrolledFaceData = @json(auth()->user()->face_data);
 
         let map, userMarker, officeMarker;
         let currentLat = 0, currentLon = 0;
+        let isFaceVerified = false;
 
         // Initialize Map
         function initMap() {
+            if (typeof google === 'undefined') return;
+
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 15,
                 center: { lat: officeLocation.latitude, lng: officeLocation.longitude }
@@ -224,49 +231,78 @@
                 title: 'Kantor Pusat',
                 icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
             });
-
-            // Get user location
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    currentLat = position.coords.latitude;
-                    currentLon = position.coords.longitude;
-
-                    document.getElementById('latitude').value = currentLat;
-                    document.getElementById('longitude').value = currentLon;
-                    document.getElementById('coordinatesDisplay').textContent =
-                        currentLat.toFixed(4) + ', ' + currentLon.toFixed(4);
-
-                    // User marker
-                    userMarker = new google.maps.Marker({
-                        map: map,
-                        position: { lat: currentLat, lng: currentLon },
-                        title: 'Lokasi Anda',
-                        icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-                    });
-
-                    // Update center
-                    map.setCenter(userMarker.getPosition());
-
-                    // Calculate distance
-                    calculateDistance();
-
-                    // Draw line between user and office
-                    const line = new google.maps.Polyline({
-                        map: map,
-                        path: [
-                            { lat: currentLat, lng: currentLon },
-                            { lat: officeLocation.latitude, lng: officeLocation.longitude }
-                        ],
-                        strokeColor: '#FF0000',
-                        strokeOpacity: 0.5,
-                        strokeWeight: 2
-                    });
+            
+            // If we already have location, update map user marker
+            if (currentLat !== 0 && currentLon !== 0) {
+                updateUserMarker(currentLat, currentLon);
+            }
+        }
+        
+        function updateUserMarker(lat, lng) {
+            if (!map || typeof google === 'undefined') return;
+            
+            if (userMarker) {
+                userMarker.setPosition({ lat: lat, lng: lng });
+            } else {
+                 userMarker = new google.maps.Marker({
+                    map: map,
+                    position: { lat: lat, lng: lng },
+                    title: 'Lokasi Anda',
+                    icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
                 });
             }
+            map.setCenter({ lat: lat, lng: lng });
+            
+            // Draw line
+            // (Simplified: remove old line if exists - strictly we'd need to track the line instance, 
+            // but for now let's just draw new one or ignore clearing old one as user moves strictly once usually)
+             new google.maps.Polyline({
+                map: map,
+                path: [
+                    { lat: lat, lng: lng },
+                    { lat: officeLocation.latitude, lng: officeLocation.longitude }
+                ],
+                strokeColor: '#FF0000',
+                strokeOpacity: 0.5,
+                strokeWeight: 2
+            });
+        }
+
+        // Get User Location (Independent of Google Maps)
+        function getUserLocation() {
+            return new Promise((resolve, reject) => {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        currentLat = position.coords.latitude;
+                        currentLon = position.coords.longitude;
+
+                        document.getElementById('latitude').value = currentLat;
+                        document.getElementById('longitude').value = currentLon;
+                        document.getElementById('coordinatesDisplay').textContent =
+                            currentLat.toFixed(6) + ', ' + currentLon.toFixed(6); // Higher precision display
+
+                        calculateDistance();
+                        updateUserMarker(currentLat, currentLon);
+                        resolve(position);
+                    }, function(error) {
+                        console.error("Geolocation Error:", error);
+                        document.getElementById('coordinatesDisplay').textContent = "Gagal mendapatkan lokasi: " + error.message;
+                        reject(error);
+                    }, {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    });
+                } else {
+                    reject(new Error("Geolocation not supported"));
+                }
+            });
         }
 
         // Calculate distance using Haversine formula
         function calculateDistance() {
+            if (currentLat === 0 || currentLon === 0) return;
+            
             const R = 6371; // Radius of earth in km
             const dLat = (officeLocation.latitude - currentLat) * Math.PI / 180;
             const dLon = (officeLocation.longitude - currentLon) * Math.PI / 180;
@@ -285,78 +321,222 @@
             }
         }
 
-        // Load face recognition models
-        async function loadModels() {
-            const MODEL_URL = window.location.origin + '/models/';
-            const success = await FaceRecognitionHelper.initModels(MODEL_URL);
-
-            if (success) {
-                document.getElementById('faceStatus').innerHTML = '<p class="text-green-600 font-bold"><i class="fas fa-check-circle mr-2"></i> Siap untuk face recognition!</p>';
+        // Wait for tfjs and face-api to be available
+        function waitForFaceApi(callback, attempts = 150) {
+            if (typeof faceapi !== 'undefined' && window.FaceRecognitionHelper) {
+                console.log('✓ tfjs and faceapi are loaded');
+                callback();
+            } else if (attempts > 0) {
+                console.log('Waiting for tfjs/faceapi... attempts left:', attempts);
+                setTimeout(() => waitForFaceApi(callback, attempts - 1), 100);
             } else {
-                document.getElementById('faceStatus').innerHTML = '<p class="text-red-600">Gagal memuat model face recognition</p>';
+                console.error('❌ tfjs or faceapi failed to load after 15 seconds');
+                document.getElementById('faceStatus').innerHTML = '<p class="text-red-600 font-bold"><i class="fas fa-exclamation-circle mr-2"></i> Gagal memuat library Face Recognition. Refresh halaman.</p>';
             }
         }
 
-        // Start camera
-        document.getElementById('startCameraBtn').addEventListener('click', async function () {
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async function () {
+            // 1. Get Location immediately
+            getUserLocation().catch(err => console.warn("Initial location fetch failed, will retry on submit"));
+
+            // 2. Try Init Map
             try {
+                if (typeof google !== 'undefined') {
+                    initMap();
+                } else {
+                    console.warn('Google Maps API not loaded.');
+                    document.getElementById('coordinatesDisplay').textContent += " (Map Disabled)";
+                }
+            } catch (e) {
+                console.warn('Map init error:', e);
+            }
+
+            // 3. Init Face API
+            waitForFaceApi(async function() {
+                const MODEL_URL = window.location.origin + '/models/';
+                const success = await FaceRecognitionHelper.initModels(MODEL_URL);
+
+                if (success) {
+                    document.getElementById('faceStatus').innerHTML = '<p class="text-green-600 font-bold"><i class="fas fa-check-circle mr-2"></i> Siap untuk face recognition!</p>';
+                    // Auto-start camera
+                    startCameraAuto();
+                } else {
+                    document.getElementById('faceStatus').innerHTML = '<p class="text-red-600">Gagal memuat model face recognition</p>';
+                }
+            });
+        });
+
+        // Separated start camera function for auto-start
+        async function startCameraAuto() {
+             try {
                 const video = document.getElementById('video');
+                // Show video container immediately
+                document.getElementById('videoContainer').style.display = 'block';
+                video.style.display = 'block';
+                document.getElementById('canvas').style.display = 'block'; // Ensure canvas is visible
+                
                 await FaceRecognitionHelper.startCamera(video);
 
-                video.style.display = 'block';
-                document.getElementById('startCameraBtn').style.display = 'none';
+                // Hide start button (if it exists)
+                const startBtn = document.getElementById('startCameraBtn');
+                if(startBtn) startBtn.style.display = 'none';
+                
                 document.getElementById('captureBtn').style.display = 'inline-block';
                 document.getElementById('stopCameraBtn').style.display = 'inline-block';
                 document.getElementById('faceStatus').innerHTML = '<p class="text-blue-600">Kamera aktif - Posisikan wajah Anda di depan kamera</p>';
+
+                // Prepare enrolled data for real-time verification
+                let enrolledFloat32 = null;
+                if (enrolledFaceData) {
+                    const enrolledArray = Object.values(enrolledFaceData);
+                    enrolledFloat32 = new Float32Array(enrolledArray);
+                }
 
                 // Start face detection with callback
                 FaceRecognitionHelper.startDetection(
                     video,
                     document.getElementById('canvas'),
-                    function (faceDetected) {
+                    function (faceDetected, isMatch) {
                         if (faceDetected) {
-                            document.getElementById('faceStatus').innerHTML = '<p class="text-green-600 font-bold"><i class="fas fa-check-circle mr-2"></i> Wajah terdeteksi! Silakan klik "Ambil Foto" untuk menyelesaikan</p>';
+                            let statusHtml = '';
+                            if (enrolledFaceData) {
+                                if (isMatch) {
+                                    statusHtml = '<p class="text-green-600 font-bold"><i class="fas fa-check-circle mr-2"></i> Wajah Cocok.</p>';
+                                } else {
+                                    statusHtml = '<p class="text-red-600 font-bold"><i class="fas fa-times-circle mr-2"></i> Wajah Tidak Cocok!</p>';
+                                    statusHtml += '<p class="text-sm text-gray-600">Pastikan Anda adalah pemilik akun.</p>';
+                                }
+                            } else {
+                                 // No data enrolled yet
+                                 statusHtml = '<p class="text-yellow-600 font-bold"><i class="fas fa-exclamation-circle mr-2"></i> Wajah Terdeteksi (Belum Enroll)</p>';
+                            }
+                            document.getElementById('faceStatus').innerHTML = statusHtml;
                         } else {
                             document.getElementById('faceStatus').innerHTML = '<p class="text-yellow-600">Mendeteksi wajah...</p>';
                         }
-                    }
+                    },
+                    "", // No label
+                    enrolledFloat32 // Pass enrolled data
                 );
+                
+                setupCameraListeners(); // Setup other listeners
             } catch (error) {
-                Swal.fire('Error', error.message, 'error');
+                console.error("Auto start camera error:", error);
+                document.getElementById('faceStatus').innerHTML = `<p class="text-red-600">Gagal membuka kamera: ${error.message}</p>`;
+                Swal.fire('Error', 'Gagal membuka kamera: ' + error.message, 'error');
             }
-        });
+        }
 
-        // Capture face
-        document.getElementById('captureBtn').addEventListener('click', async function () {
-            try {
-                const video = document.getElementById('video');
-                const blob = await FaceRecognitionHelper.captureFace(video);
+        function setupCameraListeners() {
+            // Remove the old usage of startCameraBtn listener since we auto-start
+            // But we keep the element in DOM just in case, or we can remove it.
+            // Start button listener is no longer needed for auto-start logic, 
+            // but we might want a "Retry Camera" button if it fails? 
+            // For now, adhering to "langsung aja kamera nya nyala" (just turn on directly).
 
-                const file = new File([blob], 'face.jpg', { type: 'image/jpeg' });
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
-                document.getElementById('face_image').files = dataTransfer.files;
-
-                document.getElementById('capturedFaceInfo').style.display = 'block';
-                document.getElementById('captureBtn').style.display = 'none';
-                document.getElementById('stopCameraBtn').click();
-            } catch (error) {
-                Swal.fire('Error', 'Gagal mengambil foto: ' + error.message, 'error');
+            const startBtn = document.getElementById('startCameraBtn');
+            if(startBtn) {
+                 startBtn.addEventListener('click', startCameraAuto);
             }
-        });
 
-        // Stop camera
-        document.getElementById('stopCameraBtn').addEventListener('click', function () {
-            FaceRecognitionHelper.stopDetection();
-            FaceRecognitionHelper.stopCamera();
+            // Capture face
+            const captureBtn = document.getElementById('captureBtn');
+            // Remove old listener to avoid duplicates if setupCameraListeners called twice
+            const newCaptureBtn = captureBtn.cloneNode(true);
+            captureBtn.parentNode.replaceChild(newCaptureBtn, captureBtn);
+            
+            newCaptureBtn.addEventListener('click', async function () {
+                try {
+                    const video = document.getElementById('video');
+                    
+                    // 1. Capture Blob for form submission
+                    const blob = await FaceRecognitionHelper.captureFace(video);
+                    const file = new File([blob], 'face.jpg', { type: 'image/jpeg' });
+                    
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    document.getElementById('face_image').files = dataTransfer.files;
 
-            document.getElementById('video').style.display = 'none';
-            document.getElementById('canvas').style.display = 'none';
-            document.getElementById('startCameraBtn').style.display = 'inline-block';
-            document.getElementById('captureBtn').style.display = 'none';
-            document.getElementById('stopCameraBtn').style.display = 'none';
-            document.getElementById('faceStatus').innerHTML = '<p class="text-gray-600">Kamera dihentikan</p>';
-        });
+                    // 2. Perform Verification if enrolled data exists
+                    if (enrolledFaceData) {
+                         Swal.fire({
+                            title: 'Memverifikasi Wajah...',
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
+                        
+                        // Wait a bit to ensure detection loop has descriptors
+                        const capturedDescriptors = await FaceRecognitionHelper.getFaceDescriptors(video);
+                        if (capturedDescriptors.length > 0) {
+                            // Safe conversion of enrolled data to Float32Array (or Array)
+                            const enrolledArray = Object.values(enrolledFaceData);
+                            const enrolledFloat32 = new Float32Array(enrolledArray);
+
+                             const match = FaceRecognitionHelper.verifyFace(capturedDescriptors[0], enrolledFloat32, 0.4);
+                            
+                            if (match) {
+                                isFaceVerified = true;
+                                Swal.close();
+                                Swal.fire('Berhasil', 'Wajah Terverifikasi', 'success');
+                                document.getElementById('capturedFaceInfo').innerHTML = '<span class="text-green-600"><i class="fas fa-check-circle"></i> Wajah Terverifikasi</span>';
+                            } else {
+                                isFaceVerified = false;
+                                Swal.close();
+                                // Show a more specific error
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Verifikasi Gagal',
+                                    text: 'Wajah tidak cocok dengan data pemilik akun. Silakan coba lagi dengan pencahayaan yang baik.',
+                                    footer: 'Pastikan Anda adalah pemilik akun yang sah.'
+                                });
+                                document.getElementById('capturedFaceInfo').innerHTML = '<span class="text-red-600"><i class="fas fa-times-circle"></i> Wajah Tidak Cocok</span>';
+                                return; 
+                            }
+                        } else {
+                            Swal.close();
+                            Swal.fire('Error', 'Wajah tidak terdeteksi dengan jelas saat pengambilan.', 'error');
+                            return;
+                        }
+                    } else {
+                         isFaceVerified = true; 
+                         document.getElementById('capturedFaceInfo').textContent = 'Wajah berhasil ditangkap (Belum ada data pembanding).';
+                    }
+
+                    document.getElementById('capturedFaceInfo').style.display = 'block';
+                    newCaptureBtn.style.display = 'none';
+                    document.getElementById('stopCameraBtn').click();
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire('Error', 'Gagal mengambil foto: ' + error.message, 'error');
+                }
+            });
+
+            // Stop camera
+            document.getElementById('stopCameraBtn').addEventListener('click', function () {
+                FaceRecognitionHelper.stopDetection();
+                FaceRecognitionHelper.stopCamera();
+
+                document.getElementById('video').style.display = 'none';
+                document.getElementById('canvas').style.display = 'none';
+                
+                const sBtn = document.getElementById('startCameraBtn');
+                // Only show start button if face is NOT verified yet
+                if(sBtn && !isFaceVerified) {
+                    sBtn.style.display = 'inline-block';
+                } else if (sBtn) {
+                     sBtn.style.display = 'none';
+                }
+                
+                newCaptureBtn.style.display = 'none';
+                this.style.display = 'none';
+                if (!isFaceVerified) {
+                    document.getElementById('faceStatus').innerHTML = '<p class="text-gray-600">Kamera dihentikan</p>';
+                } else {
+                     document.getElementById('faceStatus').innerHTML = '<p class="text-green-600 font-bold">Wajah sudah tersimpan. Silakan simpan presensi.</p>';
+                }
+            });
+        }
 
         // Handle status change
         document.querySelectorAll('input[name="status"]').forEach(radio => {
@@ -378,13 +558,30 @@
         document.getElementById('absenceForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            const status = document.querySelector('input[name="status"]:checked').value;
+            let status = 'hadir';
+            const statusRadio = document.querySelector('input[name="status"]:checked');
+            if (statusRadio) {
+                status = statusRadio.value;
+            } else {
+                const statusHidden = document.querySelector('input[name="status"][type="hidden"]');
+                if (statusHidden) {
+                    status = statusHidden.value;
+                }
+            }
             const description = document.getElementById('description')?.value;
             const faceImage = document.getElementById('face_image').files;
 
-            if (status === 'hadir' && faceImage.length === 0) {
-                Swal.fire('Error', 'Silakan ambil foto wajah terlebih dahulu', 'error');
-                return;
+            if (status === 'hadir') {
+                if (faceImage.length === 0) {
+                    Swal.fire('Error', 'Silakan ambil foto wajah terlebih dahulu', 'error');
+                    return;
+                }
+                
+                // If enrolled data exists, enforce verification success
+                if (enrolledFaceData && !isFaceVerified) {
+                     Swal.fire('Error', 'Verifikasi wajah gagal. Silakan coba lagi.', 'error');
+                     return;
+                }
             }
 
             if ((status === 'sakit' || status === 'izin') && !description) {
@@ -393,6 +590,8 @@
             }
 
             const formData = new FormData(this);
+            // Append verification status so backend knows we did it client-side
+            formData.append('face_verified_client', isFaceVerified ? '1' : '0');
 
             Swal.fire({
                 title: 'Memproses...',
@@ -407,7 +606,8 @@
                     method: 'POST',
                     body: formData,
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+                        'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                        'Accept': 'application/json'
                     }
                 });
 
@@ -423,12 +623,6 @@
             } catch (error) {
                 Swal.fire('Error', 'Terjadi kesalahan: ' + error.message, 'error');
             }
-        });
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function () {
-            loadModels();
-            initMap();
         });
     </script>
 @endsection

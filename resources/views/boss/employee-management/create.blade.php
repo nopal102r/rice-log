@@ -128,7 +128,7 @@
 
                     <div class="flex gap-2 justify-center mb-4">
                         <button type="button" id="startEnrollmentCameraBtn"
-                            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded">
+                            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded" style="display: none;">
                             <i class="fas fa-video mr-2"></i> Buka Kamera
                         </button>
                         <button type="button" id="captureEnrollmentBtn"
@@ -181,7 +181,16 @@
             position: absolute;
             top: 0;
             left: 0;
+            width: 100%;
+            height: 100%;
             border-radius: 12px;
+            pointer-events: none;
+        }
+        
+        #enrollmentVideo {
+             width: 100%;
+             border-radius: 12px;
+             display: block;
         }
 
         /* Ensure buttons are always clickable */
@@ -239,47 +248,49 @@
                 // Initialize face enrollment on page load
                 initFaceEnrollment();
 
-                // Start enrollment camera
+                // Auto-start enrollment camera
                 const startBtn = document.getElementById('startEnrollmentCameraBtn');
-                if (startBtn) {
-                    console.log('✓ Start button found');
-                    startBtn.addEventListener('click', async function () {
-                        try {
-                            console.log('Starting enrollment camera...');
-                            const video = document.getElementById('enrollmentVideo');
-                            const canvas = document.getElementById('enrollmentCanvas');
+                
+                async function autoStartEnrollment() {
+                    try {
+                        console.log('Auto-starting enrollment camera...');
+                        const video = document.getElementById('enrollmentVideo');
+                        const canvas = document.getElementById('enrollmentCanvas');
 
-                            console.log('Video element:', video);
-                            console.log('Canvas element:', canvas);
+                        await FaceRecognitionHelper.startCamera(video);
+                        console.log('Camera started, stream ready');
 
-                            await FaceRecognitionHelper.startCamera(video);
-                            console.log('Camera started, stream ready');
+                        document.getElementById('videoContainer').style.display = 'block';
+                        if(startBtn) startBtn.style.display = 'none';
+                        document.getElementById('captureEnrollmentBtn').style.display = 'inline-block';
+                        document.getElementById('stopEnrollmentCameraBtn').style.display = 'inline-block';
+                        document.getElementById('faceEnrollmentStatus').innerHTML = '<p class="text-blue-600">Posisikan wajah Anda di depan kamera...</p>';
 
-                            document.getElementById('videoContainer').style.display = 'block';
-                            document.getElementById('startEnrollmentCameraBtn').style.display = 'none';
-                            document.getElementById('captureEnrollmentBtn').style.display = 'inline-block';
-                            document.getElementById('stopEnrollmentCameraBtn').style.display = 'inline-block';
-                            document.getElementById('faceEnrollmentStatus').innerHTML = '<p class="text-blue-600">Posisikan wajah Anda di depan kamera...</p>';
-
-                            // Wait a bit for video to load
-                            setTimeout(() => {
-                                console.log('Starting face detection...');
-                                // Start real-time face detection
-                                FaceRecognitionHelper.startDetection(video, canvas, function (faceDetected) {
-                                    console.log('Face detected:', faceDetected);
-                                    if (faceDetected) {
-                                        document.getElementById('faceEnrollmentStatus').innerHTML = '<p class="text-green-600 font-bold"><i class="fas fa-check-circle mr-2"></i> Wajah terdeteksi! Klik "Ambil Foto"</p>';
-                                    } else {
-                                        document.getElementById('faceEnrollmentStatus').innerHTML = '<p class="text-yellow-600">Mendeteksi wajah...</p>';
-                                    }
-                                });
-                            }, 500);
-                        } catch (error) {
-                            console.error('Error starting camera:', error);
-                            Swal.fire('Error', error.message, 'error');
-                        }
-                    });
+                        // Wait a bit for video to load
+                        setTimeout(() => {
+                            console.log('Starting face detection...');
+                            // Start real-time face detection
+                            FaceRecognitionHelper.startDetection(video, canvas, function (faceDetected) {
+                                if (faceDetected) {
+                                    document.getElementById('faceEnrollmentStatus').innerHTML = '<p class="text-green-600 font-bold"><i class="fas fa-check-circle mr-2"></i> Wajah terdeteksi! Klik "Ambil Foto"</p>';
+                                } else {
+                                    document.getElementById('faceEnrollmentStatus').innerHTML = '<p class="text-yellow-600">Mendeteksi wajah...</p>';
+                                }
+                            });
+                        }, 500);
+                    } catch (error) {
+                        console.error('Error starting camera:', error);
+                        document.getElementById('faceEnrollmentStatus').innerHTML = `<p class="text-red-600">Gagal membuka kamera: ${error.message}</p>`;
+                    }
                 }
+
+                if (startBtn) {
+                     // We keep the listener if user stops and wants to restart manually
+                    startBtn.addEventListener('click', autoStartEnrollment);
+                }
+                
+                // Trigger auto-start after small delay to ensure init is done
+                setTimeout(autoStartEnrollment, 1000);
 
                 // Capture face for enrollment
                 const captureBtn = document.getElementById('captureEnrollmentBtn');
@@ -307,9 +318,12 @@
 
                             // Store descriptors
                             faceDescriptorsData = descriptors[0];
-                            document.getElementById('face_descriptors').value = JSON.stringify(descriptors[0]);
+                            const descriptorsJson = JSON.stringify(descriptors[0]);
+                            document.getElementById('face_descriptors').value = descriptorsJson;
+                            
                             console.log('Face descriptors stored successfully');
                             console.log('Stored data length:', descriptors[0].length);
+                            console.log('Input value set:', document.getElementById('face_descriptors').value.substring(0, 50) + '...');
 
                             document.getElementById('faceEnrollmentSuccess').style.display = 'block';
                             document.getElementById('captureEnrollmentBtn').style.display = 'none';

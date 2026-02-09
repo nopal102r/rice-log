@@ -145,8 +145,17 @@
          * @param {HTMLVideoElement} videoElement - Video element
          * @param {HTMLCanvasElement} canvasElement - Canvas element for drawing
          * @param {Function} callback - Callback when face is detected/lost
+         * @param {string} labelText - Optional text to display on validation
          */
-        startDetection: function (videoElement, canvasElement, callback) {
+        /**
+         * Start real-time face detection
+         * @param {HTMLVideoElement} videoElement - Video element
+         * @param {HTMLCanvasElement} canvasElement - Canvas element for drawing
+         * @param {Function} callback - Callback when face is detected/lost
+         * @param {string} labelText - [Deprecated]
+         * @param {Float32Array} enrolledDescriptor - Optional enrolled descriptor for real-time validation
+         */
+        startDetection: function (videoElement, canvasElement, callback, labelText = "", enrolledDescriptor = null) {
             if (this.detectionRunning) return;
 
             if (!videoElement || !canvasElement) {
@@ -155,6 +164,8 @@
             }
 
             this.detectionRunning = true;
+            let lastVerificationTime = 0;
+            let isMatch = false;
 
             const displaySize = {
                 width: videoElement.width || videoElement.offsetWidth,
@@ -170,15 +181,13 @@
                     // Get detection options based on detector type
                     let detectionOptions;
                     if (this.detectionMode === "tinyFaceDetector") {
-                        // Tiny Face Detector options - tuned for real-time detection
                         detectionOptions = new faceapi.TinyFaceDetectorOptions({
-                            inputSize: 416, // Larger input = more accurate but slower
-                            scoreThreshold: 0.5, // Lower = more detections (more sensitive)
+                            inputSize: 416,
+                            scoreThreshold: 0.5,
                         });
                     } else {
-                        // SSD MobileNet options
                         detectionOptions = new faceapi.SsdMobilenetv1Options({
-                            minConfidence: 0.5, // Lower threshold for better detection
+                            minConfidence: 0.5,
                         });
                     }
 
@@ -201,16 +210,32 @@
                         canvasElement.height,
                     );
 
+                    // Real-time verification (Throttled to every 500ms)
+                    const now = Date.now();
+                    if (enrolledDescriptor && resizedDetections.length > 0 && now - lastVerificationTime > 500) {
+                        // Check first face
+                        isMatch = this.verifyFace(resizedDetections[0].descriptor, enrolledDescriptor, 0.45);
+                        lastVerificationTime = now;
+                    }
+
                     // Draw detections
                     resizedDetections.forEach((detection) => {
                         const box = detection.detection.box;
-                        ctx.strokeStyle = "#00FF00";
-                        ctx.lineWidth = 2;
+                        
+                        // Set color based on match status if enrolled data exists
+                        if (enrolledDescriptor) {
+                            ctx.strokeStyle = isMatch ? "#00FF00" : "#FF0000"; // Green vs Red
+                            ctx.lineWidth = 3;
+                        } else {
+                            ctx.strokeStyle = "#00FF00"; // Default Green
+                            ctx.lineWidth = 2;
+                        }
+
                         ctx.strokeRect(box.x, box.y, box.width, box.height);
 
                         // Draw landmarks
                         if (detection.landmarks) {
-                            ctx.fillStyle = "#FF0000";
+                            ctx.fillStyle = enrolledDescriptor ? (isMatch ? "#00FF00" : "#FF0000") : "#FF0000";
                             const points = detection.landmarks.positions;
                             points.forEach((point) => {
                                 ctx.beginPath();
@@ -222,7 +247,7 @@
 
                     // Callback with detection status
                     if (callback) {
-                        callback(resizedDetections.length > 0);
+                        callback(resizedDetections.length > 0, isMatch);
                     }
                 } catch (err) {
                     console.error("Detection error:", err);
@@ -329,9 +354,15 @@
         verifyFace: function (
             capturedDescriptor,
             enrolledDescriptor,
-            threshold = 0.6,
+            threshold = 0.45,
         ) {
             if (!capturedDescriptor || !enrolledDescriptor) return false;
+            
+            // Ensure both are arrays/typed arrays and have correct length (FaceAPI uses 128)
+            if (capturedDescriptor.length !== 128 || enrolledDescriptor.length !== 128) {
+                console.error("Descriptor length mismatch or invalid:", capturedDescriptor.length, enrolledDescriptor.length);
+                return false;
+            }
 
             const distance = this.compareFaceDescriptors(
                 capturedDescriptor,

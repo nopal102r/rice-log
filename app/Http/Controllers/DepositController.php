@@ -44,20 +44,20 @@ class DepositController extends Controller
 
         // Store photo
         $photoPath = $request->file('photo')->store('deposits/' . date('Y/m/d'), 'public');
+        
+        $pricePerKg = $settings->price_per_kg;
+        $totalPrice = $validated['weight'] * $pricePerKg;
 
         // Create deposit
         $deposit = Deposit::create([
             'user_id' => $user->id,
             'weight' => $validated['weight'],
-            'price_per_kg' => $settings->price_per_kg,
+            'price_per_kg' => $pricePerKg,
+            'total_price' => $totalPrice,
             'photo' => $photoPath,
-            'notes' => $validated['notes'],
+            'notes' => $validated['notes'] ?? null,
             'status' => 'pending', // Admin/boss akan verify
         ]);
-
-        // Calculate total price
-        $deposit->calculateTotalPrice();
-        $deposit->save();
 
         // Send notification to boss
         $bosses = \App\Models\User::where('role', 'bos')->get();
