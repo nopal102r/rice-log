@@ -132,7 +132,7 @@ class EmployeeManagementController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
             'phone' => 'required|string',
-            'job' => 'required|in:kurir,sawah,ngegiling',
+            'job' => 'required|in:supir,petani,ngegiling,sales',
             'date_of_birth' => 'required|date',
             'address' => 'nullable|string',
             'face_descriptors' => 'nullable|array',

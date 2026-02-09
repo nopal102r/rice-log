@@ -11,35 +11,46 @@
         </div>
 
         <!-- Key Metrics -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="card-hover bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-gray-500 text-sm">Total Karyawan</p>
-                        <p class="text-4xl font-bold text-gray-800">{{ $totalEmployees }}</p>
+                        <p class="text-gray-500 text-xs font-bold uppercase">Total Karyawan</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ $totalEmployees }}</p>
                     </div>
-                    <i class="fas fa-users text-blue-500 text-4xl opacity-20"></i>
+                    <i class="fas fa-users text-blue-500 text-3xl opacity-20"></i>
                 </div>
             </div>
 
             <div class="card-hover bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-gray-500 text-sm">Karyawan Aktif (Bulan Ini)</p>
-                        <p class="text-4xl font-bold text-gray-800">{{ $activeEmployees }}</p>
+                        <p class="text-gray-500 text-xs font-bold uppercase">Karyawan Aktif</p>
+                        <p class="text-3xl font-bold text-gray-800">{{ $activeEmployees }}</p>
                     </div>
-                    <i class="fas fa-check-circle text-green-500 text-4xl opacity-20"></i>
+                    <i class="fas fa-check-circle text-green-500 text-3xl opacity-20"></i>
                 </div>
             </div>
 
             <div class="card-hover bg-white rounded-lg shadow p-6 border-l-4 border-orange-500">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-gray-500 text-sm">Penghasilan Bulan Ini</p>
-                        <p class="text-3xl font-bold text-gray-800">Rp {{ number_format($totalMonthlyIncome, 0, ',', '.') }}
+                        <p class="text-gray-500 text-xs font-bold uppercase">Omset Sales (Bulan Ini)</p>
+                        <p class="text-2xl font-bold text-gray-800">Rp {{ number_format($totalMonthlyIncome, 0, ',', '.') }}
                         </p>
                     </div>
-                    <i class="fas fa-money-bill-wave text-orange-500 text-4xl opacity-20"></i>
+                    <i class="fas fa-money-bill-trend-up text-orange-500 text-3xl opacity-20"></i>
+                </div>
+            </div>
+
+            <div class="card-hover bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-xs font-bold uppercase">Estimasi Gaji (Bulan Ini)</p>
+                        <p class="text-2xl font-bold text-gray-800">Rp {{ number_format($totalMonthlySalaryExpense, 0, ',', '.') }}
+                        </p>
+                    </div>
+                    <i class="fas fa-hand-holding-dollar text-red-500 text-3xl opacity-20"></i>
                 </div>
             </div>
         </div>

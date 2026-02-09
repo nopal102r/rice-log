@@ -20,7 +20,7 @@
             <div class="card-hover bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
                 <p class="text-gray-500 text-sm mb-2">Total Penghasilan</p>
                 <p class="text-3xl font-bold text-green-600">Rp
-                    {{ number_format($depositsData['total_price'], 0, ',', '.') }}</p>
+                    {{ number_format($depositsData['total_wage'], 0, ',', '.') }}</p>
             </div>
 
             <div class="card-hover bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
