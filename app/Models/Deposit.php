@@ -26,6 +26,7 @@ class Deposit extends Model
         'end_time',
         'verified_by',
         'verified_at',
+        'details', // Store packed item breakdown
     ];
 
     protected $casts = [
@@ -34,6 +35,7 @@ class Deposit extends Model
         'box_count' => 'integer',
         'money_amount' => 'decimal:2',
         'wage_amount' => 'decimal:2',
+        'details' => 'array',
     ];
 
     /**

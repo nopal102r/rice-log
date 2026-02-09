@@ -55,12 +55,23 @@ class EmployeeDashboardController extends Controller
         // Get unread notifications
         $notifications = \App\Models\Notification::getUnreadForUser($user->id);
 
+        // Get relevant stock info for the role
+        $relevantStock = null;
+        if ($user->isMiller()) {
+            $relevantStock = \App\Models\Stock::getByName('gabah');
+        } elseif ($user->isPacking()) {
+            $relevantStock = \App\Models\Stock::getByName('beras_giling');
+        } elseif ($user->isSales() || $user->isDriver()) {
+            $relevantStock = \App\Models\Stock::where('name', 'like', 'packed_%')->get();
+        }
+
         return view('employee.dashboard', [
             'user' => $user,
             'stats' => $stats,
             'depositsData' => $depositsData,
             'recentActivities' => $recentActivities,
             'notifications' => $notifications,
+            'relevantStock' => $relevantStock,
         ]);
     }
 }

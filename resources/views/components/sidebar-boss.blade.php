@@ -29,6 +29,11 @@
                 <i class="fas fa-file-invoice-dollar"></i>
                 <span>Laporan Gaji</span>
             </a>
+            <a href="{{ route('boss.stock.index') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.stock.*') ? 'bg-blue-600' : '' }}">
+                <i class="fas fa-warehouse"></i>
+                <span>Stok Inventori</span>
+            </a>
         </div>
 
         <div class="mb-4">

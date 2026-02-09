@@ -118,7 +118,7 @@ class EmployeeManagementController extends Controller
     public function create(): View
     {
         return view('boss.employee-management.create', [
-            'jobs' => ['kurir', 'sawah', 'ngegiling'],
+            'jobs' => ['supir', 'petani', 'ngegiling', 'sales', 'packing'],
         ]);
     }
 
@@ -132,7 +132,7 @@ class EmployeeManagementController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
             'phone' => 'required|string',
-            'job' => 'required|in:supir,petani,ngegiling,sales',
+            'job' => 'required|in:supir,petani,ngegiling,sales,packing',
             'date_of_birth' => 'required|date',
             'address' => 'nullable|string',
             'face_descriptors' => 'nullable|array',

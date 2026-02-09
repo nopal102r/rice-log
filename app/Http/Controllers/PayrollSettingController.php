@@ -35,6 +35,7 @@ class PayrollSettingController extends Controller
             'max_distance_allowed' => 'required|numeric|min:0.1',
             'leave_days_per_month' => 'required|integer|min:1',
             'min_deposit_per_week' => 'required|integer|min:1',
+            'packing_rate_per_kg' => 'required|numeric|min:0',
         ]);
 
         $settings = PayrollSetting::getCurrent();
