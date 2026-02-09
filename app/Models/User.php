@@ -118,6 +118,24 @@ class User extends Authenticatable
         return $this->role === 'karyawan';
     }
 
+    // Role Checks
+    public function isDriver(): bool 
+    {
+        return $this->job === 'supir';
+    }
+
+    public function isFarmer(): bool {
+        return $this->job === 'petani';
+    }
+
+    public function isMiller(): bool {
+        return $this->job === 'ngegiling';
+    }
+
+    public function isSales(): bool {
+        return $this->job === 'sales';
+    }
+
     /**
      * Calculate age from date of birth
      */

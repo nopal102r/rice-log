@@ -20,17 +20,14 @@ class AbsenceController extends Controller
         $settings = PayrollSetting::getCurrent();
 
         // Check if already checked in/out today
-        if ($type === 'masuk' && Absence::hasCheckedInToday($user->id)) {
-            return redirect()->route('employee.dashboard')->with('info', 'Anda sudah absen masuk hari ini');
-        }
-
-        if ($type === 'keluar' && Absence::hasCheckedOutToday($user->id)) {
-            return redirect()->route('employee.dashboard')->with('info', 'Anda sudah absen keluar hari ini');
-        }
+        $hasCheckedIn = Absence::hasCheckedInToday($user->id);
+        $hasCheckedOut = Absence::hasCheckedOutToday($user->id);
 
         return view('employee.absence.form', [
             'user' => $user,
             'type' => $type,
+            'hasCheckedIn' => $hasCheckedIn,
+            'hasCheckedOut' => $hasCheckedOut,
             'officeLocation' => [
                 'latitude' => $settings->office_latitude,
                 'longitude' => $settings->office_longitude,

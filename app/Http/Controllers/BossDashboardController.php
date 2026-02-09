@@ -23,7 +23,20 @@ class BossDashboardController extends Controller
 
         // Calculate active employees (those with at least one presence this month)
         $activeEmployees = 0;
-        $totalMonthlyIncome = 0;
+        // $totalMonthlyIncome = 0; // Legacy
+        
+        // New Calculations
+        // Income = Money Amount from Sales
+        $totalMonthlyIncome = Deposit::where('status', 'verified')
+            ->whereYear('created_at', $currentYear)
+            ->whereMonth('created_at', $currentMonth)
+            ->sum('money_amount');
+
+        // Salary Expense = Wage Amount from All
+        $totalMonthlySalaryExpense = Deposit::where('status', 'verified')
+            ->whereYear('created_at', $currentYear)
+            ->whereMonth('created_at', $currentMonth)
+            ->sum('wage_amount');
 
         $employeeSummaries = [];
 
@@ -33,7 +46,7 @@ class BossDashboardController extends Controller
 
             if ($summary->status === 'active') {
                 $activeEmployees++;
-                $totalMonthlyIncome += $summary->total_salary;
+                // $totalMonthlyIncome += $summary->total_salary; // Removed legacy summary count
             }
 
             $employeeSummaries[] = [
@@ -58,6 +71,7 @@ class BossDashboardController extends Controller
             'totalEmployees' => $employees->count(),
             'activeEmployees' => $activeEmployees,
             'totalMonthlyIncome' => $totalMonthlyIncome,
+            'totalMonthlySalaryExpense' => $totalMonthlySalaryExpense, // Passed new variable
             'pendingLeaves' => $pendingLeaves,
             'pendingDeposits' => $pendingDeposits,
             'employeeSummaries' => $employeeSummaries,

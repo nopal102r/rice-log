@@ -12,18 +12,28 @@ class Deposit extends Model
 
     protected $fillable = [
         'user_id',
+        'type', // regular, land_management
         'weight',
-        'price_per_kg',
-        'total_price',
+        'box_count', // for land management
+        'money_amount', // for sales
+        'wage_amount', // calculated wage
+        'price_per_kg', // context dependent
+        'total_price', // context dependent or unused for some
         'photo',
         'notes',
         'status',
+        'start_time',
+        'end_time',
         'verified_by',
         'verified_at',
     ];
 
     protected $casts = [
         'verified_at' => 'datetime',
+        'weight' => 'decimal:2',
+        'box_count' => 'integer',
+        'money_amount' => 'decimal:2',
+        'wage_amount' => 'decimal:2',
     ];
 
     /**
@@ -58,7 +68,8 @@ class Deposit extends Model
 
         return [
             'total_kg' => $deposits->sum('weight'),
-            'total_price' => $deposits->sum('total_price'),
+            'total_wage' => $deposits->sum('wage_amount'), // Changed from total_price to wage_amount for salary
+            'total_revenue' => $deposits->sum('money_amount'), // Added for sales tracking
             'count' => $deposits->count(),
         ];
     }
@@ -72,13 +83,5 @@ class Deposit extends Model
             ->where('status', 'verified')
             ->where('created_at', '>=', now()->subDays(7))
             ->get();
-    }
-
-    /**
-     * Calculate total price based on weight and price per kg
-     */
-    public function calculateTotalPrice(): void
-    {
-        $this->total_price = $this->weight * $this->price_per_kg;
     }
 }

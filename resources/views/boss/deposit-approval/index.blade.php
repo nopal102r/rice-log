@@ -26,13 +26,40 @@
                                     <p class="text-lg font-bold text-gray-800">{{ $deposit->created_at->format('d-m-Y H:i') }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-gray-600 text-sm font-bold">Berat</p>
-                                    <p class="text-2xl font-bold text-orange-600">{{ $deposit->weight }} kg</p>
+                                    <p class="text-gray-600 text-sm font-bold">Detail Pekerjaan</p>
+                                    @if($deposit->user->isSales())
+                                        <p class="text-lg font-bold text-gray-800">{{ $deposit->weight }} kg</p>
+                                        <p class="text-xs text-gray-500">Estimasi: {{ $deposit->weight / 10 }} - {{ $deposit->weight / 25 }} karung</p>
+                                    @elseif($deposit->type === 'land_management')
+                                        <p class="text-lg font-bold text-gray-800">{{ $deposit->box_count }} Kotak</p>
+                                        <p class="text-xs text-gray-500">Urus Lahan</p>
+                                    @else
+                                        <p class="text-2xl font-bold text-orange-600">{{ $deposit->weight }} kg</p>
+                                    @endif
                                 </div>
                                 <div>
-                                    <p class="text-gray-600 text-sm font-bold">Total</p>
+                                    <p class="text-gray-600 text-sm font-bold">Total Nilai Barang</p>
+                                    @php
+                                        $displayTotal = $deposit->total_price;
+                                        if (!$displayTotal || $displayTotal == 0) {
+                                            if ($deposit->user && $deposit->user->isSales()) {
+                                                $displayTotal = $deposit->money_amount;
+                                            } else {
+                                                $displayTotal = ($deposit->weight ?? 0) * ($deposit->price_per_kg ?? 12000);
+                                            }
+                                        }
+                                    @endphp
+                                    <p class="text-xl font-bold text-gray-800">Rp
+                                        {{ number_format($displayTotal, 0, ',', '.') }}</p>
+                                    @if($deposit->user && $deposit->user->isSales())
+                                        <p class="text-xs text-blue-500 font-bold">Uang Setoran Sales</p>
+                                    @endif
+                                </div>
+                                <div>
+                                    <p class="text-gray-600 text-sm font-bold">Estimasi Upah</p>
                                     <p class="text-2xl font-bold text-green-600">Rp
-                                        {{ number_format($deposit->total_price, 0, ',', '.') }}</p>
+                                        {{ number_format($deposit->wage_amount, 0, ',', '.') }}</p>
+                                    <p class="text-xs text-gray-400">Gaji yang akan diterima</p>
                                 </div>
                                 <div>
                                     <p class="text-gray-600 text-sm font-bold">Status</p>

@@ -19,7 +19,8 @@
         video {
             width: 100%;
             border-radius: 12px;
-            display: block; /* Ensure it takes up space */
+            display: block;
+            transform : scaleX(-1); /* Ensure it takes up space */
         }
 
         #canvasContainer {
@@ -35,6 +36,7 @@
             width: 100%;
             height: 100%;
             border-radius: 12px;
+            transform : scaleX(-1);
         }
 
         .distance-warning {
@@ -56,6 +58,18 @@
             </h1>
             <p class="text-gray-600">Lengkapi data presensi Anda hari ini</p>
         </div>
+
+        @if(($type === 'masuk' && $hasCheckedIn) || ($type === 'keluar' && $hasCheckedOut))
+            <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-8 rounded shadow-sm" role="alert">
+                <div class="flex items-center">
+                    <i class="fas fa-info-circle text-2xl mr-3"></i>
+                    <div>
+                        <p class="font-bold">Informasi: Sudah Absen</p>
+                        <p class="text-sm">Anda telah melakukan presensi {{ $type }} untuk hari ini. Anda masih dapat melihat halaman ini, namun tidak perlu melakukan pengiriman ulang.</p>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <!-- Map Section -->
         <div class="bg-white rounded-lg shadow p-6 mb-8">
@@ -162,6 +176,9 @@
                     </div>
 
                     <div id="faceStatus" class="text-center mb-4">
+                        @if(($type === 'masuk' && $hasCheckedIn) || ($type === 'keluar' && $hasCheckedOut))
+                            <p class="text-blue-600 font-bold"><i class="fas fa-info-circle mr-2"></i> Anda sudah melakukan absen {{ $type }} hari ini.</p>
+                        @endif
                         <p class="text-gray-600">Memuat model face recognition...</p>
                     </div>
 
@@ -191,7 +208,8 @@
             <!-- Submit Button -->
             <div class="flex gap-4">
                 <button type="submit"
-                    class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2">
+                    @if(($type === 'masuk' && $hasCheckedIn) || ($type === 'keluar' && $hasCheckedOut)) disabled @endif
+                    class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 @if(($type === 'masuk' && $hasCheckedIn) || ($type === 'keluar' && $hasCheckedOut)) opacity-50 cursor-not-allowed @endif">
                     <i class="fas fa-check"></i> Simpan Presensi
                 </button>
                 <a href="{{ route('employee.dashboard') }}"
@@ -506,6 +524,14 @@
                     document.getElementById('capturedFaceInfo').style.display = 'block';
                     newCaptureBtn.style.display = 'none';
                     document.getElementById('stopCameraBtn').click();
+
+                    @if(($type === 'masuk' && $hasCheckedIn) || ($type === 'keluar' && $hasCheckedOut))
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Sudah Absen',
+                            text: 'Anda sudah melakukan absen {{ $type }} hari ini. Foto ditangkap namun tombol simpan dinonaktifkan.',
+                        });
+                    @endif
                 } catch (error) {
                     console.error(error);
                     Swal.fire('Error', 'Gagal mengambil foto: ' + error.message, 'error');

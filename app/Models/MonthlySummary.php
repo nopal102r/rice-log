@@ -81,7 +81,7 @@ class MonthlySummary extends Model
         // Count total deposits
         $deposits = Deposit::getTotalMonthDeposits($this->user_id, $this->month, $this->year);
         $this->total_kg_deposited = $deposits['total_kg'];
-        $this->total_salary = $deposits['total_price'];
+        $this->total_salary = $deposits['total_wage'];
 
         // Determine if employee was active (had at least one presence)
         $this->status = $this->days_present > 0 ? 'active' : 'inactive';

@@ -1,83 +1,154 @@
 @extends('layouts.app')
 
-@section('title', 'Setor Beras')
+@section('title', 'Laporan Kerja')
 
 @section('content')
     <div class="max-w-2xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">Setor Beras</h1>
-            <p class="text-gray-600">Setor beras Anda dan dapatkan penghasilan sesuai dengan bobot.</p>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Laporan Kerja</h1>
+            <p class="text-gray-600">
+                Halo, {{ Auth::user()->name }} ({{ ucfirst(Auth::user()->job) }}). Silakan lapor kerjaan Anda.
+            </p>
         </div>
 
         <div class="bg-white rounded-lg shadow p-8">
             <div class="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
                 <p class="text-blue-800 text-sm">
                     <i class="fas fa-info-circle mr-2"></i>
-                    <strong>Catatan:</strong> Anda harus melakukan absen masuk terlebih dahulu sebelum dapat melakukan setor
-                    beras.
+                    <strong>Catatan:</strong> Pastikan data yang Anda masukkan sesuai dengan kenyataan.
                 </p>
             </div>
 
             <form id="depositForm">
                 @csrf
+                
+                {{-- Dynamic Fields based on Role --}}
+                
+                @if($user->isFarmer())
+                    {{-- PETANI: Toggle Type --}}
+                    <div class="mb-6">
+                        <label class="block text-gray-800 font-bold mb-2">Jenis Kegiatan</label>
+                        <div class="flex gap-4">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="type" value="land_management" class="peer hidden" checked>
+                                <div class="p-4 border border-gray-300 rounded-lg text-center bg-gray-50 peer-checked:bg-green-100 peer-checked:border-green-500 peer-checked:text-green-800">
+                                    <i class="fas fa-tractor mb-2 text-2xl"></i><br>Urus Lahan
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="type" value="regular" class="peer hidden">
+                                <div class="p-4 border border-gray-300 rounded-lg text-center bg-gray-50 peer-checked:bg-green-100 peer-checked:border-green-500 peer-checked:text-green-800">
+                                    <i class="fas fa-seedling mb-2 text-2xl"></i><br>Setor Beras/Pare
+                                </div>
+                            </label>
+                        </div>
+                    </div>
 
-                <div class="mb-6">
-                    <label class="block text-gray-800 font-bold mb-2">
-                        <i class="fas fa-weight text-green-600 mr-2"></i> Berat Beras (kg)
-                    </label>
-                    <input type="number" name="weight" id="weight" required step="0.1" min="0.1"
-                        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-green-500"
-                        placeholder="Masukkan berat beras dalam kg">
-                    <p class="text-xs text-gray-500 mt-1">Contoh: 25.5 kg</p>
-                </div>
+                    {{-- Form: Urus Lahan --}}
+                    <div id="landManagementForm">
+                        <div class="mb-4">
+                            <label class="block text-gray-800 font-bold mb-2">Jumlah Kotak Sawah</label>
+                            <input type="number" name="box_count" class="w-full border border-gray-300 rounded px-4 py-2" min="1">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2">Jam Mulai</label>
+                                <input type="time" name="start_time" class="w-full border border-gray-300 rounded px-4 py-2">
+                            </div>
+                            <div>
+                                <label class="block text-gray-800 font-bold mb-2">Jam Selesai</label>
+                                <input type="time" name="end_time" class="w-full border border-gray-300 rounded px-4 py-2">
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="mb-6">
+                    {{-- Form: Setor Beras (Hidden by default) --}}
+                    <div id="regularForm" class="hidden">
+                        <div class="mb-4">
+                            <label class="block text-gray-800 font-bold mb-2">Berat (Kg)</label>
+                            <input type="number" name="weight" id="weight_farmer" class="w-full border border-gray-300 rounded px-4 py-2" step="0.1" min="0.1">
+                        </div>
+                    </div>
+                
+                @elseif($user->isSales())
+                    {{-- SALES --}}
+                    <div class="mb-4">
+                        <label class="block text-gray-800 font-bold mb-2">
+                            <i class="fas fa-box text-purple-600 mr-2"></i> Ukuran Karung
+                        </label>
+                        <select name="sack_size" id="sack_size" class="w-full border border-gray-300 rounded px-4 py-2" required>
+                            <option value="">-- Pilih Ukuran --</option>
+                            <option value="25">25 kg/karung</option>
+                            <option value="15">15 kg/karung</option>
+                            <option value="10">10 kg/karung</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-800 font-bold mb-2">
+                            <i class="fas fa-boxes text-purple-600 mr-2"></i> Jumlah Karung Terjual
+                        </label>
+                        <input type="number" name="sack_count" id="sack_count" class="w-full border border-gray-300 rounded px-4 py-2" required min="1" step="1" placeholder="Contoh: 10">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-800 font-bold mb-2">Uang Setoran (Rp)</label>
+                        <input type="number" name="money_amount" id="money_amount" class="w-full border border-gray-300 rounded px-4 py-2" required placeholder="Contoh: 5000000">
+                    </div>
+                    {{-- Hidden field for calculated weight --}}
+                    <input type="hidden" name="weight" id="weight_sales">
+                    <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-4">
+                        <p class="text-sm text-gray-700">
+                            <i class="fas fa-calculator text-blue-600 mr-2"></i>
+                            <strong>Total Berat:</strong> <span id="total_weight_display">0</span> kg
+                        </p>
+                    </div>
+
+                @else
+                    {{-- SUPIR & NGEGILING & OTHERS --}}
+                    <div class="mb-4">
+                        <label class="block text-gray-800 font-bold mb-2">Berat (Kg)</label>
+                        <input type="number" name="weight" id="weight_general" class="w-full border border-gray-300 rounded px-4 py-2" required step="0.1" min="0.1">
+                    </div>
+                @endif
+
+
+                {{-- Common Fields --}}
+                <div class="mb-6 mt-6">
                     <label class="block text-gray-800 font-bold mb-2">
-                        <i class="fas fa-images text-green-600 mr-2"></i> Foto Beras
+                        <i class="fas fa-camera text-green-600 mr-2"></i> Bukti Foto
                     </label>
                     <div class="relative border-2 border-dashed border-green-300 rounded-lg p-6 cursor-pointer hover:bg-green-50 transition"
                         id="photoDropZone">
                         <input type="file" name="photo" id="photo" required accept="image/*" class="hidden">
                         <div class="text-center">
                             <i class="fas fa-camera text-4xl text-green-400 mb-2"></i>
-                            <p class="text-gray-700 font-bold">Klik atau seret gambar ke sini</p>
-                            <p class="text-xs text-gray-500 mt-2">Format: JPG, PNG (Max 5MB)</p>
+                            <p class="text-gray-700 font-bold">Klik atau seret foto ke sini</p>
                         </div>
                     </div>
-                    <div id="photoPreview" class="mt-4" style="display: none;">
+                    <div id="photoPreview" class="mt-4 hidden">
                         <img id="photoImg" src="" alt="Preview" class="w-full max-w-xs rounded">
-                        <button type="button" id="removePhotoBtn"
-                            class="mt-2 text-red-600 hover:text-red-800 text-sm font-bold">
-                            <i class="fas fa-trash mr-1"></i> Hapus Foto
-                        </button>
+                        <button type="button" id="removePhotoBtn" class="mt-2 text-red-600 font-bold text-sm">Hapus Foto</button>
                     </div>
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-gray-800 font-bold mb-2">
-                        <i class="fas fa-sticky-note text-green-600 mr-2"></i> Catatan (Opsional)
-                    </label>
-                    <textarea name="notes" id="notes" rows="3"
-                        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-green-500"
-                        placeholder="Tambahkan catatan atau informasi tambahan..."></textarea>
+                    <label class="block text-gray-800 font-bold mb-2">Catatan (Opsional)</label>
+                    <textarea name="notes" id="notes" rows="2" class="w-full border border-gray-300 rounded px-4 py-2"></textarea>
                 </div>
 
+                {{-- Wage Estimation --}}
                 <div class="bg-green-50 border border-green-200 rounded p-4 mb-6">
-                    <p class="text-green-800 font-bold mb-2">Perhitungan Upah:</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-700">Harga per kg: <span class="font-bold">Rp 30.000</span></span>
-                        <span class="text-gray-700">Berat: <span id="weightDisplay" class="font-bold">0</span> kg</span>
+                    <p class="text-green-800 font-bold mb-2">Estimasi Pendapatan:</p>
+                    <div class="text-2xl font-bold text-green-700">
+                        Rp <span id="wageDisplay">0</span>
                     </div>
-                    <div class="border-t border-green-200 mt-3 pt-3 text-xl font-bold text-green-700">
-                        Total: Rp <span id="totalPrice">0</span>
-                    </div>
+                    <p id="wageFormula" class="text-xs text-green-600 mt-1"></p>
                 </div>
 
                 <div class="flex gap-4">
                     <button type="submit"
                         class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2">
-                        <i class="fas fa-check"></i> Setor Beras
+                        <i class="fas fa-check"></i> Kirim Laporan
                     </button>
                     <a href="{{ route('employee.dashboard') }}"
                         class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 rounded-lg flex items-center justify-center gap-2">
@@ -91,69 +162,141 @@
 
 @section('extra-js')
     <script>
-        const pricePerKg = 30000;
-        const weightInput = document.getElementById('weight');
+        // Settings from Server
+        const settings = @json($settings);
+        const userJob = "{{ $user->job }}";
+        
+        // Elements
+        const form = document.getElementById('depositForm');
+        const wageDisplay = document.getElementById('wageDisplay');
+        const wageFormula = document.getElementById('wageFormula');
+
+        // Logic for Farmer Toggle
+        const landForm = document.getElementById('landManagementForm');
+        const regularForm = document.getElementById('regularForm');
+        const radioType = document.querySelectorAll('input[name="type"]');
+        
+        if (userJob === 'petani') {
+            radioType.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'land_management') {
+                        landForm.classList.remove('hidden');
+                        regularForm.classList.add('hidden');
+                    } else {
+                        landForm.classList.add('hidden');
+                        regularForm.classList.remove('hidden');
+                    }
+                    calculateWage();
+                });
+            });
+        }
+
+        // Calculations
+        function calculateWage() {
+            let wage = 0;
+            let formula = '';
+
+            if (userJob === 'supir') {
+                const w = parseFloat(document.getElementById('weight_general').value) || 0;
+                wage = w * settings.driver_rate_per_kg;
+                formula = `${w} kg x Rp ${settings.driver_rate_per_kg}`;
+            
+            } else if (userJob === 'ngegiling') {
+                const w = parseFloat(document.getElementById('weight_general').value) || 0;
+                wage = w * settings.miller_rate_per_kg;
+                formula = `${w} kg x Rp ${settings.miller_rate_per_kg}`;
+            
+            } else if (userJob === 'petani') {
+                const type = document.querySelector('input[name="type"]:checked').value;
+                if (type === 'land_management') {
+                    const boxes = parseInt(document.querySelector('input[name="box_count"]').value) || 0;
+                    wage = boxes * settings.farmer_rate_per_box;
+                    formula = `${boxes} kotak x Rp ${settings.farmer_rate_per_box}`;
+                } else {
+                    const w = parseFloat(document.getElementById('weight_farmer').value) || 0;
+                    wage = w * settings.price_per_kg; // Using Rice Price
+                    formula = `${w} kg x Rp ${settings.price_per_kg}`;
+                }
+
+            } else if (userJob === 'sales') {
+                const sackSize = parseFloat(document.getElementById('sack_size').value) || 0;
+                const sackCount = parseInt(document.getElementById('sack_count').value) || 0;
+                const money = parseFloat(document.getElementById('money_amount').value) || 0;
+                
+                // Calculate total weight from sacks (for display and record)
+                const weight = sackSize * sackCount;
+                
+                // Update hidden weight field
+                document.getElementById('weight_sales').value = weight;
+                
+                // Update weight display
+                const weightDisplay = document.getElementById('total_weight_display');
+                if (weightDisplay) {
+                    weightDisplay.textContent = weight.toFixed(1);
+                }
+                
+                // Calculate wage: Money / Sack Count (not weight!)
+                if (sackCount > 0) {
+                    wage = money / sackCount;
+                    formula = `Rp ${money.toLocaleString('id-ID')} / ${sackCount} karung = Rp ${wage.toLocaleString('id-ID')}/karung`;
+                }
+            }
+
+            wageDisplay.textContent = wage.toLocaleString('id-ID');
+            wageFormula.textContent = formula;
+        }
+
+        // Attach listeners to all inputs and selects
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('input', calculateWage);
+            element.addEventListener('change', calculateWage);
+        });
+
+        // Photo Upload Logic (Existing)
         const photoInput = document.getElementById('photo');
         const photoDropZone = document.getElementById('photoDropZone');
         const photoPreview = document.getElementById('photoPreview');
         const photoImg = document.getElementById('photoImg');
         const removePhotoBtn = document.getElementById('removePhotoBtn');
 
-        // Update price calculation
-        weightInput.addEventListener('change', function () {
-            const weight = parseFloat(this.value) || 0;
-            const total = weight * pricePerKg;
-            document.getElementById('weightDisplay').textContent = weight.toFixed(1);
-            document.getElementById('totalPrice').textContent = total.toLocaleString('id-ID');
-        });
-
-        // Drag and drop
         photoDropZone.addEventListener('click', () => photoInput.click());
-        photoDropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            photoDropZone.classList.add('bg-green-100');
-        });
-        photoDropZone.addEventListener('dragleave', () => {
-            photoDropZone.classList.remove('bg-green-100');
-        });
+        photoDropZone.addEventListener('dragover', (e) => { e.preventDefault(); photoDropZone.classList.add('bg-green-100'); });
+        photoDropZone.addEventListener('dragleave', () => photoDropZone.classList.remove('bg-green-100'));
         photoDropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             photoDropZone.classList.remove('bg-green-100');
-            if (e.dataTransfer.files.length) {
-                photoInput.files = e.dataTransfer.files;
-                handlePhotoSelect();
-            }
+            if (e.dataTransfer.files.length) photoInput.files = e.dataTransfer.files;
+            handlePhotoSelect();
         });
-
         photoInput.addEventListener('change', handlePhotoSelect);
-
         function handlePhotoSelect() {
             if (photoInput.files && photoInput.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function (e) {
+                reader.onload = (e) => {
                     photoImg.src = e.target.result;
-                    photoPreview.style.display = 'block';
+                    photoPreview.classList.remove('hidden');
                 };
                 reader.readAsDataURL(photoInput.files[0]);
             }
         }
-
-        removePhotoBtn.addEventListener('click', function () {
-            photoInput.value = '';
-            photoPreview.style.display = 'none';
+        removePhotoBtn.addEventListener('click', () => {
+             photoInput.value = ''; 
+             photoPreview.classList.add('hidden'); 
         });
 
-        document.getElementById('depositForm').addEventListener('submit', async function (e) {
+        // Submit
+        form.addEventListener('submit', async function(e) {
             e.preventDefault();
-
-            const weight = parseFloat(weightInput.value);
-            if (!weight || weight <= 0) {
-                Swal.fire('Error', 'Silakan masukkan berat beras yang valid', 'error');
-                return;
+            
+            // Basic Validation Check
+            if (userJob === 'sales') {
+                 if (parseFloat(document.getElementById('weight_sales').value) <= 0) {
+                     Swal.fire('Error', 'Berat beras harus lebih dari 0', 'error');
+                     return;
+                 }
             }
-
             if (!photoInput.files || photoInput.files.length === 0) {
-                Swal.fire('Error', 'Silakan unggah foto beras', 'error');
+                Swal.fire('Error', 'Wajib upload foto', 'error');
                 return;
             }
 
@@ -161,21 +304,15 @@
 
             Swal.fire({
                 title: 'Konfirmasi',
-                text: 'Setor ' + weight + ' kg beras? Total: Rp ' + (weight * pricePerKg).toLocaleString('id-ID'),
+                text: 'Kirim laporan kerja ini?',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Ya, Setor!',
+                confirmButtonText: 'Ya, Kirim',
                 cancelButtonText: 'Batal'
             }).then(async (result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Memproses...',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-
+                    Swal.fire({ title: 'Memproses...', didOpen: () => Swal.showLoading() });
+                    
                     try {
                         const response = await fetch('{{ route("employee.deposit.store") }}', {
                             method: 'POST',
@@ -185,18 +322,16 @@
                                 'Accept': 'application/json'
                             }
                         });
-
                         const data = await response.json();
-
                         if (data.success) {
                             Swal.fire('Berhasil!', data.message, 'success').then(() => {
                                 window.location.href = '{{ route("employee.deposit.my-deposits") }}';
                             });
                         } else {
-                            Swal.fire('Error', data.message, 'error');
+                            Swal.fire('Error', data.message || 'Gagal', 'error');
                         }
-                    } catch (error) {
-                        Swal.fire('Error', 'Terjadi kesalahan: ' + error.message, 'error');
+                    } catch (err) {
+                        Swal.fire('Error', err.message, 'error');
                     }
                 }
             });
