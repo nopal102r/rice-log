@@ -136,6 +136,10 @@ class User extends Authenticatable
         return $this->job === 'sales';
     }
 
+    public function isPacking(): bool {
+        return $this->job === 'packing';
+    }
+
     /**
      * Calculate age from date of birth
      */

@@ -80,6 +80,21 @@
                             </div>
                             <p class="text-xs text-gray-500 mt-1">Persentase komisi (opsional/alternatif).</p>
                         </div>
+
+                        <!-- Packing -->
+                        <div>
+                            <label class="block text-gray-800 font-bold mb-2">
+                                Upah Packing (per kg)
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg font-bold text-gray-600">Rp</span>
+                                <input type="number" name="packing_rate_per_kg" id="packing_rate_per_kg" value="{{ $settings->packing_rate_per_kg }}"
+                                    required step="1" min="0"
+                                    class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-green-500"
+                                    placeholder="20">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Upah tukang packing per kg beras yang dipacking.</p>
+                        </div>
                     </div>
 
                      <div class="mt-6">
@@ -213,6 +228,7 @@
                 max_distance_allowed: document.getElementById('max_distance_allowed').value,
                 leave_days_per_month: document.getElementById('leave_days_per_month').value,
                 min_deposit_per_week: document.getElementById('min_deposit_per_week').value,
+                packing_rate_per_kg: document.getElementById('packing_rate_per_kg').value,
             };
 
             Swal.fire({

@@ -37,26 +37,69 @@ class DepositApprovalController extends Controller
             ], 422);
         }
 
-        $deposit->update([
-            'status' => 'verified',
-            'verified_by' => auth()->id(),
-            'verified_at' => now(),
-        ]);
+        \DB::transaction(function () use ($deposit) {
+            $deposit->update([
+                'status' => 'verified',
+                'verified_by' => auth()->id(),
+                'verified_at' => now(),
+            ]);
+
+            $user = $deposit->user;
+            
+            // --- STOCK ADJUSTMENT LOGIC ---
+            if ($user->isFarmer() && $deposit->type === 'regular') {
+                // + Gabah
+                $stock = \App\Models\Stock::getByName('gabah');
+                $stock->incrementStock($deposit->weight);
+
+            } elseif ($user->isMiller()) {
+                // - Gabah, + Beras Giling
+                $gabah = \App\Models\Stock::getByName('gabah');
+                $beras = \App\Models\Stock::getByName('beras_giling');
+                
+                $gabah->decrementStock($deposit->weight);
+                $beras->incrementStock($deposit->weight);
+
+            } elseif ($user->isPacking()) {
+                // - Beras Giling, + Packed Sacks
+                $beras = \App\Models\Stock::getByName('beras_giling');
+                $beras->decrementStock($deposit->weight);
+
+                if ($deposit->details) {
+                    foreach ($deposit->details as $item) {
+                        $packed = \App\Models\Stock::getByName("packed_{$item['size']}kg");
+                        if ($packed) {
+                            $packed->incrementStock($item['count']);
+                        }
+                    }
+                }
+
+            } elseif ($user->isSales() || $user->isDriver()) {
+                // - Packed Sacks
+                if ($deposit->details) {
+                    foreach ($deposit->details as $item) {
+                        $packed = \App\Models\Stock::getByName("packed_{$item['size']}kg");
+                        if ($packed) {
+                            $packed->decrementStock($item['count']);
+                        }
+                    }
+                }
+            }
+        });
 
         // Send notification to employee
         Notification::create([
             'user_id' => $deposit->user_id,
             'type' => 'deposit_verified',
             'title' => 'Setor Terverifikasi',
-            'message' => 'Setor ' . $deposit->weight . ' kg beras Anda telah diverifikasi. Total: Rp ' .
-                number_format($deposit->total_price, 0, ',', '.'),
+            'message' => 'Laporan kerja ' . ($deposit->weight ?? 0) . ' kg/karung Anda telah diverifikasi. Stok sistem diperbarui.',
             'notifiable_type' => Deposit::class,
             'notifiable_id' => $deposit->id,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Setor diverifikasi.',
+            'message' => 'Setor diverifikasi dan stok diperbarui .',
         ]);
     }
 
