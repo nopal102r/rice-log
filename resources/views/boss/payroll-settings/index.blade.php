@@ -3,26 +3,88 @@
 @section('title', 'Pengaturan Gaji')
 
 @section('content')
-    <div class="max-w-2xl mx-auto">
+    <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-4xl font-bold text-gray-800 mb-2">Pengaturan Gaji & Sistem</h1>
-            <p class="text-gray-600">Atur parameter gaji karyawan pabrik</p>
+            <p class="text-gray-600">Atur parameter gaji untuk setiap posisi dan aturan sistem.</p>
         </div>
 
         <div class="bg-white rounded-lg shadow p-8">
             <form id="settingsForm">
                 @csrf
 
-                <!-- Price Per KG -->
+                <!-- Wage Settings -->
                 <div class="mb-8 pb-8 border-b border-gray-200">
                     <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <i class="fas fa-dollar-sign text-green-600"></i> Upah Beras
+                        <i class="fas fa-money-bill-wave text-green-600"></i> Pengaturan Upah
                     </h3>
 
-                    <div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Drivers -->
+                        <div>
+                            <label class="block text-gray-800 font-bold mb-2">
+                                Upah Supir (per kg)
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg font-bold text-gray-600">Rp</span>
+                                <input type="number" name="driver_rate_per_kg" id="driver_rate_per_kg" value="{{ $settings->driver_rate_per_kg }}"
+                                    required step="50" min="0"
+                                    class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-green-500"
+                                    placeholder="500">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Upah supir per kg beras yang dikirim.</p>
+                        </div>
+
+                        <!-- Millers -->
+                        <div>
+                            <label class="block text-gray-800 font-bold mb-2">
+                                Upah Penggiling (per kg)
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg font-bold text-gray-600">Rp</span>
+                                <input type="number" name="miller_rate_per_kg" id="miller_rate_per_kg" value="{{ $settings->miller_rate_per_kg }}"
+                                    required step="50" min="0"
+                                    class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-green-500"
+                                    placeholder="200">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Upah penggiling per kg beras yang digiling.</p>
+                        </div>
+
+                        <!-- Farmers Box -->
+                        <div>
+                            <label class="block text-gray-800 font-bold mb-2">
+                                Upah Petani (per Kotak Lahan)
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg font-bold text-gray-600">Rp</span>
+                                <input type="number" name="farmer_rate_per_box" id="farmer_rate_per_box" value="{{ $settings->farmer_rate_per_box }}"
+                                    required step="1000" min="0"
+                                    class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-green-500"
+                                    placeholder="50000">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Upah petani per kotak lahan yang diurus.</p>
+                        </div>
+
+                        <!-- Sales Commission -->
+                        <div>
+                            <label class="block text-gray-800 font-bold mb-2">
+                                Komisi Sales (%) / Cadangan
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" name="sales_commission_rate" id="sales_commission_rate" value="{{ $settings->sales_commission_rate }}"
+                                    required step="0.1" min="0" max="100"
+                                    class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-green-500"
+                                    placeholder="5">
+                                <span class="text-lg font-bold text-gray-600">%</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Persentase komisi (opsional/alternatif).</p>
+                        </div>
+                    </div>
+
+                     <div class="mt-6">
                         <label class="block text-gray-800 font-bold mb-2">
-                            Harga per kg Beras (Rp)
+                            Harga Jual Beras Standar (per kg)
                         </label>
                         <div class="flex items-center gap-2">
                             <span class="text-lg font-bold text-gray-600">Rp</span>
@@ -32,8 +94,7 @@
                                 placeholder="Contoh: 30000">
                         </div>
                         <p class="text-xs text-gray-500 mt-1">
-                            Harga ini akan dikalikan dengan berat beras (kg) untuk menghitung gaji karyawan.
-                            Contoh: 25 kg × Rp 30.000 = Rp 750.000
+                            Harga dasar untuk perhitungan pendapatan/setoran beras.
                         </p>
                     </div>
                 </div>
@@ -65,9 +126,6 @@
                                 placeholder="Contoh: 106.8456">
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">
-                        Gunakan Google Maps atau GPS Coordinates untuk mendapatkan koordinat lokasi kantor pusat.
-                    </p>
                 </div>
 
                 <!-- Distance & Attendance Rules -->
@@ -123,22 +181,6 @@
                     </div>
                 </div>
 
-                <!-- Summary -->
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-                    <h4 class="font-bold text-blue-800 mb-4">
-                        <i class="fas fa-info-circle mr-2"></i> Ringkasan Pengaturan Saat Ini
-                    </h4>
-                    <div class="space-y-2 text-sm text-blue-800">
-                        <p>✓ Harga beras: <strong>Rp {{ number_format($settings->price_per_kg, 0, ',', '.') }}/kg</strong>
-                        </p>
-                        <p>✓ Lokasi kantor: <strong>{{ $settings->office_latitude }},
-                                {{ $settings->office_longitude }}</strong></p>
-                        <p>✓ Jarak maksimal: <strong>{{ $settings->max_distance_allowed }} km</strong></p>
-                        <p>✓ Hari cuti/bulan: <strong>{{ $settings->leave_days_per_month }} hari</strong></p>
-                        <p>✓ Minimal setor/minggu: <strong>{{ $settings->min_deposit_per_week }}x</strong></p>
-                    </div>
-                </div>
-
                 <!-- Buttons -->
                 <div class="flex gap-4">
                     <button type="submit"
@@ -162,6 +204,10 @@
 
             const formData = {
                 price_per_kg: document.getElementById('price_per_kg').value,
+                driver_rate_per_kg: document.getElementById('driver_rate_per_kg').value,
+                miller_rate_per_kg: document.getElementById('miller_rate_per_kg').value,
+                farmer_rate_per_box: document.getElementById('farmer_rate_per_box').value,
+                sales_commission_rate: document.getElementById('sales_commission_rate').value,
                 office_latitude: document.getElementById('office_latitude').value,
                 office_longitude: document.getElementById('office_longitude').value,
                 max_distance_allowed: document.getElementById('max_distance_allowed').value,

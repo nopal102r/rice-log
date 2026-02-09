@@ -95,9 +95,9 @@
                         <span class="text-2xl font-bold text-orange-600">{{ $depositsData['total_kg'] }} kg</span>
                     </div>
                     <div class="flex justify-between items-center border-b pb-2">
-                        <span class="text-gray-600">Total Harga</span>
+                        <span class="text-gray-600">Total Gaji</span>
                         <span class="text-2xl font-bold text-green-600">Rp
-                            {{ number_format($depositsData['total_price'], 0, ',', '.') }}</span>
+                            {{ number_format($depositsData['total_wage'], 0, ',', '.') }}</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-gray-600">Jumlah Setor</span>

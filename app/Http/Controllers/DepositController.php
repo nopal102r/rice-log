@@ -8,6 +8,8 @@ use App\Models\PayrollSetting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DepositController extends Controller
 {
@@ -16,7 +18,10 @@ class DepositController extends Controller
      */
     public function create(): View
     {
-        return view('employee.deposit.create');
+        return view('employee.deposit.create', [
+            'user' => Auth::user(),
+            'settings' => PayrollSetting::getCurrent(),
+        ]);
     }
 
     /**
@@ -26,48 +31,162 @@ class DepositController extends Controller
     {
         $user = auth()->user();
 
-        // Check if user has checked in today
+        // Check if user has checked in today (skip for now if easy debug needed, but keeping for production logic)
+        // Checks logic can remain
         if (!Absence::hasCheckedInToday($user->id)) {
-            return response()->json([
+             return response()->json([
                 'success' => false,
-                'message' => 'Anda harus melakukan absen masuk terlebih dahulu sebelum melakukan setor.',
+                'message' => 'Anda harus melakukan absen masuk terlebih dahulu sebelum melakukan kegiatan.',
             ], 422);
         }
 
-        $validated = $request->validate([
-            'weight' => 'required|numeric|min:0.1',
-            'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
-            'notes' => 'nullable|string|max:500',
-        ]);
+        $settings = PayrollSetting::getCurrent(); // Always fetched fresh
+        $job = $user->job;
 
-        $settings = PayrollSetting::getCurrent();
+        $validated = [];
+        $wageAmount = 0;
+        $totalPrice = 0; // Context dependent
+        $moneyAmount = null; // Sales only
+        $boxCount = null;
+        $type = 'regular';
+        $startTime = null;
+        $endTime = null;
+        $weight = null;
 
-        // Store photo
-        $photoPath = $request->file('photo')->store('deposits/' . date('Y/m/d'), 'public');
+        // --- ROLE BASED VALIDATION & CALCULATION ---
+
+        if ($user->isDriver()) {
+            // SUPIR: Gaji dari seberapa banyak (kg) yg ia kirim ke konsumen
+            $validated = $request->validate([
+                'weight' => 'required|numeric|min:0.1',
+                'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+                'notes' => 'nullable|string|max:500',
+            ]);
+            
+            $weight = $validated['weight'];
+            // Wage = Weight * Driver Rate
+            $wageAmount = $weight * $settings->driver_rate_per_kg;
+            $totalPrice = $weight * $settings->price_per_kg;
+
+        } elseif ($user->isMiller()) {
+            // NGEGILING: Gaji dari berapa kg/karung yg ia giling
+            $validated = $request->validate([
+                'weight' => 'required|numeric|min:0.1',
+                'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+                'notes' => 'nullable|string|max:500',
+            ]);
+
+            $weight = $validated['weight'];
+            // Wage = Weight * Miller Rate
+            $wageAmount = $weight * $settings->miller_rate_per_kg;
+            $totalPrice = $weight * $settings->price_per_kg;
+
+        } elseif ($user->isFarmer()) {
+            // PETANI: Dua pilihan (Urus Lahan / Setor Beras)
+            $type = $request->input('type'); // 'regular' (Setor Beras) or 'land_management' (Urus Lahan)
+            
+            if ($type === 'land_management') {
+                $validated = $request->validate([
+                    'type' => 'required|in:land_management',
+                    'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+                    'start_time' => 'required|date_format:H:i',
+                    'end_time' => 'required|date_format:H:i|after:start_time',
+                    'box_count' => 'required|integer|min:1',
+                    'notes' => 'nullable|string|max:500',
+                ]);
+
+                $boxCount = $validated['box_count'];
+                $startTime = $validated['start_time'];
+                $endTime = $validated['end_time'];
+                
+                // Wage = Boxes * Farmer Box Rate
+                $wageAmount = $boxCount * $settings->farmer_rate_per_box;
+                $totalPrice = 0; // No rice value for land management
+
+            } else {
+                // Setor Beras Mentah / Pare
+                $validated = $request->validate([
+                    'type' => 'required|in:regular',
+                    'weight' => 'required|numeric|min:0.1',
+                    'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+                    'notes' => 'nullable|string|max:500',
+                ]);
+
+                $weight = $validated['weight'];
+                // Logic: Petani setor beras -> Get paid for the rice? 
+                // Using standard price_per_kg (Buying Price) for the rice value itself. 
+                // Or is this just a wage for harvesting? 
+                // The prompt says "setor beras mentah... login juga beda bedain".
+                // I will assume for now it's treated like a "sale" from farmer to company, so Wage = Weight * PricePerKg.
+                // Re-reading: "setor beras mentah" implies giving product. 
+                $wageAmount = $weight * $settings->price_per_kg; 
+                $totalPrice = $weight * $settings->price_per_kg;
+            }
+
+        } elseif ($user->isSales()) {
+            // SALES: Setor Uang & Karung Terjual
+            // Wage = Setor Uang / Jumlah Karung (per karung, bukan per kg)
+            $validated = $request->validate([
+                'money_amount' => 'required|numeric|min:0',
+                'sack_size' => 'required|numeric|in:10,15,25', // Ukuran karung
+                'sack_count' => 'required|integer|min:1', // Jumlah karung
+                'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+                'notes' => 'nullable|string|max:500',
+            ]);
+
+            $moneyAmount = $validated['money_amount'];
+            $sackSize = $validated['sack_size'];
+            $sackCount = $validated['sack_count'];
+            
+            // Calculate total weight from sacks (for record keeping)
+            $weight = $sackSize * $sackCount;
+            
+            // Formula: Wage = Money / Sack Count (not weight!)
+            $wageAmount = $moneyAmount / $sackCount;
+            $totalPrice = $moneyAmount; // Total money brought in
         
-        $pricePerKg = $settings->price_per_kg;
-        $totalPrice = $validated['weight'] * $pricePerKg;
+        } else {
+            // Fallback / Generic Employee
+             $validated = $request->validate([
+                'weight' => 'required|numeric|min:0.1',
+                'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+                'notes' => 'nullable|string|max:500',
+            ]);
+            $weight = $validated['weight'];
+            $wageAmount = 0; // No defined wage logic for generic currently
+        }
 
-        // Create deposit
+        // --- STORE DATA ---
+
+        $photoPath = null;
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('deposits/' . date('Y/m/d'), 'public');
+        }
+
         $deposit = Deposit::create([
             'user_id' => $user->id,
-            'weight' => $validated['weight'],
-            'price_per_kg' => $pricePerKg,
-            'total_price' => $totalPrice,
+            'type' => $type,
+            'weight' => $weight,
+            'box_count' => $boxCount,
+            'money_amount' => $moneyAmount,
+            'wage_amount' => $wageAmount,
+            'price_per_kg' => $settings->price_per_kg, // Snapshot current rate
+            'total_price' => $totalPrice, // Legacy / Contextual
+            'start_time' => $startTime,
+            'end_time' => $endTime,
             'photo' => $photoPath,
-            'notes' => $validated['notes'] ?? null,
-            'status' => 'pending', // Admin/boss akan verify
+            'notes' => $request->input('notes'),
+            'status' => 'pending', 
         ]);
 
         // Send notification to boss
         $bosses = \App\Models\User::where('role', 'bos')->get();
-
         foreach ($bosses as $boss) {
             \App\Models\Notification::create([
                 'user_id' => $boss->id,
                 'type' => 'deposit_pending',
-                'title' => 'Setor Beras Menunggu Verifikasi',
-                'message' => $user->name . ' telah melakukan setor ' . $validated['weight'] . ' kg beras.',
+                'title' => 'Laporan Kerja Baru (' . ucfirst($job ?? 'Karyawan') . ')',
+                'message' => $user->name . ' telah mengirim laporan kerja terbaru.',
                 'notifiable_type' => Deposit::class,
                 'notifiable_id' => $deposit->id,
             ]);
@@ -75,8 +194,9 @@ class DepositController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Setor berhasil dicatat. Menunggu verifikasi dari atasan.',
+            'message' => 'Laporan berhasil dicatat. Menunggu verifikasi bos.',
             'deposit' => $deposit,
+            'wage_estimation' => $wageAmount,
         ]);
     }
 

@@ -68,9 +68,10 @@
                         <select name="job" id="job" required
                             class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500">
                             <option value="">-- Pilih Posisi --</option>
-                            <option value="kurir">Kurir</option>
-                            <option value="sawah">Sawah (Petani)</option>
-                            <option value="ngegiling">Ngegiling (Operator Mesin)</option>
+                            <option value="supir">Supir (Driver)</option>
+                            <option value="petani">Petani (Farmer)</option>
+                            <option value="ngegiling">Ngegiling (Miller)</option>
+                            <option value="sales">Sales</option>
                         </select>
                     </div>
 
@@ -116,8 +117,8 @@
                         <div class="relative w-full max-w-md mx-auto"
                             style="position: relative; max-width: 500px; margin: 0 auto;">
                             <video id="enrollmentVideo" autoplay muted playsinline
-                                style="width: 100%; border: 2px solid #9333ea; border-radius: 12px; display: block;"></video>
-                            <canvas id="enrollmentCanvas" style="position: absolute; top: 0; left: 0; border-radius: 12px;"
+                                style="width: 100%; border: 2px solid #9333ea; border-radius: 12px; display: block; transform: scaleX(-1);"></video>
+                            <canvas id="enrollmentCanvas" style="position: absolute; top: 0; left: 0; border-radius: 12px; transform: scaleX(-1);"
                                 display="block"></canvas>
                         </div>
                     </div>

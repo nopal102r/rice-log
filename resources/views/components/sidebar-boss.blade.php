@@ -24,6 +24,11 @@
                 <i class="fas fa-check-circle"></i>
                 <span>Verifikasi Setor</span>
             </a>
+            <a href="{{ route('boss.reports.index') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.reports.*') ? 'bg-blue-600' : '' }}">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Laporan Gaji</span>
+            </a>
         </div>
 
         <div class="mb-4">

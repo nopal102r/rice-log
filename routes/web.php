@@ -72,6 +72,9 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
     // Payroll Settings
     Route::get('/payroll-settings', [PayrollSettingController::class, 'index'])->name('payroll-settings.index');
     Route::post('/payroll-settings', [PayrollSettingController::class, 'update'])->name('payroll-settings.update');
+
+    // Reports
+    Route::get('/reports', [\App\Http\Controllers\BossReportController::class, 'index'])->name('reports.index');
 });
 
 // Authenticated Routes (both roles)
