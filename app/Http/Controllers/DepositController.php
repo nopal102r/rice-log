@@ -19,7 +19,7 @@ class DepositController extends Controller
     public function create(): View
     {
         return view('employee.deposit.create', [
-            'user' => Auth::user(),
+            'user' => auth()->user(),
             'settings' => PayrollSetting::getCurrent(),
         ]);
     }
@@ -52,18 +52,27 @@ class DepositController extends Controller
         $startTime = null;
         $endTime = null;
         $weight = null;
+        $details = null;
 
         // --- ROLE BASED VALIDATION & CALCULATION ---
 
         if ($user->isDriver()) {
             // SUPIR: Gaji dari seberapa banyak (kg) yg ia kirim ke konsumen
             $validated = $request->validate([
-                'weight' => 'required|numeric|min:0.1',
+                'weight' => 'nullable|numeric|min:0.1',
+                'sack_size' => 'nullable|numeric|in:5,10,15,20,25',
+                'sack_count' => 'nullable|integer|min:1',
                 'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
                 'notes' => 'nullable|string|max:500',
             ]);
             
-            $weight = $validated['weight'];
+            if ($validated['sack_size'] && $validated['sack_count']) {
+                $weight = $validated['sack_size'] * $validated['sack_count'];
+                $details = [['size' => $validated['sack_size'], 'count' => $validated['sack_count']]];
+            } else {
+                $weight = $validated['weight'] ?? 0;
+            }
+
             // Wage = Weight * Driver Rate
             $wageAmount = $weight * $settings->driver_rate_per_kg;
             $totalPrice = $weight * $settings->price_per_kg;
@@ -128,7 +137,7 @@ class DepositController extends Controller
             // Wage = Setor Uang / Jumlah Karung (per karung, bukan per kg)
             $validated = $request->validate([
                 'money_amount' => 'required|numeric|min:0',
-                'sack_size' => 'required|numeric|in:10,15,25', // Ukuran karung
+                'sack_size' => 'required|numeric|in:5,10,15,20,25', // Updated sizes
                 'sack_count' => 'required|integer|min:1', // Jumlah karung
                 'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
                 'notes' => 'nullable|string|max:500',
@@ -144,7 +153,43 @@ class DepositController extends Controller
             // Formula: Wage = Money / Sack Count (not weight!)
             $wageAmount = $moneyAmount / $sackCount;
             $totalPrice = $moneyAmount; // Total money brought in
+
+            // Store in details for stock tracking
+            $details = [['size' => $sackSize, 'count' => $sackCount]];
         
+        } elseif ($user->isPacking()) {
+            // PACKING: Setor hasil packing (multi-ukuran)
+            $validated = $request->validate([
+                'details' => 'required|array|min:1',
+                'details.*.size' => 'required|numeric|in:5,10,15,20,25',
+                'details.*.count' => 'required|integer|min:1',
+                'photo' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+                'notes' => 'nullable|string|max:500',
+            ]);
+
+            $details = $validated['details'];
+            $totalWeight = 0;
+            $totalSacks = 0;
+
+            foreach ($details as $item) {
+                $totalWeight += $item['size'] * $item['count'];
+                $totalSacks += $item['count'];
+            }
+
+            $weight = $totalWeight;
+            // Wage = Total Weight (kg) * Packing Rate per Kg
+            $wageAmount = $weight * $settings->packing_rate_per_kg;
+            $totalPrice = $weight * $settings->price_per_kg;
+
+            // STOCK CHECK: Packing needs 'beras_giling'
+            $stock = \App\Models\Stock::getByName('beras_giling');
+            if (!$stock || !$stock->isAvailable($weight)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stok beras giling tidak mencukupi untuk dipacking. Tersedia: ' . ($stock->quantity ?? 0) . ' kg',
+                ], 422);
+            }
+
         } else {
             // Fallback / Generic Employee
              $validated = $request->validate([
@@ -154,6 +199,32 @@ class DepositController extends Controller
             ]);
             $weight = $validated['weight'];
             $wageAmount = 0; // No defined wage logic for generic currently
+        }
+
+        // --- GLOBAL STOCK CHECKS FOR OTHER ROLES ---
+        if ($user->isMiller()) {
+            $stock = \App\Models\Stock::getByName('gabah');
+            if (!$stock || !$stock->isAvailable($weight)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stok gabah tidak mencukupi untuk digiling. Tersedia: ' . ($stock->quantity ?? 0) . ' kg',
+                ], 422);
+            }
+        } elseif ($user->isSales() || $user->isDriver()) {
+            // Check specific sack size stock
+            $sackSize = $request->input('sack_size');
+            $sackCount = $request->input('sack_count') ?? 1;
+            
+            if ($sackSize) {
+                $stockName = "packed_{$sackSize}kg";
+                $stock = \App\Models\Stock::getByName($stockName);
+                if (!$stock || !$stock->isAvailable($sackCount)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Stok karung {$sackSize}kg tidak mencukupi. Tersedia: " . ($stock->quantity ?? 0) . " karung",
+                    ], 422);
+                }
+            }
         }
 
         // --- STORE DATA ---
@@ -176,6 +247,7 @@ class DepositController extends Controller
             'end_time' => $endTime,
             'photo' => $photoPath,
             'notes' => $request->input('notes'),
+            'details' => $details ?? null,
             'status' => 'pending', 
         ]);
 

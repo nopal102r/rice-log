@@ -13,6 +13,7 @@
         </div>
 
         <div class="bg-white rounded-lg shadow p-8">
+
             <div class="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
                 <p class="text-blue-800 text-sm">
                     <i class="fas fa-info-circle mr-2"></i>
@@ -101,6 +102,52 @@
                             <i class="fas fa-calculator text-blue-600 mr-2"></i>
                             <strong>Total Berat:</strong> <span id="total_weight_display">0</span> kg
                         </p>
+                    </div>
+
+                @elseif($user->isPacking())
+                    {{-- PACKING: Multi-item Sack Sizes --}}
+                    <div class="mb-6">
+                        <label class="block text-gray-800 font-bold mb-4 flex justify-between items-center">
+                            <span><i class="fas fa-boxes-stacked text-blue-600 mr-2"></i> Hasil Packing (Beras Karung)</span>
+                            <button type="button" id="addPackItemBtn" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-1 px-3 rounded-full transition">
+                                <i class="fas fa-plus mr-1"></i> Tambah Baris
+                            </button>
+                        </label>
+                        
+                        <div id="packingFormItems" class="space-y-3">
+                            <div class="packing-item grid grid-cols-5 gap-2 mb-2 items-end">
+                                <div class="col-span-2">
+                                    <label class="block text-xs text-gray-500 mb-1 font-bold">Ukuran Karung</label>
+                                    <select name="details[0][size]" class="pack-size w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 outline-none">
+                                        <option value="25">25 kg</option>
+                                        <option value="20">20 kg</option>
+                                        <option value="15">15 kg</option>
+                                        <option value="10">10 kg</option>
+                                        <option value="5">5 kg</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-xs text-gray-500 mb-1 font-bold">Jumlah Karung</label>
+                                    <input type="number" name="details[0][count]" class="pack-count w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 outline-none" min="1" value="1">
+                                </div>
+                                <div class="col-span-1">
+                                    <button type="button" class="remove-pack-item bg-red-100 text-red-600 rounded p-2 hover:bg-red-200 transition h-[40px] w-full">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 grid grid-cols-2 gap-4">
+                            <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Karung</p>
+                                <p class="text-xl font-black text-gray-800" id="packing_total_sacks">1</p>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                                <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Total Berat (Kg)</p>
+                                <p class="text-xl font-black text-gray-800"><span id="packing_total_weight">25</span> kg</p>
+                            </div>
+                        </div>
                     </div>
 
                 @else
@@ -223,27 +270,113 @@
                 const sackCount = parseInt(document.getElementById('sack_count').value) || 0;
                 const money = parseFloat(document.getElementById('money_amount').value) || 0;
                 
-                // Calculate total weight from sacks (for display and record)
                 const weight = sackSize * sackCount;
-                
-                // Update hidden weight field
                 document.getElementById('weight_sales').value = weight;
                 
-                // Update weight display
                 const weightDisplay = document.getElementById('total_weight_display');
-                if (weightDisplay) {
-                    weightDisplay.textContent = weight.toFixed(1);
-                }
+                if (weightDisplay) weightDisplay.textContent = weight.toFixed(1);
                 
-                // Calculate wage: Money / Sack Count (not weight!)
                 if (sackCount > 0) {
                     wage = money / sackCount;
                     formula = `Rp ${money.toLocaleString('id-ID')} / ${sackCount} karung = Rp ${wage.toLocaleString('id-ID')}/karung`;
                 }
+
+            } else if (userJob === 'packing') {
+                const items = document.querySelectorAll('.packing-item');
+                let totalWeight = 0;
+                let totalSacks = 0;
+
+                items.forEach(item => {
+                    const size = parseFloat(item.querySelector('.pack-size').value) || 0;
+                    const count = parseInt(item.querySelector('.pack-count').value) || 0;
+                    totalWeight += size * count;
+                    totalSacks += count;
+                });
+
+                wage = totalWeight * settings.packing_rate_per_kg;
+                formula = `${totalWeight.toFixed(1)} kg x Rp ${settings.packing_rate_per_kg}/kg`;
+
+                document.getElementById('packing_total_weight').textContent = totalWeight.toFixed(1);
+                document.getElementById('packing_total_sacks').textContent = totalSacks;
             }
 
             wageDisplay.textContent = wage.toLocaleString('id-ID');
             wageFormula.textContent = formula;
+        }
+
+        // --- PACKING ITEMS DYNAMIC LOGIC ---
+        if (userJob === 'packing') {
+            const packingContainer = document.getElementById('packingFormItems');
+            const addBtn = document.getElementById('addPackItemBtn');
+            let itemIndex = 1;
+
+            addBtn.addEventListener('click', () => {
+                const div = document.createElement('div');
+                div.className = 'packing-item grid grid-cols-5 gap-2 mb-2 items-end';
+                div.innerHTML = `
+                    <div class="col-span-2">
+                        <label class="block text-xs text-gray-500 mb-1 font-bold">Ukuran Karung</label>
+                        <select name="details[${itemIndex}][size]" class="pack-size w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 outline-none">
+                            <option value="25">25 kg</option>
+                            <option value="20">20 kg</option>
+                            <option value="15">15 kg</option>
+                            <option value="10">10 kg</option>
+                            <option value="5">5 kg</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs text-gray-500 mb-1 font-bold">Jumlah Karung</label>
+                        <input type="number" name="details[${itemIndex}][count]" class="pack-count w-full border border-gray-300 rounded px-3 py-2 text-sm focus:border-blue-500 outline-none" min="1" value="1">
+                    </div>
+                    <div class="col-span-1">
+                        <button type="button" class="remove-pack-item bg-red-100 text-red-600 rounded p-2 hover:bg-red-200 transition h-[40px] w-full">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                packingContainer.appendChild(div);
+                itemIndex++;
+                attachDynamicListeners();
+                calculateWage();
+            });
+
+            function attachDynamicListeners() {
+                document.querySelectorAll('.pack-size, .pack-count').forEach(el => {
+                    el.removeEventListener('input', calculateWage);
+                    el.addEventListener('input', calculateWage);
+                });
+                document.querySelectorAll('.remove-pack-item').forEach(btn => {
+                    btn.onclick = function() {
+                        const items = document.querySelectorAll('.packing-item');
+                        if (items.length > 1) {
+                            this.closest('.packing-item').remove();
+                            calculateWage();
+                        } else {
+                            Swal.fire('Info', 'Minimal harus ada 1 item.', 'info');
+                        }
+                    };
+                });
+            }
+            attachDynamicListeners();
+        }
+
+        // Driver sack calculation
+        if (userJob === 'supir') {
+            const sackSize = document.getElementById('driver_sack_size');
+            const sackCount = document.getElementById('driver_sack_count');
+            const weightInput = document.getElementById('weight_general');
+
+            const updateDriverWeight = () => {
+                const size = parseFloat(sackSize.value) || 0;
+                const count = parseInt(sackCount.value) || 0;
+                if (size > 0 && count > 0) {
+                    weightInput.value = (size * count).toFixed(1);
+                }
+                calculateWage();
+            };
+
+            sackSize.addEventListener('change', updateDriverWeight);
+            sackCount.addEventListener('input', updateDriverWeight);
         }
 
         // Attach listeners to all inputs and selects

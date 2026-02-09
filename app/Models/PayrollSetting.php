@@ -20,6 +20,7 @@ class PayrollSetting extends Model
         'max_distance_allowed',
         'leave_days_per_month',
         'min_deposit_per_week',
+        'packing_rate_per_kg',
     ];
 
     protected $casts = [
@@ -28,6 +29,7 @@ class PayrollSetting extends Model
         'farmer_rate_per_box' => 'float',
         'miller_rate_per_kg' => 'float',
         'sales_commission_rate' => 'float',
+        'packing_rate_per_kg' => 'float',
         'office_latitude' => 'float',
         'office_longitude' => 'float',
         'max_distance_allowed' => 'float',
@@ -58,6 +60,7 @@ class PayrollSetting extends Model
             'max_distance_allowed' => 2.0,
             'leave_days_per_month' => 3,
             'min_deposit_per_week' => 1,
+            'packing_rate_per_kg' => 20, // Default packing rate per kg
         ]);
     }
 }

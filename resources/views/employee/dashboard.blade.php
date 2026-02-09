@@ -53,6 +53,53 @@
             </div>
         </div>
 
+        <!-- Stock Info Widget (for Miller, Packing, Sales) -->
+        @if(isset($relevantStock) && $relevantStock)
+            <div class="mb-8">
+                <div class="bg-gray-800 rounded-lg p-6 text-white shadow-lg overflow-hidden relative">
+                    <div class="absolute top-0 right-0 p-6 opacity-10">
+                        <i class="fas fa-warehouse text-7xl"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <h4 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
+                            <i class="fas fa-chart-line text-blue-400"></i> Stok Bahan Baku / Produk Tersedia
+                        </h4>
+                        
+                        @if($user->isSales() || $user->isDriver())
+                            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                                @foreach($relevantStock as $stock)
+                                    <div class="bg-gray-700/50 rounded-lg p-3 border border-gray-600 hover:border-blue-500 transition-colors">
+                                        <div class="text-[11px] text-gray-400 font-bold uppercase mb-1">{{ str_replace('packed_', '', $stock->name) }}</div>
+                                        <div class="text-2xl font-black">{{ number_format($stock->quantity, 0) }} <span class="text-xs font-normal text-gray-400">Krng</span></div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="flex flex-col md:flex-row md:items-center gap-6">
+                                <div class="flex items-end gap-3">
+                                    <span class="text-5xl font-black text-blue-400">{{ number_format($relevantStock->quantity, 1) }}</span>
+                                    <span class="text-gray-300 text-lg mb-1 font-bold">Kg {{ $relevantStock->name === 'gabah' ? 'Gabah' : 'Beras Giling' }}</span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between text-xs mb-1 font-bold text-gray-500 uppercase">
+                                        <span>Kapasitas Produksi</span>
+                                        <span>{{ min(100, round(($relevantStock->quantity / 1000) * 100)) }}%</span>
+                                    </div>
+                                    <div class="h-3 w-full bg-gray-700 rounded-full overflow-hidden border border-gray-600">
+                                        @php
+                                            $percent = min(100, ($relevantStock->quantity / 1000) * 100);
+                                            $color = $percent > 30 ? 'bg-blue-500' : ($percent > 10 ? 'bg-yellow-500' : 'bg-red-500');
+                                        @endphp
+                                        <div class="h-full {{ $color }} transition-all duration-500" style="width: {{ $percent }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Action Buttons -->
         <div class="bg-white rounded-lg shadow p-8 mb-8">
             <h2 class="text-2xl font-bold text-gray-800 mb-6">Menu Absensi & Setor</h2>

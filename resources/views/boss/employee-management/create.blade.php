@@ -72,6 +72,7 @@
                             <option value="petani">Petani (Farmer)</option>
                             <option value="ngegiling">Ngegiling (Miller)</option>
                             <option value="sales">Sales</option>
+                            <option value="packing">Packing</option>
                         </select>
                     </div>
 

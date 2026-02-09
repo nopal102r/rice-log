@@ -75,6 +75,9 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
 
     // Reports
     Route::get('/reports', [\App\Http\Controllers\BossReportController::class, 'index'])->name('reports.index');
+
+    // Stock Inventory
+    Route::get('/stock', [\App\Http\Controllers\StockController::class, 'index'])->name('stock.index');
 });
 
 // Authenticated Routes (both roles)

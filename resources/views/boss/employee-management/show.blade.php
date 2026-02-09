@@ -58,6 +58,10 @@
                         <p class="font-bold text-gray-800">{{ $employee->name }}</p>
                     </div>
                     <div>
+                        <p class="text-gray-600 text-sm">Posisi</p>
+                        <p class="font-bold text-gray-800 capitalize">{{ str_replace('_', ' ', $employee->job) }}</p>
+                    </div>
+                    <div>
                         <p class="text-gray-600 text-sm">Email</p>
                         <p class="font-bold text-gray-800">{{ $employee->email }}</p>
                     </div>
