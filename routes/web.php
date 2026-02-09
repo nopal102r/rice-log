@@ -75,6 +75,8 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
 
     // Reports
     Route::get('/reports', [\App\Http\Controllers\BossReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/attendance', [\App\Http\Controllers\BossReportController::class, 'attendance'])->name('reports.attendance');
+    Route::get('/reports/attendance/detail/{user}', [\App\Http\Controllers\BossReportController::class, 'attendanceDetail'])->name('reports.attendance.detail');
 
     // Stock Inventory
     Route::get('/stock', [\App\Http\Controllers\StockController::class, 'index'])->name('stock.index');

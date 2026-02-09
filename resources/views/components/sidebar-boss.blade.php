@@ -25,9 +25,14 @@
                 <span>Verifikasi Setor</span>
             </a>
             <a href="{{ route('boss.reports.index') }}"
-                class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.reports.*') ? 'bg-blue-600' : '' }}">
+                class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.reports.index') ? 'bg-blue-600' : '' }}">
                 <i class="fas fa-file-invoice-dollar"></i>
                 <span>Laporan Gaji</span>
+            </a>
+            <a href="{{ route('boss.reports.attendance') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.reports.attendance') ? 'bg-blue-600' : '' }}">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Laporan Kehadiran</span>
             </a>
             <a href="{{ route('boss.stock.index') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('boss.stock.*') ? 'bg-blue-600' : '' }}">
