@@ -36,7 +36,7 @@
             <a href="{{ route('employee.deposit.create') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('employee.deposit.create') ? 'bg-blue-600' : '' }}">
                 <i class="fas fa-shopping-bag"></i>
-                <span>Setor Beras</span>
+                <span>Setoran</span>
             </a>
             <a href="{{ route('employee.deposit.my-deposits') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded hover:bg-gray-700 {{ request()->routeIs('employee.deposit.my-deposits') ? 'bg-blue-600' : '' }}">

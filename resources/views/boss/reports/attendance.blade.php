@@ -43,13 +43,13 @@
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b-2 border-gray-100">
                         <tr>
-                            <th class="px-8 py-5 text-left text-sm font-black text-gray-500 uppercase tracking-widest">Karyawan</th>
-                            <th class="px-8 py-5 text-center text-sm font-black text-gray-500 uppercase tracking-widest">Jabatan</th>
-                            <th class="px-8 py-5 text-center text-sm font-black text-gray-500 uppercase tracking-widest">Jam Masuk</th>
-                            <th class="px-8 py-5 text-center text-sm font-black text-gray-500 uppercase tracking-widest">Jam Keluar</th>
-                            <th class="px-8 py-5 text-center text-sm font-black text-gray-500 uppercase tracking-widest">Status</th>
-                            <th class="px-8 py-5 text-center text-sm font-black text-gray-500 uppercase tracking-widest">Jarak (Km)</th>
-                            <th class="px-8 py-5 text-right text-sm font-black text-gray-500 uppercase tracking-widest">Aksi</th>
+                            <th class="px-8 py-5 text-left text-sm font-bold text-gray-500 uppercase tracking-widest">Karyawan</th>
+                            <th class="px-8 py-5 text-center text-sm font-bold text-gray-500 uppercase tracking-widest">Jabatan</th>
+                            <th class="px-8 py-5 text-center text-sm font-bold text-gray-500 uppercase tracking-widest">Jam Masuk</th>
+                            <th class="px-8 py-5 text-center text-sm font-bold text-gray-500 uppercase tracking-widest">Jam Keluar</th>
+                            <th class="px-8 py-5 text-center text-sm font-bold text-gray-500 uppercase tracking-widest">Status</th>
+                            <th class="px-8 py-5 text-center text-sm font-bold text-gray-500 uppercase tracking-widest">Jarak (Km)</th>
+                            <th class="px-8 py-5 text-right text-sm font-bold text-gray-500 uppercase tracking-widest">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -61,55 +61,55 @@
                                             {{ substr($data->user->name, 0, 1) }}
                                         </div>
                                         <div class="ml-4">
-                                            <div class="text-lg font-black text-gray-900 leading-none mb-1 group-hover:text-blue-700 transition-colors">{{ $data->user->name }}</div>
-                                            <div class="text-xs font-bold text-gray-400 uppercase tracking-tighter">{{ $data->user->email }}</div>
+                                            <div class="text-lg font-bold text-gray-900 leading-none mb-1 group-hover:text-blue-700 transition-colors">{{ $data->user->name }}</div>
+                                            <div class="text-xs font-semibold text-gray-400 uppercase tracking-tighter">{{ $data->user->email }}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-8 py-6 text-center whitespace-nowrap">
-                                    <span class="px-3 py-1 text-xs font-black rounded-full bg-gray-100 text-gray-600 uppercase tracking-wider">
+                                    <span class="px-3 py-1 text-xs font-bold rounded-full bg-gray-100 text-gray-600 uppercase tracking-wider">
                                         {{ $data->user->job }}
                                     </span>
                                 </td>
                                 <td class="px-8 py-6 text-center whitespace-nowrap">
                                     @if($data->in !== '-')
-                                        <div class="inline-flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg border border-green-100 font-black">
+                                        <div class="inline-flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg border border-green-100 font-bold text-sm">
                                             <i class="fas fa-sign-in-alt"></i>
                                             {{ $data->in }}
                                         </div>
                                     @else
-                                        <span class="text-gray-300 font-black">-</span>
+                                        <span class="text-gray-300 font-bold">-</span>
                                     @endif
                                 </td>
                                 <td class="px-8 py-6 text-center whitespace-nowrap">
                                     @if($data->out !== '-')
-                                        <div class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-3 py-1.5 rounded-lg border border-red-100 font-black">
+                                        <div class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-3 py-1.5 rounded-lg border border-red-100 font-bold text-sm">
                                             <i class="fas fa-sign-out-alt"></i>
                                             {{ $data->out }}
                                         </div>
                                     @else
-                                        <span class="text-gray-300 font-black">-</span>
+                                        <span class="text-gray-300 font-bold">-</span>
                                     @endif
                                 </td>
                                 <td class="px-8 py-6 text-center whitespace-nowrap">
                                     @if($data->status !== '-')
-                                        <span class="px-3 py-1 text-xs font-black rounded-full 
+                                        <span class="px-3 py-1 text-xs font-bold rounded-full 
                                             {{ $data->status === 'hadir' ? 'bg-green-100 text-green-800' : 
                                                ($data->status === 'sakit' ? 'bg-orange-100 text-orange-800' : 'bg-blue-100 text-blue-800') }} uppercase tracking-widest">
                                             {{ $data->status }}
                                         </span>
                                     @else
-                                        <span class="text-gray-300 font-black">T/A</span>
+                                        <span class="text-gray-300 font-bold">T/A</span>
                                     @endif
                                 </td>
-                                <td class="px-8 py-6 text-center whitespace-nowrap font-bold text-gray-600">
+                                <td class="px-8 py-6 text-center whitespace-nowrap font-medium text-gray-600">
                                     {{ $data->distance !== null ? $data->distance . ' km' : '-' }}
                                 </td>
                                 <td class="px-8 py-6 text-right whitespace-nowrap">
                                     <a href="{{ route('boss.reports.attendance.detail', $data->user->id) }}" 
-                                       class="inline-flex items-center justify-center p-3 bg-white text-blue-600 hover:bg-blue-600 hover:text-white border-2 border-blue-600 rounded-xl font-black transition-all shadow-sm active:scale-95 group-hover:shadow-md">
+                                       class="inline-flex items-center justify-center px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600 rounded-xl font-bold text-xs transition-all shadow-sm active:scale-95 group-hover:shadow-md">
                                        <i class="fas fa-chart-pie mr-2"></i>
-                                       Detail Bulanan
+                                       Detail
                                     </a>
                                 </td>
                             </tr>
