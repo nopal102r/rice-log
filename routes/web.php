@@ -10,6 +10,7 @@ use App\Http\Controllers\EmployeeDashboardController;
 use App\Http\Controllers\LeaveApprovalController;
 use App\Http\Controllers\LeaveSubmissionController;
 use App\Http\Controllers\PayrollSettingController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -94,5 +95,8 @@ Route::middleware(['auth'])->group(function () {
     // Notifications
     Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index']);
     Route::post('/notifications/{notification}/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead']);
+
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 });
 
