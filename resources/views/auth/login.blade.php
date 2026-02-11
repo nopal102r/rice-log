@@ -80,9 +80,9 @@
             <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-50 rounded-full blur-3xl opacity-50"></div>
 
             <div class="relative z-10">
-            <div class="text-center mb-10">
-                <img src="{{ asset('image/logo 1.png') }}" alt="Logo Main" class="h-32 mx-auto mb-3 drop-shadow-md">
-                <img src="{{ asset('image/logo 3.png') }}" alt="Logo Tagline" class="h-14 mx-auto opacity-90">
+            <div class="text-center mb-8 md:mb-10">
+                <img src="{{ asset('image/logo 1.png') }}" alt="Logo Main" class="h-24 md:h-32 mx-auto mb-3 drop-shadow-md">
+                <img src="{{ asset('image/logo 3.png') }}" alt="Logo Tagline" class="h-10 md:h-14 mx-auto opacity-90">
             </div>
 
             <!-- Login Form -->

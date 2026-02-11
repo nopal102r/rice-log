@@ -1,7 +1,11 @@
 <nav class="bg-white border-b border-gray-100 text-gray-800 px-8 flex items-center shadow-sm fixed top-0 left-0 right-0 z-40 w-full h-24">
     <div class="flex justify-between items-center w-full">
         <div class="flex items-center gap-4">
-            <img src="{{ asset('image/logo 2.png') }}" alt="Logo" class="h-16 md:h-20 transition-all duration-300">
+            <!-- Hamburger Menu (Mobile Only) -->
+            <button onclick="toggleSidebar()" class="lg:hidden text-gray-600 focus:outline-none p-2 hover:bg-gray-100 rounded-lg">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <img src="{{ asset('image/logo 2.png') }}" alt="Logo" class="h-12 md:h-16 lg:h-20 transition-all duration-300">
         </div>
 
         <div class="flex items-center gap-6">

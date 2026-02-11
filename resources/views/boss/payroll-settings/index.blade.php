@@ -197,9 +197,9 @@
                 </div>
 
                 <!-- Buttons -->
-                <div class="flex gap-4">
+                <div class="flex flex-col md:flex-row gap-4">
                     <button type="submit"
-                        class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2">
+                        class="flex-[2] bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2">
                         <i class="fas fa-save"></i> Simpan Pengaturan
                     </button>
                     <a href="{{ route('boss.dashboard') }}"

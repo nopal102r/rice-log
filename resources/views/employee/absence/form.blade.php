@@ -75,7 +75,7 @@
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <i class="fas fa-map-marker-alt text-red-600"></i> Lokasi Anda
             </h2>
-            <div id="map" style="width: 100%; height: 400px; border-radius: 12px; margin-bottom: 1rem;"></div>
+            <div id="map" class="w-full h-[300px] md:h-[400px] rounded-xl mb-4 shadow-inner border border-gray-100"></div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-gray-50 p-4 rounded">
@@ -205,14 +205,14 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="flex gap-4">
+            <div class="flex flex-col md:flex-row gap-4">
                 <button type="submit"
                     @if(($type === 'masuk' && $hasCheckedIn) || ($type === 'keluar' && $hasCheckedOut)) disabled @endif
-                    class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 @if(($type === 'masuk' && $hasCheckedIn) || ($type === 'keluar' && $hasCheckedOut)) opacity-50 cursor-not-allowed @endif">
+                    class="order-1 md:order-2 flex-[2] bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 @if(($type === 'masuk' && $hasCheckedIn) || ($type === 'keluar' && $hasCheckedOut)) opacity-50 cursor-not-allowed @endif">
                     <i class="fas fa-check"></i> Simpan Presensi
                 </button>
                 <a href="{{ route('employee.dashboard') }}"
-                    class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 rounded-lg flex items-center justify-center gap-2">
+                    class="order-2 md:order-1 flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 rounded-lg flex items-center justify-center gap-2">
                     <i class="fas fa-times"></i> Batal
                 </a>
             </div>

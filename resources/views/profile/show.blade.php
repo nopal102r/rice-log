@@ -5,28 +5,28 @@
 @section('content')
     <div class="max-w-6xl mx-auto">
         <!-- Header -->
-        <div class="mb-8 flex justify-between items-start">
-            <div>
-                <h1 class="text-4xl font-bold text-gray-800 mb-2">{{ $user->name }}</h1>
+        <div class="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
+            <div class="order-2 md:order-1">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">{{ $user->name }}</h1>
                 <p class="text-gray-600">
                     <i class="fas fa-birthday-cake mr-2"></i> Umur: <strong>{{ $user->getAge() }} tahun</strong> |
                     <i class="fas fa-envelope mr-2"></i> {{ $user->email }} |
                     <i class="fas fa-phone mr-2"></i> {{ $user->phone }}
                 </p>
-                <div class="mt-2 flex gap-2">
-                    <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-black uppercase tracking-wider">
+                <div class="mt-2 flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-[10px] font-black uppercase tracking-wider">
                         {{ $user->role === 'bos' ? 'BOS / OWNER' : 'KARYAWAN - ' . strtoupper($user->job) }}
                     </span>
-                    <span class="px-3 py-1 {{ $user->status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }} rounded-full text-xs font-black uppercase tracking-wider">
+                    <span class="px-3 py-1 {{ $user->status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }} rounded-full text-[10px] font-black uppercase tracking-wider">
                         {{ strtoupper($user->status) }}
                     </span>
                 </div>
             </div>
             
             @if($user->isEmployee())
-                 <div class="bg-blue-600 text-white p-4 rounded-xl shadow-lg transform rotate-2">
+                 <div class="order-1 md:order-2 bg-blue-600 text-white p-5 rounded-2xl shadow-lg transform md:rotate-2 w-full md:w-auto">
                     <p class="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 mb-1">Total Gaji Bulan Ini</p>
-                    <p class="text-2xl font-black italic">Rp {{ number_format($summary->total_salary, 0, ',', '.') }}</p>
+                    <p class="text-2xl md:text-3xl font-black italic">Rp {{ number_format($summary->total_salary, 0, ',', '.') }}</p>
                 </div>
             @endif
         </div>
