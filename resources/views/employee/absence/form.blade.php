@@ -3,8 +3,7 @@
 @section('title', 'Presensi ' . ($type === 'masuk' ? 'Masuk' : 'Keluar'))
 
 @section('extra-css')
-    <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <script src="{{ asset('js/face-recognition-helper.js') }}"></script>
@@ -222,68 +221,73 @@
 @endsection
 
 @section('extra-js')
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        const googleMapsApiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Ganti dengan API key Anda
         const officeLocation = @json($officeLocation);
         const maxDistance = {{ $maxDistance }};
         // Pass enrolled face data to the view
         const enrolledFaceData = @json(auth()->user()->face_data);
 
-        let map, userMarker, officeMarker;
+        let map, userMarker, officeMarker, distanceLine;
         let currentLat = 0, currentLon = 0;
         let isFaceVerified = false;
 
         // Initialize Map
         function initMap() {
-            if (typeof google === 'undefined') return;
+            if (map) return; // Already initialized
 
-            map = new google.maps.Map(document.getElementById('map'), {
-                zoom: 15,
-                center: { lat: officeLocation.latitude, lng: officeLocation.longitude }
-            });
+           map = L.map('map').setView([officeLocation.latitude, officeLocation.longitude], 15);
+
+           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
 
             // Office marker
-            officeMarker = new google.maps.Marker({
-                map: map,
-                position: { lat: officeLocation.latitude, lng: officeLocation.longitude },
-                title: 'Kantor Pusat',
-                icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-            });
+           officeMarker = L.marker([officeLocation.latitude, officeLocation.longitude])
+                .addTo(map)
+                .bindPopup("Kantor Pusat");
+        }
             
             // If we already have location, update map user marker
             if (currentLat !== 0 && currentLon !== 0) {
                 updateUserMarker(currentLat, currentLon);
             }
-        }
+        
         
         function updateUserMarker(lat, lng) {
-            if (!map || typeof google === 'undefined') return;
-            
+            if (!map) return;
+
+            // Jika marker user sudah ada, pindahkan lokasinya. Jika belum, buat baru.
             if (userMarker) {
-                userMarker.setPosition({ lat: lat, lng: lng });
+                userMarker.setLatLng([lat, lng]);
             } else {
-                 userMarker = new google.maps.Marker({
-                    map: map,
-                    position: { lat: lat, lng: lng },
-                    title: 'Lokasi Anda',
-                    icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-                });
+                userMarker = L.marker([lat, lng], {
+                    title: "Lokasi Anda",
+                    icon: L.icon({
+                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    })
+                }).addTo(map).bindPopup("Anda di sini").openPopup();
             }
-            map.setCenter({ lat: lat, lng: lng });
+            map.setView([lat, lng], map.getZoom());
             
             // Draw line
             // (Simplified: remove old line if exists - strictly we'd need to track the line instance, 
             // but for now let's just draw new one or ignore clearing old one as user moves strictly once usually)
-             new google.maps.Polyline({
-                map: map,
-                path: [
-                    { lat: lat, lng: lng },
-                    { lat: officeLocation.latitude, lng: officeLocation.longitude }
-                ],
-                strokeColor: '#FF0000',
-                strokeOpacity: 0.5,
-                strokeWeight: 2
-            });
+             if (distanceLine) map.removeLayer(distanceLine);
+            
+            distanceLine = L.polyline([
+                [lat, lng],
+                [officeLocation.latitude, officeLocation.longitude]
+            ], {color: 'red', weight: 3, opacity: 0.5}).addTo(map);
+
+            // Zoom peta agar menampilkan kedua marker
+            const group = new L.featureGroup([officeMarker, userMarker]);
+            map.fitBounds(group.getBounds().pad(0.1));
         }
 
         // Get User Location (Independent of Google Maps)
@@ -360,12 +364,7 @@
 
             // 2. Try Init Map
             try {
-                if (typeof google !== 'undefined') {
-                    initMap();
-                } else {
-                    console.warn('Google Maps API not loaded.');
-                    document.getElementById('coordinatesDisplay').textContent += " (Map Disabled)";
-                }
+                initMap();
             } catch (e) {
                 console.warn('Map init error:', e);
             }
@@ -608,6 +607,21 @@
                      Swal.fire('Error', 'Verifikasi wajah gagal. Silakan coba lagi.', 'error');
                      return;
                 }
+            }
+
+            // Check distance again before submitting
+            const R = 6371; 
+            const dLat = (officeLocation.latitude - currentLat) * Math.PI / 180;
+            const dLon = (officeLocation.longitude - currentLon) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(currentLat * Math.PI / 180) * Math.cos(officeLocation.latitude * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+
+            if (distance > maxDistance) {
+                Swal.fire('Error', `Jarak Anda terlalu jauh (${distance.toFixed(2)} km). Maksimal ${maxDistance} km.`, 'error');
+                return;
             }
 
             if ((status === 'sakit' || status === 'izin') && !description) {
