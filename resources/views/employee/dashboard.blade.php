@@ -68,7 +68,7 @@
                         @if($user->isSales() || $user->isDriver())
                             <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                                 @foreach($relevantStock as $stock)
-                                    <div class="bg-blue-50/30 rounded-xl p-3 border border-blue-50 transition-colors">
+                                    <div class="bg-blue-50/30 rounded-xl p-3 border border-blue-200 transition-colors">
                                         <div class="text-[11px] text-blue-400 font-bold uppercase mb-1">{{ str_replace('packed_', '', $stock->name) }}</div>
                                         <div class="text-2xl font-black text-gray-800">{{ number_format($stock->quantity, 0) }} <span class="text-xs font-normal text-gray-400">Krng</span></div>
                                     </div>

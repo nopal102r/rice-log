@@ -8,23 +8,81 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        :root {
+            --primary-blue: #3b82f6;
+            --primary-green: #10b981;
+            --primary-red: #ef4444;
         }
-    </style>   
+
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-green) 100%);
+        }
+
+        /* Animated Rice Background */
+        .rice-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: #f8fafc;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .rice-particle {
+            position: absolute;
+            color: var(--primary-green);
+            opacity: 0.15;
+            font-size: 24px;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.15; }
+            90% { opacity: 0.15; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Rice Decorations */
+        .rice-decor-left, .rice-decor-right {
+            position: fixed;
+            bottom: -20px;
+            font-size: 15rem;
+            color: var(--primary-green);
+            opacity: 0.05;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .rice-decor-left { left: -50px; transform: rotate(15deg); }
+        .rice-decor-right { right: -50px; transform: rotate(-15deg); }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 overflow-hidden">
+    <!-- Rice Decorations/Background -->
+    <div class="rice-background" id="rice-bg"></div>
+    <i class="fas fa-seedling rice-decor-left"></i>
+    <i class="fas fa-wheat-awn rice-decor-right"></i>
+
     <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-            <!-- Logo -->
-            <div class="text-center mb-8">
-                <div
-                    class="gradient-bg text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-seedling text-2xl"></i>
-                </div>
-                <h1 class="text-3xl font-bold text-gray-800">Rice Log</h1>
-                <p class="text-gray-600 text-sm">Sistem Absensi Pabrik Beras</p>
+        <div class="max-w-md w-full glass-card rounded-3xl shadow-2xl p-10 border border-white/50 relative overflow-hidden">
+            <!-- Subtle internal decoration -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-green-50 rounded-full blur-3xl opacity-50"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-50 rounded-full blur-3xl opacity-50"></div>
+
+            <div class="relative z-10">
+            <div class="text-center mb-10">
+                <img src="{{ asset('image/logo 1.png') }}" alt="Logo Main" class="h-32 mx-auto mb-3 drop-shadow-md">
+                <img src="{{ asset('image/logo 3.png') }}" alt="Logo Tagline" class="h-14 mx-auto opacity-90">
             </div>
 
             <!-- Login Form -->
@@ -70,23 +128,28 @@
                 </button>
             </form>
 
-            <!-- Demo Credentials -->
-            <div class="mt-8 pt-8 border-t border-gray-200">
-                <p class="text-gray-700 text-sm font-bold mb-4">Demo Akun:</p>
-                <div class="space-y-2 bg-gray-50 p-4 rounded text-sm">
-                    <div>
-                        <p class="text-gray-600"><strong>Bos:</strong></p>
-                        <p class="text-gray-700">Email: bos@ricemail.com</p>
-                        <p class="text-gray-700">Password: password</p>
-                    </div>
-                    <div class="pt-2 border-t">
-                        <p class="text-gray-600"><strong>Karyawan:</strong></p>
-                        <p class="text-gray-700">Lihat di database seeder</p>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const bg = document.getElementById('rice-bg');
+            const icons = ['fa-seedling', 'fa-wheat-awn', 'fa-spa'];
+            
+            for (let i = 0; i < 25; i++) {
+                const particle = document.createElement('i');
+                const icon = icons[Math.floor(Math.random() * icons.length)];
+                particle.className = `fas ${icon} rice-particle`;
+                
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.fontSize = (20 + Math.random() * 30) + 'px';
+                particle.style.opacity = (0.05 + Math.random() * 0.1).toString();
+                
+                bg.appendChild(particle);
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -12,7 +12,7 @@
 
         <!-- Key Metrics -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
                         <i class="fas fa-users text-blue-600"></i>
@@ -24,7 +24,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
                         <i class="fas fa-check-circle text-green-600"></i>
@@ -36,7 +36,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">
                         <i class="fas fa-money-bill-trend-up text-orange-600"></i>
@@ -48,7 +48,7 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
                         <i class="fas fa-hand-holding-dollar text-red-600"></i>
