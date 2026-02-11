@@ -131,13 +131,13 @@
                             @if($leave->reason)
                                 <p class="text-sm text-gray-700 mb-2">Alasan: {{ $leave->reason }}</p>
                             @endif
-                            <div class="flex gap-2">
+                            <div class="flex flex-col sm:flex-row gap-2 mt-4">
                                 <button onclick="approveLeave({{ $leave->id }})"
-                                    class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded">
+                                    class="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg font-bold flex-1">
                                     <i class="fas fa-check mr-1"></i> Setujui
                                 </button>
                                 <button onclick="openRejectModal({{ $leave->id }})"
-                                    class="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded">
+                                    class="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-bold flex-1">
                                     <i class="fas fa-times mr-1"></i> Tolak
                                 </button>
                             </div>
@@ -173,13 +173,13 @@
                                 <span
                                     class="bg-purple-200 text-purple-800 text-xs font-bold px-2 py-1 rounded">{{ $deposit->status }}</span>
                             </div>
-                            <div class="flex gap-2">
+                            <div class="flex flex-col sm:flex-row gap-2 mt-4">
                                 <button onclick="verifyDeposit({{ $deposit->id }})"
-                                    class="text-xs bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded">
+                                    class="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg font-bold flex-1">
                                     <i class="fas fa-check mr-1"></i> Verifikasi
                                 </button>
                                 <button onclick="openRejectDepositModal({{ $deposit->id }})"
-                                    class="text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded">
+                                    class="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-bold flex-1">
                                     <i class="fas fa-times mr-1"></i> Tolak
                                 </button>
                             </div>

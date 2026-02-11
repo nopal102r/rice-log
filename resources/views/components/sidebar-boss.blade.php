@@ -1,5 +1,5 @@
-<aside
-    class="w-64 bg-white border-r border-gray-100 min-h-screen p-4 hidden md:block fixed left-0 top-24 bottom-0 overflow-y-auto z-30 shadow-sm">
+<aside id="sidebar-boss"
+    class="sidebar-responsive fixed left-0 top-24 bottom-0 w-64 bg-white border-r border-gray-100 p-4 transition-transform duration-300 transform -translate-x-full lg:translate-x-0 overflow-y-auto z-30 shadow-sm">
     <nav class="space-y-1">
         <a href="{{ route('boss.dashboard') }}"
             class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('boss.dashboard') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600' }}">

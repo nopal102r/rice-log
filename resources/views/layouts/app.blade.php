@@ -73,7 +73,9 @@
 
     @include('components.navbar')
 
-    <div class="flex pt-28">
+    <div class="flex pt-28 relative">
+        <!-- Mobile Sidebar Backdrop -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-20 hidden lg:hidden transition-opacity duration-300 opacity-0" onclick="toggleSidebar()"></div>
         @if(auth()->check())
             @if(auth()->user()->isBoss())
                 @include('components.sidebar-boss')
@@ -82,7 +84,7 @@
             @endif
         @endif
 
-        <main class="flex-1 p-4 md:p-8 md:ml-64">
+        <main id="main-content" class="flex-1 p-4 md:p-8 lg:ml-64 transition-all duration-300">
             @if($errors->any())
                 <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
                     <ul class="list-disc ml-5">
@@ -122,6 +124,33 @@
                 bg.appendChild(particle);
             }
         });
+
+        // Mobile Sidebar Toggle
+        function toggleSidebar() {
+            const sidebars = document.querySelectorAll('.sidebar-responsive');
+            const overlay = document.getElementById('sidebar-overlay');
+            const body = document.body;
+            
+            sidebars.forEach(sidebar => {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+            
+            if (overlay.classList.contains('hidden')) {
+                overlay.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.classList.add('opacity-100');
+                    overlay.classList.remove('opacity-0');
+                }, 10);
+                body.classList.add('overflow-hidden');
+            } else {
+                overlay.classList.add('opacity-0');
+                overlay.classList.remove('opacity-100');
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                }, 300);
+                body.classList.remove('overflow-hidden');
+            }
+        }
     </script>
     @yield('extra-js')
 </body>
