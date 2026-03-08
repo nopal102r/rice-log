@@ -490,7 +490,7 @@
                             const enrolledArray = Object.values(enrolledFaceData);
                             const enrolledFloat32 = new Float32Array(enrolledArray);
 
-                             const match = FaceRecognitionHelper.verifyFace(capturedDescriptors[0], enrolledFloat32, 0.4);
+                             const match = FaceRecognitionHelper.verifyFace(capturedDescriptors[0], enrolledFloat32, 0.45);
                             
                             if (match) {
                                 isFaceVerified = true;
