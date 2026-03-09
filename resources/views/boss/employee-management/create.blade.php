@@ -128,18 +128,18 @@
                         <p class="text-gray-600">Siap untuk daftar wajah</p>
                     </div>
 
-                    <div class="flex gap-2 justify-center mb-4">
+                    <div class="flex flex-col sm:flex-row gap-2 justify-center mb-4">
                         <button type="button" id="startEnrollmentCameraBtn"
-                            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded" style="display: none;">
+                            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-lg w-full sm:w-auto" style="display: none;">
                             <i class="fas fa-video mr-2"></i> Buka Kamera
                         </button>
                         <button type="button" id="captureEnrollmentBtn"
-                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded"
+                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg w-full sm:w-auto"
                             style="display: none;">
                             <i class="fas fa-camera mr-2"></i> Ambil Foto
                         </button>
                         <button type="button" id="stopEnrollmentCameraBtn"
-                            class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded"
+                            class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg w-full sm:w-auto"
                             style="display: none;">
                             <i class="fas fa-stop mr-2"></i> Tutup Kamera
                         </button>

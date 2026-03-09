@@ -10,6 +10,7 @@ use App\Http\Controllers\EmployeeDashboardController;
 use App\Http\Controllers\LeaveApprovalController;
 use App\Http\Controllers\LeaveSubmissionController;
 use App\Http\Controllers\PayrollSettingController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -34,6 +35,7 @@ Route::middleware(['auth', 'employee'])->prefix('employee')->name('employee.')->
     Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('dashboard');
 
     // Absences
+    Route::get('/absence/report', [AbsenceController::class, 'report'])->name('absence.report');
     Route::get('/absence/{type}', [AbsenceController::class, 'show'])->name('absence.form')->where('type', 'masuk|keluar');
     Route::post('/absence', [AbsenceController::class, 'store'])->name('absence.store');
 
@@ -55,7 +57,7 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
 
     // Employee Management
     Route::resource('employees', EmployeeManagementController::class);
-    Route::patch('/employees/{user}/toggle-status', [EmployeeManagementController::class, 'toggleStatus'])->name('employees.toggle-status');
+    Route::patch('/employees/{employee}/toggle-status', [\App\Http\Controllers\EmployeeManagementController::class, 'toggleStatus'])->name('employees.toggle-status');
     Route::get('/boss-management/create', [EmployeeManagementController::class, 'createBoss'])->name('boss-management.create');
     Route::post('/boss-management', [EmployeeManagementController::class, 'storeBoss'])->name('boss-management.store');
 
@@ -75,6 +77,8 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
 
     // Reports
     Route::get('/reports', [\App\Http\Controllers\BossReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/attendance', [\App\Http\Controllers\BossReportController::class, 'attendance'])->name('reports.attendance');
+    Route::get('/reports/attendance/detail/{user}', [\App\Http\Controllers\BossReportController::class, 'attendanceDetail'])->name('reports.attendance.detail');
 
     // Stock Inventory
     Route::get('/stock', [\App\Http\Controllers\StockController::class, 'index'])->name('stock.index');
@@ -88,5 +92,12 @@ Route::middleware(['auth'])->group(function () {
         }
         return redirect()->route('employee.dashboard');
     })->name('dashboard');
+
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index']);
+    Route::post('/notifications/{notification}/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead']);
+
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 });
 

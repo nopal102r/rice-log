@@ -46,12 +46,23 @@ class BossDashboardController extends Controller
 
             if ($summary->status === 'active') {
                 $activeEmployees++;
-                // $totalMonthlyIncome += $summary->total_salary; // Removed legacy summary count
+            }
+
+            // Get today's activity
+            $todayAbsence = Absence::where('user_id', $employee->id)
+                ->whereDate('created_at', now()->toDateString())
+                ->where('type', 'masuk')
+                ->first();
+            
+            $activity = 'tidak hadir';
+            if ($todayAbsence) {
+                $activity = $todayAbsence->status; // hadir, izin, sakit
             }
 
             $employeeSummaries[] = [
                 'user' => $employee,
                 'summary' => $summary,
+                'activity' => $activity,
             ];
         }
 

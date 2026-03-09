@@ -44,71 +44,83 @@ class EmployeeManagementController extends Controller
             }
         }
 
-        $employees = $query->with('monthlySummaries')->paginate(15);
-
-        // Get current month/year for summaries
-        $currentMonth = now()->month;
-        $currentYear = now()->year;
-
-        // Enhance employee data with current summary
-        $employeesData = $employees->map(function ($employee) use ($currentMonth, $currentYear) {
-            $summary = MonthlySummary::getOrCreateCurrent($employee->id, $currentMonth, $currentYear);
-            $summary->calculateSummary();
-
-            return [
-                'employee' => $employee,
-                'summary' => $summary,
-            ];
-        });
+        $employees = $query->paginate(15);
 
         return view('boss.employee-management.index', [
             'employees' => $employees,
-            'employeesData' => $employeesData,
-            'currentMonth' => $currentMonth,
-            'currentYear' => $currentYear,
         ]);
     }
 
     /**
      * Show employee details and performance.
      */
-    public function show(User $user): View
+    public function show(User $employee): View
     {
-        if ($user->role !== 'karyawan') {
+        if ($employee->role !== 'karyawan') {
             abort(404);
         }
 
         $currentMonth = now()->month;
         $currentYear = now()->year;
 
-        $summary = MonthlySummary::getOrCreateCurrent($user->id, $currentMonth, $currentYear);
+        $summary = MonthlySummary::getOrCreateCurrent($employee->id, $currentMonth, $currentYear);
         $summary->calculateSummary();
 
         // Get last absences
-        $recentAbsences = Absence::where('user_id', $user->id)
+        $recentAbsences = Absence::where('user_id', $employee->id)
             ->latest()
             ->limit(10)
             ->get();
 
         // Get last deposits
-        $recentDeposits = Deposit::where('user_id', $user->id)
+        $recentDeposits = Deposit::where('user_id', $employee->id)
             ->latest()
             ->limit(10)
             ->get();
 
+        // Calculate job-specific totals for this month
+        $monthDeposits = Deposit::where('user_id', $employee->id)
+            ->where('status', 'verified')
+            ->whereMonth('created_at', $currentMonth)
+            ->whereYear('created_at', $currentYear)
+            ->get();
+
+        $jobMetrics = [
+            'total_kg' => $monthDeposits->sum('weight'),
+            'total_money' => $monthDeposits->sum('money_amount'),
+            'total_items' => 0,
+            'packing_details' => [],
+        ];
+
+        if ($employee->job === 'packing') {
+            foreach ($monthDeposits as $deposit) {
+                if ($deposit->details) {
+                    foreach ($deposit->details as $item) {
+                        $label = ($item['weight'] ?? 0) . 'kg - ' . ($item['type'] ?? 'Reguler');
+                        $jobMetrics['packing_details'][$label] = ($jobMetrics['packing_details'][$label] ?? 0) + ($item['count'] ?? 0);
+                        $jobMetrics['total_items'] += ($item['count'] ?? 0);
+                    }
+                }
+            }
+        } elseif ($employee->job === 'ngegiling' || $employee->job === 'petani') {
+            // For petani, box_count usually refers to land management (ngurus lahan)
+            $jobMetrics['total_items'] = $monthDeposits->sum('box_count');
+        }
+
         // Get all month data
-        $monthlyData = MonthlySummary::where('user_id', $user->id)
+        $monthlyData = MonthlySummary::where('user_id', $employee->id)
             ->orderBy('year', 'desc')
             ->orderBy('month', 'desc')
             ->limit(12)
             ->get();
 
         return view('boss.employee-management.show', [
-            'employee' => $user,
+            'employee' => $employee,
             'summary' => $summary,
             'recentAbsences' => $recentAbsences,
             'recentDeposits' => $recentDeposits,
             'monthlyData' => $monthlyData,
+            'jobMetrics' => $jobMetrics,
         ]);
     }
 
@@ -212,17 +224,17 @@ class EmployeeManagementController extends Controller
     /**
      * Toggle employee status.
      */
-    public function toggleStatus(User $user): JsonResponse
+    public function toggleStatus(User $employee): JsonResponse
     {
-        if ($user->role !== 'karyawan') {
+        if ($employee->role !== 'karyawan') {
             return response()->json([
                 'success' => false,
                 'message' => 'User bukan karyawan.',
             ], 422);
         }
 
-        $newStatus = $user->status === 'active' ? 'inactive' : 'active';
-        $user->update(['status' => $newStatus]);
+        $newStatus = $employee->status === 'active' ? 'inactive' : 'active';
+        $employee->update(['status' => $newStatus]);
 
         return response()->json([
             'success' => true,

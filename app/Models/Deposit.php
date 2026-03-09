@@ -31,6 +31,8 @@ class Deposit extends Model
 
     protected $casts = [
         'verified_at' => 'datetime',
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',
         'weight' => 'decimal:2',
         'box_count' => 'integer',
         'money_amount' => 'decimal:2',
@@ -70,6 +72,7 @@ class Deposit extends Model
 
         return [
             'total_kg' => $deposits->sum('weight'),
+            'total_boxes' => $deposits->sum('box_count'),
             'total_wage' => $deposits->sum('wage_amount'), // Changed from total_price to wage_amount for salary
             'total_revenue' => $deposits->sum('money_amount'), // Added for sales tracking
             'count' => $deposits->count(),

@@ -53,6 +53,7 @@ class DepositController extends Controller
         $endTime = null;
         $weight = null;
         $details = null;
+        $currentRate = $settings->price_per_kg; // Default
 
         // --- ROLE BASED VALIDATION & CALCULATION ---
 
@@ -74,7 +75,8 @@ class DepositController extends Controller
             }
 
             // Wage = Weight * Driver Rate
-            $wageAmount = $weight * $settings->driver_rate_per_kg;
+            $currentRate = $settings->driver_rate_per_kg;
+            $wageAmount = $weight * $currentRate;
             $totalPrice = $weight * $settings->price_per_kg;
 
         } elseif ($user->isMiller()) {
@@ -87,7 +89,8 @@ class DepositController extends Controller
 
             $weight = $validated['weight'];
             // Wage = Weight * Miller Rate
-            $wageAmount = $weight * $settings->miller_rate_per_kg;
+            $currentRate = $settings->miller_rate_per_kg;
+            $wageAmount = $weight * $currentRate;
             $totalPrice = $weight * $settings->price_per_kg;
 
         } elseif ($user->isFarmer()) {
@@ -109,7 +112,8 @@ class DepositController extends Controller
                 $endTime = $validated['end_time'];
                 
                 // Wage = Boxes * Farmer Box Rate
-                $wageAmount = $boxCount * $settings->farmer_rate_per_box;
+                $currentRate = $settings->farmer_rate_per_box;
+                $wageAmount = $boxCount * $currentRate;
                 $totalPrice = 0; // No rice value for land management
 
             } else {
@@ -128,7 +132,8 @@ class DepositController extends Controller
                 // The prompt says "setor beras mentah... login juga beda bedain".
                 // I will assume for now it's treated like a "sale" from farmer to company, so Wage = Weight * PricePerKg.
                 // Re-reading: "setor beras mentah" implies giving product. 
-                $wageAmount = $weight * $settings->price_per_kg; 
+                $currentRate = $settings->price_per_kg; 
+                $wageAmount = $weight * $currentRate; 
                 $totalPrice = $weight * $settings->price_per_kg;
             }
 
@@ -178,7 +183,8 @@ class DepositController extends Controller
 
             $weight = $totalWeight;
             // Wage = Total Weight (kg) * Packing Rate per Kg
-            $wageAmount = $weight * $settings->packing_rate_per_kg;
+            $currentRate = $settings->packing_rate_per_kg;
+            $wageAmount = $weight * $currentRate;
             $totalPrice = $weight * $settings->price_per_kg;
 
             // STOCK CHECK: Packing needs 'beras_giling'
@@ -241,7 +247,7 @@ class DepositController extends Controller
             'box_count' => $boxCount,
             'money_amount' => $moneyAmount,
             'wage_amount' => $wageAmount,
-            'price_per_kg' => $settings->price_per_kg, // Snapshot current rate
+            'price_per_kg' => $currentRate, // Snapshot CORRECT specific rate
             'total_price' => $totalPrice, // Legacy / Contextual
             'start_time' => $startTime,
             'end_time' => $endTime,

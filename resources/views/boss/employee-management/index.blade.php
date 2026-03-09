@@ -46,72 +46,34 @@
                             <th class="px-4 py-3 text-left text-gray-700 font-bold">Nama</th>
                             <th class="px-4 py-3 text-left text-gray-700 font-bold">Email</th>
                             <th class="px-4 py-3 text-left text-gray-700 font-bold">Umur</th>
-                            <th class="px-4 py-3 text-center text-gray-700 font-bold">Status</th>
-                            <th class="px-4 py-3 text-center text-gray-700 font-bold">Aktivitas</th>
-                            <th class="px-4 py-3 text-center text-gray-700 font-bold">Hadir</th>
-                            <th class="px-4 py-3 text-center text-gray-700 font-bold">Kg Setor</th>
-                            <th class="px-4 py-3 text-right text-gray-700 font-bold">Gaji</th>
                             <th class="px-4 py-3 text-center text-gray-700 font-bold">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($employees as $employee)
-                            <tr class="border-b hover:bg-gray-50">
-                                <td class="px-4 py-3 font-bold text-gray-800">{{ $employee->name }}</td>
-                                <td class="px-4 py-3 text-gray-700 text-sm">{{ $employee->email }}</td>
-                                <td class="px-4 py-3 text-gray-700">{{ $employee->getAge() }} tahun</td>
-                                <td class="px-4 py-3 text-center">
-                                    <span
-                                        class="px-2 py-1 rounded text-xs font-bold {{ $employee->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ $employee->status === 'active' ? 'Aktif' : 'Tidak Aktif' }}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    @php
-                                        $summary = $employeesData->where('employee.id', $employee->id)->first();
-                                        $isActive = $summary && $summary['summary']->status === 'active';
-                                    @endphp
-                                    <span
-                                        class="px-2 py-1 rounded text-xs font-bold {{ $isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' }}">
-                                        {{ $isActive ? 'Aktif' : 'Tidak Aktif' }}
-                                    </span>
-                                </td>
-                                <td class="px-4 py-3 text-center font-bold">
-                                    @php
-                                        $summary = $employeesData->where('employee.id', $employee->id)->first();
-                                        echo $summary ? $summary['summary']->days_present : 0;
-                                    @endphp
-                                </td>
-                                <td class="px-4 py-3 text-center font-bold text-orange-600">
-                                    @php
-                                        $summary = $employeesData->where('employee.id', $employee->id)->first();
-                                        echo $summary ? $summary['summary']->total_kg_deposited : 0;
-                                    @endphp
-                                </td>
-                                <td class="px-4 py-3 text-right font-bold text-green-600 text-sm">
-                                    @php
-                                        $summary = $employeesData->where('employee.id', $employee->id)->first();
-                                        echo $summary ? 'Rp ' . number_format($summary['summary']->total_salary, 0, ',', '.') : 'Rp 0';
-                                    @endphp
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <div class="flex gap-2 justify-center">
-                                        <a href="{{ route('boss.employees.show', $employee->id) }}"
-                                            class="text-blue-600 hover:text-blue-800" title="Lihat Detail">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <button onclick="toggleStatus({{ $employee->id }})"
-                                            class="text-yellow-600 hover:text-yellow-800" title="Ubah Status">
-                                            <i class="fas fa-toggle-on"></i>
-                                        </button>
+                            <tr class="border-b hover:bg-gray-50 text-sm">
+                                <td class="px-4 py-4 font-bold text-gray-800">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black">
+                                            {{ substr($employee->name, 0, 1) }}
+                                        </div>
+                                        {{ $employee->name }}
                                     </div>
+                                </td>
+                                <td class="px-4 py-4 text-gray-600 italic">{{ $employee->email }}</td>
+                                <td class="px-4 py-4 text-gray-700 font-semibold">{{ $employee->getAge() }} tahun</td>
+                                <td class="px-4 py-4 text-center">
+                                    <a href="{{ route('boss.employees.show', $employee->id) }}"
+                                        class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-xs font-black uppercase tracking-widest rounded hover:bg-blue-700 transition shadow-sm gap-2">
+                                        <i class="fas fa-eye"></i> Detail
+                                    </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="px-4 py-8 text-center text-gray-400">
-                                    <i class="fas fa-inbox text-4xl mb-2 block opacity-50"></i>
-                                    Tidak ada data karyawan
+                                <td colspan="4" class="px-4 py-12 text-center text-gray-400">
+                                    <i class="fas fa-inbox text-5xl mb-3 block opacity-20"></i>
+                                    <p class="italic">Tidak ada data karyawan ditemukan</p>
                                 </td>
                             </tr>
                         @endforelse

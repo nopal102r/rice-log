@@ -225,4 +225,112 @@ class AbsenceController extends Controller
 
         return $messages[$type][$status] ?? 'Absen berhasil dicatat.';
     }
+
+    /**
+     * Show the employee's own attendance report page (daily, monthly, yearly).
+     */
+    public function report(Request $request): View
+    {
+        $user = auth()->user();
+        $period = $request->input('period', 'hari'); // hari, bulan, tahun
+        
+        $dateStr = $request->input('date', now()->format('Y-m-d'));
+        $date = \Carbon\Carbon::parse($dateStr);
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+
+        $reportData = [];
+
+        if ($period === 'hari') {
+            $absences = Absence::where('user_id', $user->id)
+                ->whereDate('created_at', $date)
+                ->get();
+            
+            $in = $absences->where('type', 'masuk')->first();
+            $out = $absences->where('type', 'keluar')->first();
+            
+            // For a daily view, let's wrap it in an array to match a table loop,
+            // or just render directly if preferred. We'll wrap to keep table logic simple.
+            if ($in || $out) {
+                $reportData[] = (object) [
+                    'date' => $date,
+                    'in' => $in ? $in->created_at->format('H:i') : '-',
+                    'out' => $out ? $out->created_at->format('H:i') : '-',
+                    'status' => $in ? $in->status : '-',
+                    'distance' => $in ? $in->distance_from_office : null,
+                ];
+            }
+        } elseif ($period === 'bulan' || $period === 'tahun') {
+            $query = Absence::where('user_id', $user->id)
+                ->where('type', 'masuk');
+                
+            if ($period === 'bulan') {
+                $query->whereMonth('created_at', $month)
+                      ->whereYear('created_at', $year);
+            } else {
+                $query->whereYear('created_at', $year);
+            }
+            
+            $absences = $query->get();
+            
+            // Group by month if yearly, or summarize entire block
+            if ($period === 'tahun') {
+                 // Return summary grouped by month
+                 for ($m = 1; $m <= 12; $m++) {
+                    $monthAbsences = $absences->filter(function($a) use ($m) {
+                        return \Carbon\Carbon::parse($a->created_at)->month == $m;
+                    });
+                    
+                    if ($monthAbsences->count() > 0) {
+                        $reportData[] = (object) [
+                            'month' => $m,
+                            'year' => $year,
+                            'hadir' => $monthAbsences->where('status', 'hadir')->count(),
+                            'sakit' => $monthAbsences->where('status', 'sakit')->count(),
+                            'izin' => $monthAbsences->where('status', 'izin')->count(),
+                        ];
+                    }
+                 }
+            } else {
+                 // Period is bulan, just send one summary row for the month, or group by day
+                 // Usually for employee monthly, seeing day-by-day is better. Let's do daily breakdown.
+                 $daysInMonth = \Carbon\Carbon::createFromDate($year, $month, 1)->daysInMonth;
+                 $allMonthAbsences = Absence::where('user_id', $user->id)
+                    ->whereMonth('created_at', $month)
+                    ->whereYear('created_at', $year)
+                    ->get()
+                    ->groupBy(function($absence) {
+                        return \Carbon\Carbon::parse($absence->created_at)->format('d');
+                    });
+
+                 for ($day = 1; $day <= $daysInMonth; $day++) {
+                    $dayStr = str_pad($day, 2, '0', STR_PAD_LEFT);
+                    $dayRecords = $allMonthAbsences->get($dayStr);
+
+                    if ($dayRecords) {
+                        $in = $dayRecords->where('type', 'masuk')->first();
+                        $out = $dayRecords->where('type', 'keluar')->first();
+
+                        $reportData[] = (object) [
+                            'date' => \Carbon\Carbon::createFromDate($year, $month, $day),
+                            'in' => $in ? $in->created_at->format('H:i') : '-',
+                            'out' => $out ? $out->created_at->format('H:i') : '-',
+                            'status' => $in ? $in->status : '-',
+                            'distance' => $in ? $in->distance_from_office : '-',
+                        ];
+                    }
+                 }
+            }
+        }
+
+        return view('employee.absence.report', [
+            'reportData' => $reportData,
+            'period' => $period,
+            'currentDate' => $date,
+            'prevDate' => $date->copy()->subDay()->format('Y-m-d'),
+            'nextDate' => $date->copy()->addDay()->format('Y-m-d'),
+            'month' => $month,
+            'year' => $year,
+        ]);
+    }
 }
