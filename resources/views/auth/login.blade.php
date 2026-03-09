@@ -107,9 +107,16 @@
                     <label for="password" class="block text-gray-800 font-bold mb-2">
                         <i class="fas fa-lock mr-2 text-blue-600"></i> Password
                     </label>
-                    <input type="password" id="password" name="password" required
-                        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500"
-                        placeholder="Masukkan password">
+                    <div class="relative">
+                        <input type="password" id="password" name="password" required
+                            class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500 pr-10"
+                            placeholder="Masukkan password">
+                        <button type="button" 
+                                id="togglePassword" 
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-blue-600 focus:outline-none transition-colors">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
                     @error('password')
                         <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                     @enderror
@@ -148,6 +155,26 @@
                 
                 bg.appendChild(particle);
             }
+            
+            // Password Toggle Verification
+            const togglePassword = document.getElementById('togglePassword');
+            const password = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            togglePassword.addEventListener('click', function () {
+                // Toggle the type attribute
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                
+                // Toggle the eye / eye-slash icon
+                if (type === 'password') {
+                    eyeIcon.classList.remove('fa-eye-slash');
+                    eyeIcon.classList.add('fa-eye');
+                } else {
+                    eyeIcon.classList.remove('fa-eye');
+                    eyeIcon.classList.add('fa-eye-slash');
+                }
+            });
         });
     </script>
 </body>
