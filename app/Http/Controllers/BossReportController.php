@@ -40,12 +40,16 @@ class BossReportController extends Controller
     }
 
     /**
-     * Show the daily attendance report page.
+     * Show the attendance report page (daily, monthly, yearly).
      */
     public function attendance(Request $request): View
     {
+        $period = $request->input('period', 'hari'); // hari, bulan, tahun
+        
         $dateStr = $request->input('date', now()->format('Y-m-d'));
         $date = \Carbon\Carbon::parse($dateStr);
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
 
         $employees = User::where('role', 'karyawan')
             ->where(function($query) {
@@ -55,28 +59,55 @@ class BossReportController extends Controller
             ->get();
         
         $reportData = [];
-        foreach ($employees as $employee) {
-            $absences = \App\Models\Absence::where('user_id', $employee->id)
-                ->whereDate('created_at', $date)
-                ->get();
-            
-            $in = $absences->where('type', 'masuk')->first();
-            $out = $absences->where('type', 'keluar')->first();
-            
-            $reportData[] = (object) [
-                'user' => $employee,
-                'in' => $in ? $in->created_at->format('H:i') : '-',
-                'out' => $out ? $out->created_at->format('H:i') : '-',
-                'status' => $in ? $in->status : '-',
-                'distance' => $in ? $in->distance_from_office : null,
-            ];
+
+        if ($period === 'hari') {
+            foreach ($employees as $employee) {
+                $absences = \App\Models\Absence::where('user_id', $employee->id)
+                    ->whereDate('created_at', $date)
+                    ->get();
+                
+                $in = $absences->where('type', 'masuk')->first();
+                $out = $absences->where('type', 'keluar')->first();
+                
+                $reportData[] = (object) [
+                    'user' => $employee,
+                    'in' => $in ? $in->created_at->format('H:i') : '-',
+                    'out' => $out ? $out->created_at->format('H:i') : '-',
+                    'status' => $in ? $in->status : '-',
+                    'distance' => $in ? $in->distance_from_office : null,
+                ];
+            }
+        } elseif ($period === 'bulan' || $period === 'tahun') {
+            foreach ($employees as $employee) {
+                $query = \App\Models\Absence::where('user_id', $employee->id)
+                    ->where('type', 'masuk');
+                    
+                if ($period === 'bulan') {
+                    $query->whereMonth('created_at', $month)
+                          ->whereYear('created_at', $year);
+                } else {
+                    $query->whereYear('created_at', $year);
+                }
+                
+                $absences = $query->get();
+                
+                $reportData[] = (object) [
+                    'user' => $employee,
+                    'hadir' => $absences->where('status', 'hadir')->count(),
+                    'sakit' => $absences->where('status', 'sakit')->count(),
+                    'izin' => $absences->where('status', 'izin')->count(),
+                ];
+            }
         }
 
         return view('boss.reports.attendance', [
             'reportData' => $reportData,
+            'period' => $period,
             'currentDate' => $date,
             'prevDate' => $date->copy()->subDay()->format('Y-m-d'),
             'nextDate' => $date->copy()->addDay()->format('Y-m-d'),
+            'month' => $month,
+            'year' => $year,
         ]);
     }
 
