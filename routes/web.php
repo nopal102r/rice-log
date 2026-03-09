@@ -35,6 +35,7 @@ Route::middleware(['auth', 'employee'])->prefix('employee')->name('employee.')->
     Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('dashboard');
 
     // Absences
+    Route::get('/absence/report', [AbsenceController::class, 'report'])->name('absence.report');
     Route::get('/absence/{type}', [AbsenceController::class, 'show'])->name('absence.form')->where('type', 'masuk|keluar');
     Route::post('/absence', [AbsenceController::class, 'store'])->name('absence.store');
 

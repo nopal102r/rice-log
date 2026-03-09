@@ -162,9 +162,14 @@
             </div>
 
             <div class="card-hover bg-white rounded-lg shadow p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <i class="fas fa-history text-purple-500"></i> Aktivitas Terakhir
-                </h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-history text-purple-500"></i> Aktivitas Terakhir
+                    </h3>
+                    <a href="{{ route('employee.absence.report') }}" class="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
+                        Lihat Semua <i class="fas fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
                 <div class="space-y-2 max-h-48 overflow-y-auto">
                     @forelse($recentActivities['absences'] as $absence)
                         <div class="flex justify-between items-center text-sm border-b pb-2">
