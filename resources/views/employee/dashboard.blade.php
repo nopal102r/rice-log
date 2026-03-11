@@ -150,9 +150,15 @@
                         <span class="text-2xl font-bold text-orange-600">{{ $depositsData['total_kg'] }} kg</span>
                     </div>
                     <div class="flex justify-between items-center border-b pb-2">
-                        <span class="text-gray-600">Total Gaji</span>
-                        <span class="text-2xl font-bold text-green-600">Rp
-                            {{ number_format($depositsData['total_wage'], 0, ',', '.') }}</span>
+                        <span class="text-gray-600">Bonus Performa</span>
+                        <span class="text-2xl font-bold text-blue-500">
+                            {{ $depositsData['bonus'] > 0 ? 'Rp ' . number_format($depositsData['bonus'], 0, ',', '.') : '-' }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <span class="text-gray-600 font-bold text-gray-800">Total Gaji</span>
+                        <span class="text-2xl font-extrabold text-green-600">Rp
+                            {{ number_format($depositsData['total_wage'] + $depositsData['bonus'], 0, ',', '.') }}</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-gray-600">Jumlah Setor</span>

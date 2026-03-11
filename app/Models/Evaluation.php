@@ -14,6 +14,7 @@ class Evaluation extends Model
         'month',
         'year',
         'feedback',
+        'bonus',
     ];
 
     public function user(): BelongsTo

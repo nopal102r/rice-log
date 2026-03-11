@@ -24,9 +24,14 @@
             <div class="lg:col-span-2 bg-white rounded-3xl shadow-xl shadow-blue-50/50 border border-gray-100 p-8 relative overflow-hidden">
                 <div class="relative z-10">
                     <div class="flex items-center justify-between mb-8">
-                        <div>
-                            <h2 class="text-xl font-black text-gray-800 uppercase tracking-tight leading-none mb-1">Radar Performa</h2>
-                            <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">{{ \Carbon\Carbon::create(null, $latestEvaluation->month)->format('F') }} {{ $latestEvaluation->year }}</p>
+                        <div class="flex flex-col md:flex-row md:items-center gap-4">
+                            <div>
+                                <h2 class="text-xl font-black text-gray-800 uppercase tracking-tight leading-none mb-1">Radar Performa</h2>
+                                <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">{{ \Carbon\Carbon::create(null, $latestEvaluation->month)->format('F') }} {{ $latestEvaluation->year }}</p>
+                            </div>
+                            <a href="{{ route('employee.evaluations.show', $latestEvaluation->id) }}" class="text-[10px] font-black text-blue-600 bg-blue-50 px-4 py-2 rounded-xl uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
+                                <i class="fas fa-search-plus mr-1"></i> Lihat Detail Penilaian
+                            </a>
                         </div>
                         <div class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-black shadow-lg shadow-blue-100 flex items-center gap-2">
                             <i class="fas fa-chart-pie"></i> Visual Insight
@@ -54,6 +59,12 @@
                             @endfor
                         </div>
                         <p class="text-xs font-bold text-blue-100">Hebat! Pertahankan performa Anda.</p>
+                        @if($latestEvaluation->bonus > 0)
+                            <div class="mt-4 bg-white/20 rounded-2xl py-2 px-4 inline-block border border-white/30 backdrop-blur-sm">
+                                <p class="text-[9px] font-black uppercase tracking-widest text-blue-100 leading-none mb-1">Bonus Bulan Ini</p>
+                                <p class="text-lg font-black text-white leading-none">Rp {{ number_format($latestEvaluation->bonus, 0, ',', '.') }}</p>
+                            </div>
+                        @endif
                     </div>
                     <!-- Decorative element -->
                     <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
@@ -86,8 +97,9 @@
                     <thead>
                         <tr class="bg-gray-50/20">
                             <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Periode</th>
-                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Skor</th>
-                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Catatan</th>
+                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Skor Performa</th>
+                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Bonus (Rp)</th>
+                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Catatan / Feedback</th>
                             <th class="px-8 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Aksi</th>
                         </tr>
                     </thead>
@@ -108,15 +120,20 @@
                                     </div>
                                 </div>
                             </td>
+                            <td class="px-8 py-6 text-right">
+                                <span class="font-black text-blue-600 {{ $item['bonus'] > 0 ? '' : 'opacity-20' }}">
+                                    {{ $item['bonus'] > 0 ? 'Rp ' . number_format($item['bonus'], 0, ',', '.') : '-' }}
+                                </span>
+                            </td>
                             <td class="px-8 py-6">
                                 <p class="text-sm text-gray-600 line-clamp-1 max-w-sm italic">
                                     {{ $item['feedback'] ?: '-' }}
                                 </p>
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <button class="p-3 rounded-2xl bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all">
+                                <a href="{{ route('employee.evaluations.show', $item['id']) }}" class="p-3 rounded-2xl bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all inline-block">
                                     <i class="fas fa-eye"></i>
-                                </button>
+                                </a>
                             </td>
                         </tr>
                         @endforeach

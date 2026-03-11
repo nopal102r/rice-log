@@ -131,6 +131,23 @@
                 </div>
             </div>
 
+            <!-- Bonus Card -->
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+                <div class="bg-gray-50/50 px-8 py-5 border-b border-gray-100 flex items-center gap-3">
+                    <i class="fas fa-gift text-blue-500"></i>
+                    <h2 class="text-sm font-black text-gray-800 uppercase tracking-widest">Bonus Tambahan (Opsional)</h2>
+                </div>
+                <div class="p-8">
+                    <div class="relative">
+                        <span class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 font-black">Rp</span>
+                        <input type="number" name="bonus" value="{{ $existingEvaluation ? $existingEvaluation->bonus : 0 }}" 
+                            class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl pl-16 pr-6 py-4 outline-none focus:border-blue-500 transition-all font-black text-gray-800 text-xl" 
+                            placeholder="0">
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-widest pl-2">Bonus ini akan otomatis ditambahkan ke total gaji bulan {{ \Carbon\Carbon::create(null, $month)->format('F') }}.</p>
+                </div>
+            </div>
+
             <!-- Action Buttons -->
             <div class="flex flex-col md:flex-row gap-4 pb-20">
                 <button type="submit" onclick="setNext(0)" class="flex-1 bg-white border-2 border-gray-200 hover:border-gray-800 hover:bg-gray-800 hover:text-white text-gray-800 py-5 rounded-3xl font-black transition-all active:scale-95 shadow-lg shadow-gray-100">

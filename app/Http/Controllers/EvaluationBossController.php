@@ -63,6 +63,7 @@ class EvaluationBossController extends Controller
             'month' => 'required|integer',
             'year' => 'required|integer',
             'feedback' => 'nullable|string',
+            'bonus' => 'nullable|numeric|min:0',
             'ratings' => 'required|array',
             'ratings.*' => 'required|integer|min:1|max:5',
             'next' => 'nullable|boolean',
@@ -79,6 +80,7 @@ class EvaluationBossController extends Controller
                 [
                     'boss_id' => auth()->id(),
                     'feedback' => $validated['feedback'],
+                    'bonus' => $validated['bonus'] ?? 0,
                 ]
             );
 

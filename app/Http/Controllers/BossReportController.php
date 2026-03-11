@@ -23,11 +23,20 @@ class BossReportController extends Controller
         foreach ($employees as $employee) {
             $stats = Deposit::getTotalMonthDeposits($employee->id, $month, $year);
             
+            // Get evaluation bonus
+            $evaluation = \App\Models\Evaluation::where('user_id', $employee->id)
+                ->where('month', $month)
+                ->where('year', $year)
+                ->first();
+            
+            $bonus = $evaluation ? $evaluation->bonus : 0;
+
             $reportData[] = (object) [
                 'user' => $employee,
                 'total_weight' => $stats['total_kg'],
                 'total_revenue' => $stats['total_revenue'],
-                'total_wage' => $stats['total_wage'],
+                'total_wage' => $stats['total_wage'] + $bonus,
+                'bonus' => $bonus,
                 'deposit_count' => $stats['count'],
             ];
         }
