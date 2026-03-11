@@ -6,36 +6,34 @@
 <div class="max-w-7xl mx-auto">
     <div class="mb-8 flex justify-between items-end">
         <div>
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">Penilaian Karyawan</h1>
-            <p class="text-gray-600">Periode: <span class="font-bold text-blue-600">{{ \Carbon\Carbon::create(null, $month)->format('F') }} {{ $year }}</span></p>
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-1">Penilaian Karyawan</h1>
+            <p class="text-gray-500 text-sm">Periode: <span class="font-bold text-blue-600">{{ \Carbon\Carbon::create(null, $month)->format('F') }} {{ $year }}</span></p>
         </div>
-        <a href="{{ route('boss.evaluation-indicators.index') }}" class="text-sm font-bold text-gray-400 hover:text-blue-600 transition-colors flex items-center gap-2">
+        <a href="{{ route('boss.evaluation-indicators.index') }}" class="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-2">
             <i class="fas fa-cog"></i> Pengaturan Indikator
         </a>
     </div>
 
     <!-- Progress Summary Card -->
-    <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 mb-8 relative overflow-hidden">
-        <div class="relative z-10">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div class="flex-1">
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-xs font-black text-gray-500 uppercase tracking-widest">Progress Penilaian</h2>
-                        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ $ratedCount }} / {{ $totalEmployees }} Karyawan</span>
-                    </div>
-                    <div class="relative w-full h-2.5 bg-gray-50 rounded-full overflow-hidden border border-gray-100 p-0.5">
-                        <div class="absolute top-0 left-0 h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: {{ $progress }}%"></div>
-                    </div>
+    <div class="bg-white rounded-2xl shadow-md border border-gray-200 mb-8 p-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex-1">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-bold text-gray-600 uppercase tracking-wider">Progress Penilaian</h2>
+                    <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg border border-blue-100">{{ $ratedCount }} / {{ $totalEmployees }} Terisi</span>
                 </div>
-                <div class="flex gap-2">
-                    <div class="bg-blue-50/50 px-4 py-2 rounded-xl border border-blue-50/50">
-                        <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Sudah</p>
-                        <p class="text-lg font-black text-blue-700 leading-none">{{ $ratedCount }}</p>
-                    </div>
-                    <div class="bg-gray-50/50 px-4 py-2 rounded-xl border border-gray-50/50">
-                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Total</p>
-                        <p class="text-lg font-black text-gray-900 leading-none">{{ $totalEmployees }}</p>
-                    </div>
+                <div class="relative w-full h-3 bg-gray-100 rounded-full overflow-hidden border border-gray-200">
+                    <div class="absolute top-0 left-0 h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(59,130,246,0.5)]" style="width: {{ $progress }}%"></div>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <div class="bg-blue-50/80 px-5 py-3 rounded-xl border border-blue-200">
+                    <p class="text-[11px] font-medium text-blue-500 uppercase tracking-wide leading-none mb-2">Sudah Dinilai</p>
+                    <p class="text-2xl font-black text-blue-800 leading-none">{{ $ratedCount }}</p>
+                </div>
+                <div class="bg-gray-50/80 px-5 py-3 rounded-xl border border-gray-200">
+                    <p class="text-[11px] font-medium text-gray-500 uppercase tracking-wide leading-none mb-2">Total Karyawan</p>
+                    <p class="text-2xl font-black text-gray-900 leading-none">{{ $totalEmployees }}</p>
                 </div>
             </div>
         </div>
@@ -43,21 +41,18 @@
 
 
     <!-- Employee List -->
-    <div class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
-        <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-            <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest">Daftar Karyawan</h3>
-            <div class="flex items-center gap-2 text-[10px] font-bold">
-                <span class="flex items-center gap-1 text-green-600"><i class="fas fa-circle text-[8px]"></i> Aktif</span>
-            </div>
+    <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+        <div class="px-8 py-5 border-b border-gray-200 flex justify-between items-center bg-gray-50/30">
+            <h3 class="text-sm font-bold text-gray-600 uppercase tracking-wider">Daftar Karyawan</h3>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full">
                 <thead>
-                    <tr class="text-left">
-                        <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Karyawan</th>
-                        <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Jabatan</th>
-                        <th class="px-8 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Status Penilaian</th>
-                        <th class="px-8 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Aksi</th>
+                    <tr class="text-left bg-gray-50/50">
+                        <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-gray-200">Karyawan</th>
+                        <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-gray-200">Jabatan</th>
+                        <th class="px-8 py-4 text-center text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-gray-200">Status</th>
+                        <th class="px-8 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-gray-200">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -65,33 +60,33 @@
                         <tr class="hover:bg-gray-50/50 transition-colors group">
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-100 to-indigo-50 flex items-center justify-center text-blue-700 font-black shadow-sm group-hover:scale-110 transition-transform">
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black shadow-md shadow-blue-100 group-hover:scale-105 transition-transform duration-300">
                                         {{ substr($item['user']->name, 0, 1) }}
                                     </div>
                                     <div>
-                                        <p class="font-black text-gray-800 leading-tight">{{ $item['user']->name }}</p>
-                                        <p class="text-xs text-gray-500">ID: #{{ str_pad($item['user']->id, 3, '0', STR_PAD_LEFT) }}</p>
+                                        <p class="text-base font-bold text-gray-900 leading-tight mb-0.5">{{ $item['user']->name }}</p>
+                                        <p class="text-xs text-gray-400 font-medium">ID: #{{ str_pad($item['user']->id, 3, '0', STR_PAD_LEFT) }}</p>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-8 py-6">
-                                <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">{{ $item['user']->job }}</span>
+                                <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-lg text-xs font-medium uppercase tracking-wider">{{ $item['user']->job }}</span>
                             </td>
                             <td class="px-8 py-6 text-center">
                                 @if($item['is_rated'])
-                                    <span class="bg-green-100 text-green-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex inline-flex items-center gap-2">
-                                        <i class="fas fa-check-circle"></i> Sudah Dinilai
+                                    <span class="bg-green-50 text-green-600 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider border border-green-100 flex inline-flex items-center gap-2">
+                                        <i class="fas fa-check-circle"></i> Selesai
                                     </span>
                                 @else
-                                    <span class="bg-orange-100 text-orange-700 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest flex inline-flex items-center gap-2">
-                                        <i class="fas fa-clock"></i> Belum Dinilai
+                                    <span class="bg-orange-50 text-orange-600 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider border border-orange-100 flex inline-flex items-center gap-2">
+                                        <i class="fas fa-clock"></i> Tertunda
                                     </span>
                                 @endif
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <a href="{{ route('boss.evaluations.create', $item['user']->id) }}" class="inline-flex items-center gap-2 {{ $item['is_rated'] ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-100' }} px-6 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all active:scale-95">
+                                <a href="{{ route('boss.evaluations.create', $item['user']->id) }}" class="inline-flex items-center gap-2 {{ $item['is_rated'] ? 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-100' }} px-5 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95">
                                     <i class="fas {{ $item['is_rated'] ? 'fa-edit' : 'fa-star' }}"></i>
-                                    {{ $item['is_rated'] ? 'Edit Nilai' : 'Beri Nilai' }}
+                                    {{ $item['is_rated'] ? 'Edit' : 'Nilai' }}
                                 </a>
                             </td>
                         </tr>

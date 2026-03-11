@@ -5,9 +5,9 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
     <!-- Header -->
-    <div class="mb-12">
-        <h1 class="text-4xl font-black text-gray-800 mb-2">Penilaian Kinerja</h1>
-        <p class="text-gray-600">Lihat ringkasan performa dan feedback dari atasan Anda.</p>
+    <div class="mb-10">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Penilaian Kinerja</h1>
+        <p class="text-gray-500 font-medium">Lihat ringkasan performa dan feedback dari atasan Anda.</p>
     </div>
 
     @if(!$latestEvaluation)
@@ -21,16 +21,16 @@
     @else
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
             <!-- Radar Chart Card -->
-            <div class="lg:col-span-2 bg-white rounded-3xl shadow-xl shadow-blue-50/50 border border-gray-100 p-8 relative overflow-hidden">
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-md border border-gray-200 p-8 relative overflow-hidden">
                 <div class="relative z-10">
                     <div class="flex items-center justify-between mb-8">
                         <div class="flex flex-col md:flex-row md:items-center gap-4">
                             <div>
-                                <h2 class="text-xl font-black text-gray-800 uppercase tracking-tight leading-none mb-1">Radar Performa</h2>
-                                <p class="text-[10px] font-black text-blue-500 uppercase tracking-widest">{{ \Carbon\Carbon::create(null, $latestEvaluation->month)->format('F') }} {{ $latestEvaluation->year }}</p>
+                                <h2 class="text-lg font-bold text-gray-800 tracking-tight leading-none mb-1">Radar Performa</h2>
+                                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">{{ \Carbon\Carbon::create(null, $latestEvaluation->month)->format('F') }} {{ $latestEvaluation->year }}</p>
                             </div>
-                            <a href="{{ route('employee.evaluations.show', $latestEvaluation->id) }}" class="text-[10px] font-black text-blue-600 bg-blue-50 px-4 py-2 rounded-xl uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
-                                <i class="fas fa-search-plus mr-1"></i> Lihat Detail Penilaian
+                            <a href="{{ route('employee.evaluations.show', $latestEvaluation->id) }}" class="text-[10px] font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-xl uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all border border-blue-100">
+                                <i class="fas fa-search-plus mr-1"></i> Lihat Detail
                             </a>
                         </div>
                         <div class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-black shadow-lg shadow-blue-100 flex items-center gap-2">
@@ -49,33 +49,34 @@
             <!-- Summary & Feedback Card -->
             <div class="flex flex-col gap-8">
                 <!-- Average Score Card -->
-                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl shadow-blue-100 relative overflow-hidden">
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg shadow-blue-100 relative overflow-hidden">
                     <div class="relative z-10 text-center">
-                        <p class="text-[10px] font-black text-blue-200 uppercase tracking-widest mb-2">Nilai Rata-rata</p>
-                        <p class="text-6xl font-black mb-1">{{ round($latestEvaluation->ratings->avg('rating'), 1) }}</p>
-                        <div class="flex justify-center gap-1 text-yellow-400 mb-4">
+                        <p class="text-[10px] font-bold text-blue-200 uppercase tracking-widest mb-3">Nilai Rata-rata</p>
+                        <p class="text-6xl font-black mb-2">{{ round($latestEvaluation->ratings->avg('rating'), 1) }}</p>
+                        <div class="flex justify-center gap-1.5 text-yellow-400 mb-5">
                             @for($i = 1; $i <= 5; $i++)
                                 <i class="fas fa-star {{ $i <= round($latestEvaluation->ratings->avg('rating')) ? '' : 'opacity-30' }}"></i>
                             @endfor
                         </div>
-                        <p class="text-xs font-bold text-blue-100">Hebat! Pertahankan performa Anda.</p>
+                        
                         @if($latestEvaluation->bonus > 0)
-                            <div class="mt-4 bg-white/20 rounded-2xl py-2 px-4 inline-block border border-white/30 backdrop-blur-sm">
-                                <p class="text-[9px] font-black uppercase tracking-widest text-blue-100 leading-none mb-1">Bonus Bulan Ini</p>
-                                <p class="text-lg font-black text-white leading-none">Rp {{ number_format($latestEvaluation->bonus, 0, ',', '.') }}</p>
+                            <div class="bg-white/10 rounded-2xl py-3 px-5 border border-white/20 backdrop-blur-md mb-2">
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-blue-100 mb-1">Bonus Performa</p>
+                                <p class="text-xl font-black text-white">Rp {{ number_format($latestEvaluation->bonus, 0, ',', '.') }}</p>
                             </div>
                         @endif
+                        <p class="text-xs font-medium text-blue-100">Hebat! Pertahankan performa Anda.</p>
                     </div>
                     <!-- Decorative element -->
                     <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
                 </div>
 
                 <!-- Feedback Card -->
-                <div class="flex-1 bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col">
-                    <h3 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <div class="flex-1 bg-white rounded-2xl shadow-md border border-gray-200 p-8 flex flex-col">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4 flex items-center gap-2">
                         <i class="fas fa-quote-left text-blue-500"></i> Feedback Atasan
                     </h3>
-                    <div class="flex-1 bg-gray-50 rounded-2xl p-6 italic text-gray-700 font-medium relative border border-gray-100">
+                    <div class="flex-1 bg-gray-50/50 rounded-2xl p-6 italic text-gray-700 font-medium relative border border-gray-100 text-base leading-relaxed">
                         @if($latestEvaluation->feedback)
                             "{{ $latestEvaluation->feedback }}"
                         @else
@@ -87,33 +88,33 @@
         </div>
 
         <!-- History Table -->
-        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest">Riwayat Penilaian</h3>
-                <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Urut: Terbaru</span>
+        <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden">
+            <div class="px-8 py-5 border-b border-gray-100 bg-gray-50/30 flex justify-between items-center">
+                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Riwayat Penilaian</h3>
+                <span class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Berurut: Terbaru</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
-                        <tr class="bg-gray-50/20">
-                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Periode</th>
-                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Skor Performa</th>
-                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Bonus (Rp)</th>
-                            <th class="px-8 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Catatan / Feedback</th>
-                            <th class="px-8 py-4 text-right text-[10px] font-black text-gray-400 uppercase tracking-widest">Aksi</th>
+                        <tr class="bg-gray-50/50">
+                            <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-gray-200">Periode</th>
+                            <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-gray-200">Skor Performa</th>
+                            <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest text-right border-b border-gray-200">Bonus</th>
+                            <th class="px-8 py-4 text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-gray-200">Catatan</th>
+                            <th class="px-8 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-widest border-b border-gray-200">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @foreach($history as $item)
                         <tr class="hover:bg-gray-50/50 transition-colors group">
                             <td class="px-8 py-6">
-                                <p class="font-black text-gray-800 leading-tight">{{ $item['month'] }}</p>
-                                <p class="text-xs text-gray-500">{{ $item['year'] }}</p>
+                                <p class="font-bold text-gray-900 leading-tight text-base">{{ $item['month'] }}</p>
+                                <p class="text-xs text-gray-400 font-medium">{{ $item['year'] }}</p>
                             </td>
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-2">
                                     <span class="text-lg font-black text-blue-600">{{ $item['average'] }}</span>
-                                    <div class="flex gap-0.5 text-xs text-yellow-500">
+                                    <div class="flex gap-0.5 text-[10px] text-yellow-500">
                                         @for($i = 1; $i <= 5; $i++)
                                             <i class="fas fa-star {{ $i <= round($item['average']) ? '' : 'text-gray-200' }}"></i>
                                         @endfor
@@ -121,17 +122,17 @@
                                 </div>
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <span class="font-black text-blue-600 {{ $item['bonus'] > 0 ? '' : 'opacity-20' }}">
+                                <span class="font-bold text-blue-600 text-sm {{ $item['bonus'] > 0 ? '' : 'opacity-20' }}">
                                     {{ $item['bonus'] > 0 ? 'Rp ' . number_format($item['bonus'], 0, ',', '.') : '-' }}
                                 </span>
                             </td>
                             <td class="px-8 py-6">
-                                <p class="text-sm text-gray-600 line-clamp-1 max-w-sm italic">
+                                <p class="text-sm text-gray-500 line-clamp-1 max-w-sm italic font-medium">
                                     {{ $item['feedback'] ?: '-' }}
                                 </p>
                             </td>
                             <td class="px-8 py-6 text-right">
-                                <a href="{{ route('employee.evaluations.show', $item['id']) }}" class="p-3 rounded-2xl bg-gray-50 text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all inline-block">
+                                <a href="{{ route('employee.evaluations.show', $item['id']) }}" class="p-2.5 rounded-xl bg-gray-50 text-gray-400 border border-gray-100 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-100 transition-all inline-block">
                                     <i class="fas fa-eye"></i>
                                 </a>
                             </td>
