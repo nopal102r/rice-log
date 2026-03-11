@@ -103,6 +103,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the evaluations for the user (as an employee).
+     */
+    public function evaluations(): HasMany
+    {
+        return $this->hasMany(Evaluation::class);
+    }
+
+    /**
      * Check if user is boss/manager
      */
     public function isBoss(): bool

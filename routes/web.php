@@ -11,6 +11,9 @@ use App\Http\Controllers\LeaveApprovalController;
 use App\Http\Controllers\LeaveSubmissionController;
 use App\Http\Controllers\PayrollSettingController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\EvaluationIndicatorController;
+use App\Http\Controllers\EvaluationBossController;
+use App\Http\Controllers\EvaluationEmployeeController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -49,6 +52,9 @@ Route::middleware(['auth', 'employee'])->prefix('employee')->name('employee.')->
     Route::get('/deposit/create', [DepositController::class, 'create'])->name('deposit.create');
     Route::post('/deposit', [DepositController::class, 'store'])->name('deposit.store');
     Route::get('/deposit/my-deposits', [DepositController::class, 'myDeposits'])->name('deposit.my-deposits');
+
+    // Evaluations
+    Route::get('/evaluations', [EvaluationEmployeeController::class, 'index'])->name('evaluations.index');
 });
 
 // Boss Routes
@@ -90,6 +96,17 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
 
     // Stock Inventory
     Route::get('/stock', [\App\Http\Controllers\StockController::class, 'index'])->name('stock.index');
+
+    // Evaluation Management
+    Route::resource('evaluation-indicators', EvaluationIndicatorController::class);
+    Route::post('evaluation-indicators/{indicator}/descriptions', [EvaluationIndicatorController::class, 'storeDescription'])->name('evaluation-indicators.descriptions.store');
+    Route::put('evaluation-descriptions/{description}', [EvaluationIndicatorController::class, 'updateDescription'])->name('evaluation-descriptions.update');
+    Route::delete('evaluation-descriptions/{description}', [EvaluationIndicatorController::class, 'destroyDescription'])->name('evaluation-descriptions.destroy');
+    
+    // Monthly Evaluations
+    Route::get('/evaluations', [EvaluationBossController::class, 'index'])->name('evaluations.index');
+    Route::get('/evaluations/create/{user}', [EvaluationBossController::class, 'create'])->name('evaluations.create');
+    Route::post('/evaluations', [EvaluationBossController::class, 'store'])->name('evaluations.store');
 });
 
 // Authenticated Routes (both roles)
