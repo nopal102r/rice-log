@@ -333,4 +333,143 @@ class AbsenceController extends Controller
             'year' => $year,
         ]);
     }
+
+    /**
+     * Export attendance report to CSV.
+     */
+    public function export(Request $request)
+    {
+        $user = auth()->user();
+        $period = $request->input('period', 'hari'); // hari, bulan, tahun
+        
+        $dateStr = $request->input('date', now()->format('Y-m-d'));
+        $date = \Carbon\Carbon::parse($dateStr);
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+
+        $monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        $filename = "rekap_kehadiran_{$user->name}_{$period}_";
+        if ($period === 'hari') {
+            $filename .= $date->format('Y_m_d');
+        } elseif ($period === 'bulan') {
+            $filename .= "{$year}_{$month}";
+        } else {
+            $filename .= $year;
+        }
+        $filename .= '.csv';
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename={$filename}",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        
+        $columns = [];
+        $rows = [];
+
+        if ($period === 'hari' || $period === 'bulan') {
+            $columns = ['Tanggal', 'Jam Masuk', 'Jam Keluar', 'Status', 'Jarak Kantor (Km)'];
+            
+            if ($period === 'hari') {
+                $absences = Absence::where('user_id', $user->id)
+                    ->whereDate('created_at', $date)
+                    ->get();
+                
+                $in = $absences->where('type', 'masuk')->first();
+                $out = $absences->where('type', 'keluar')->first();
+                
+                if ($in || $out) {
+                    $rows[] = [
+                        $date->format('d M Y'),
+                        $in ? $in->created_at->format('H:i') : '-',
+                        $out ? $out->created_at->format('H:i') : '-',
+                        $in ? $in->status : '-',
+                        $in ? $in->distance_from_office : '-',
+                    ];
+                }
+            } else {
+                $daysInMonth = \Carbon\Carbon::createFromDate($year, $month, 1)->daysInMonth;
+                $allMonthAbsences = Absence::where('user_id', $user->id)
+                    ->whereMonth('created_at', $month)
+                    ->whereYear('created_at', $year)
+                    ->get()
+                    ->groupBy(function($absence) {
+                        return \Carbon\Carbon::parse($absence->created_at)->format('d');
+                    });
+
+                for ($day = 1; $day <= $daysInMonth; $day++) {
+                    $dayStr = str_pad($day, 2, '0', STR_PAD_LEFT);
+                    $dayRecords = $allMonthAbsences->get($dayStr);
+
+                    if ($dayRecords) {
+                        $in = $dayRecords->where('type', 'masuk')->first();
+                        $out = $dayRecords->where('type', 'keluar')->first();
+                        
+                        $rowDate = \Carbon\Carbon::createFromDate($year, $month, $day);
+
+                        $rows[] = [
+                            $rowDate->format('d M Y'),
+                            $in ? $in->created_at->format('H:i') : '-',
+                            $out ? $out->created_at->format('H:i') : '-',
+                            $in ? $in->status : '-',
+                            $in ? $in->distance_from_office : '-',
+                        ];
+                    }
+                }
+            }
+        } elseif ($period === 'tahun') {
+            $columns = ['Bulan', 'Tahun', 'Hadir', 'Sakit', 'Izin'];
+            
+            $absences = Absence::where('user_id', $user->id)
+                ->where('type', 'masuk')
+                ->whereYear('created_at', $year)
+                ->get();
+                
+            for ($m = 1; $m <= 12; $m++) {
+                $monthAbsences = $absences->filter(function($a) use ($m) {
+                    return \Carbon\Carbon::parse($a->created_at)->month == $m;
+                });
+                
+                if ($monthAbsences->count() > 0) {
+                    $rows[] = [
+                        $monthNames[$m - 1],
+                        $year,
+                        $monthAbsences->where('status', 'hadir')->count(),
+                        $monthAbsences->where('status', 'sakit')->count(),
+                        $monthAbsences->where('status', 'izin')->count(),
+                    ];
+                }
+            }
+        }
+
+        $callback = function() use($columns, $rows) {
+            $file = fopen('php://output', 'w');
+            
+            // Write BOM for Excel compatibility with UTF-8
+            fputs($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            
+            fputcsv($file, $columns, ';'); // Use semicolon for excel locale compatibility sometimes, but usually comma is fine. Let's stick to comma for standard CSV.
+            fclose($file); 
+
+            // Wait, actually better use standard comma for CSV
+        };
+
+        $callback = function() use($columns, $rows) {
+            $file = fopen('php://output', 'w');
+            fputs($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM
+            fputcsv($file, $columns);
+            
+            foreach ($rows as $row) {
+                fputcsv($file, $row);
+            }
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

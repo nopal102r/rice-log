@@ -160,4 +160,172 @@ class BossReportController extends Controller
             'currentYear' => (int)$year,
         ]);
     }
+
+    /**
+     * Export the attendance report to CSV.
+     */
+    public function exportAttendance(Request $request)
+    {
+        $period = $request->input('period', 'hari'); // hari, bulan, tahun
+        
+        $dateStr = $request->input('date', now()->format('Y-m-d'));
+        $date = \Carbon\Carbon::parse($dateStr);
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+
+        $monthNames = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        $filename = "laporan_kehadiran_{$period}_";
+        if ($period === 'hari') {
+            $filename .= $date->format('Y_m_d');
+        } elseif ($period === 'bulan') {
+            $filename .= "{$year}_{$month}";
+        } else {
+            $filename .= $year;
+        }
+        $filename .= '.csv';
+
+        $employees = User::where('role', 'karyawan')
+            ->where(function($query) {
+                $query->whereIn('status', ['active', 'aktif', 'Aktif'])
+                      ->orWhereNull('status');
+            })
+            ->get();
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename={$filename}",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        
+        $columns = [];
+        $rows = [];
+
+        if ($period === 'hari') {
+            $columns = ['Nama Karyawan', 'Jabatan', 'Jam Masuk', 'Jam Keluar', 'Status', 'Jarak (Km)'];
+            foreach ($employees as $employee) {
+                $absences = \App\Models\Absence::where('user_id', $employee->id)
+                    ->whereDate('created_at', $date)
+                    ->get();
+                
+                $in = $absences->where('type', 'masuk')->first();
+                $out = $absences->where('type', 'keluar')->first();
+                
+                $rows[] = [
+                    $employee->name,
+                    $employee->job,
+                    $in ? $in->created_at->format('H:i') : '-',
+                    $out ? $out->created_at->format('H:i') : '-',
+                    $in ? $in->status : '-',
+                    $in ? $in->distance_from_office : '-',
+                ];
+            }
+        } elseif ($period === 'bulan' || $period === 'tahun') {
+            $columns = ['Nama Karyawan', 'Jabatan', 'Hadir', 'Sakit', 'Izin'];
+            foreach ($employees as $employee) {
+                $query = \App\Models\Absence::where('user_id', $employee->id)
+                    ->where('type', 'masuk');
+                    
+                if ($period === 'bulan') {
+                    $query->whereMonth('created_at', $month)
+                          ->whereYear('created_at', $year);
+                } else {
+                    $query->whereYear('created_at', $year);
+                }
+                
+                $absences = $query->get();
+                
+                $rows[] = [
+                    $employee->name,
+                    $employee->job,
+                    $absences->where('status', 'hadir')->count(),
+                    $absences->where('status', 'sakit')->count(),
+                    $absences->where('status', 'izin')->count(),
+                ];
+            }
+        }
+
+        $callback = function() use($columns, $rows) {
+            $file = fopen('php://output', 'w');
+            fputs($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM
+            fputcsv($file, $columns);
+            
+            foreach ($rows as $row) {
+                fputcsv($file, $row);
+            }
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Export detailed monthly attendance for a specific employee.
+     */
+    public function exportAttendanceDetail(Request $request, User $user)
+    {
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+        
+        $date = \Carbon\Carbon::createFromDate($year, $month, 1);
+        $daysInMonth = $date->daysInMonth;
+        
+        $attendances = \App\Models\Absence::where('user_id', $user->id)
+            ->whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->get()
+            ->groupBy(function($absence) {
+                return \Carbon\Carbon::parse($absence->created_at)->format('d');
+            });
+
+        $filename = "detail_kehadiran_{$user->name}_{$year}_{$month}.csv";
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename={$filename}",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+        
+        $columns = ['Tanggal', 'Hari', 'Jam Masuk', 'Jam Keluar', 'Status', 'Jarak (Km)'];
+        $rows = [];
+        
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $dayStr = str_pad($day, 2, '0', STR_PAD_LEFT);
+            $dayRecords = $attendances->get($dayStr);
+            
+            $in = $dayRecords ? $dayRecords->where('type', 'masuk')->first() : null;
+            $out = $dayRecords ? $dayRecords->where('type', 'keluar')->first() : null;
+            
+            $rowDate = \Carbon\Carbon::createFromDate($year, $month, $day);
+            
+            $rows[] = [
+                $rowDate->format('Y-m-d'),
+                $rowDate->format('l'),
+                $in ? $in->created_at->format('H:i') : '-',
+                $out ? $out->created_at->format('H:i') : '-',
+                $in ? $in->status : '-',
+                $in ? $in->distance_from_office : '-',
+            ];
+        }
+
+        $callback = function() use($columns, $rows) {
+            $file = fopen('php://output', 'w');
+            fputs($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM
+            fputcsv($file, $columns);
+            
+            foreach ($rows as $row) {
+                fputcsv($file, $row);
+            }
+            
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

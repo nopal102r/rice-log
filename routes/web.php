@@ -36,6 +36,7 @@ Route::middleware(['auth', 'employee'])->prefix('employee')->name('employee.')->
 
     // Absences
     Route::get('/absence/report', [AbsenceController::class, 'report'])->name('absence.report');
+    Route::get('/absence/report/export', [AbsenceController::class, 'export'])->name('absence.export');
     Route::get('/absence/{type}', [AbsenceController::class, 'show'])->name('absence.form')->where('type', 'masuk|keluar');
     Route::post('/absence', [AbsenceController::class, 'store'])->name('absence.store');
 
@@ -78,7 +79,9 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
     // Reports
     Route::get('/reports', [\App\Http\Controllers\BossReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/attendance', [\App\Http\Controllers\BossReportController::class, 'attendance'])->name('reports.attendance');
+    Route::get('/reports/attendance/export', [\App\Http\Controllers\BossReportController::class, 'exportAttendance'])->name('reports.attendance.export');
     Route::get('/reports/attendance/detail/{user}', [\App\Http\Controllers\BossReportController::class, 'attendanceDetail'])->name('reports.attendance.detail');
+    Route::get('/reports/attendance/detail/{user}/export', [\App\Http\Controllers\BossReportController::class, 'exportAttendanceDetail'])->name('reports.attendance.detail.export');
 
     // Stock Inventory
     Route::get('/stock', [\App\Http\Controllers\StockController::class, 'index'])->name('stock.index');
