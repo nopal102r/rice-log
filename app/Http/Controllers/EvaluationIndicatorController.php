@@ -19,6 +19,14 @@ class EvaluationIndicatorController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     */
+    public function create(): View
+    {
+        return view('boss.evaluation-indicators.create');
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -30,6 +38,14 @@ class EvaluationIndicatorController extends Controller
         EvaluationIndicator::create($validated);
 
         return redirect()->route('boss.evaluation-indicators.index')->with('success', 'Indikator berhasil ditambahkan.');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(EvaluationIndicator $evaluationIndicator): View
+    {
+        return view('boss.evaluation-indicators.edit', compact('evaluationIndicator'));
     }
 
     /**
@@ -56,6 +72,14 @@ class EvaluationIndicatorController extends Controller
     }
 
     /**
+     * Show the form for creating a new description.
+     */
+    public function createDescription(EvaluationIndicator $indicator): View
+    {
+        return view('boss.evaluation-indicators.descriptions.create', compact('indicator'));
+    }
+
+    /**
      * Store a new description for an indicator.
      */
     public function storeDescription(Request $request, EvaluationIndicator $indicator)
@@ -67,6 +91,14 @@ class EvaluationIndicatorController extends Controller
         $indicator->descriptions()->create($validated);
 
         return redirect()->route('boss.evaluation-indicators.index')->with('success', 'Deskripsi berhasil ditambahkan.');
+    }
+
+    /**
+     * Show the form for editing a description.
+     */
+    public function editDescription(EvaluationDescription $description): View
+    {
+        return view('boss.evaluation-indicators.descriptions.edit', compact('description'));
     }
 
     /**

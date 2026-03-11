@@ -59,6 +59,7 @@ Route::middleware(['auth', 'employee'])->prefix('employee')->name('employee.')->
 });
 
 // Boss Routes
+// Boss Routes Group Start
 Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [BossDashboardController::class, 'index'])->name('dashboard');
@@ -100,7 +101,9 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
 
     // Evaluation Management
     Route::resource('evaluation-indicators', EvaluationIndicatorController::class);
+    Route::get('evaluation-indicators/{indicator}/descriptions/create', [EvaluationIndicatorController::class, 'createDescription'])->name('evaluation-indicators.descriptions.create');
     Route::post('evaluation-indicators/{indicator}/descriptions', [EvaluationIndicatorController::class, 'storeDescription'])->name('evaluation-indicators.descriptions.store');
+    Route::get('evaluation-descriptions/{description}/edit', [EvaluationIndicatorController::class, 'editDescription'])->name('evaluation-descriptions.edit');
     Route::put('evaluation-descriptions/{description}', [EvaluationIndicatorController::class, 'updateDescription'])->name('evaluation-descriptions.update');
     Route::delete('evaluation-descriptions/{description}', [EvaluationIndicatorController::class, 'destroyDescription'])->name('evaluation-descriptions.destroy');
     
@@ -126,4 +129,3 @@ Route::middleware(['auth'])->group(function () {
     // Profile
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 });
-
