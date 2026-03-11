@@ -4,24 +4,24 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    <div class="mb-8 flex justify-between items-center">
+    <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">Indikator Penilaian</h1>
-            <p class="text-gray-600">Atur kriteria penilaian kinerja karyawan secara dinamis.</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Konfigurasi Penilaian</h1>
+            <p class="text-gray-500 font-medium">Atur kriteria dan indikator performa karyawan Anda secara dinamis.</p>
         </div>
-        <button onclick="openAddIndicatorModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition-all active:scale-95 flex items-center gap-2">
-            <i class="fas fa-plus"></i> Tambah Indikator
+        <button onclick="openAddIndicatorModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-7 py-3.5 rounded-2xl font-bold shadow-lg shadow-blue-100 transition-all active:scale-95 flex items-center gap-2">
+            <i class="fas fa-plus"></i> Tambah Indikator Baru
         </button>
     </div>
 
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         @forelse($indicators as $indicator)
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden group hover:shadow-md transition-all">
-                <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                    <h2 class="text-xl font-black text-gray-800 uppercase tracking-tight">{{ $indicator->name }}</h2>
-                    <div class="flex gap-2">
-                        <button onclick="openEditIndicatorModal({{ $indicator->id }}, '{{ $indicator->name }}')" class="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50 transition-colors">
+            <div class="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden group hover:shadow-lg transition-all duration-300">
+                <div class="bg-gray-50/50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-gray-800 uppercase tracking-tight">{{ $indicator->name }}</h2>
+                    <div class="flex gap-1">
+                        <button onclick="openEditIndicatorModal({{ $indicator->id }}, '{{ $indicator->name }}')" class="text-gray-400 hover:text-blue-600 p-2 rounded-xl hover:bg-blue-50 transition-all">
                             <i class="fas fa-edit"></i>
                         </button>
                         <form action="{{ route('boss.evaluation-indicators.destroy', $indicator->id) }}" method="POST" onsubmit="return confirm('Hapus indikator ini dan semua deskripsinya?')">
@@ -34,19 +34,19 @@
                     </div>
                 </div>
                 <div class="p-6">
-                    <div class="mb-4 flex justify-between items-center">
-                        <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Deskripsi Penilaian</span>
-                        <button onclick="openAddDescriptionModal({{ $indicator->id }})" class="text-xs bg-gray-100 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg font-bold transition-all">
-                            <i class="fas fa-plus mr-1"></i> Tambah Item
+                    <div class="mb-5 flex justify-between items-center">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-widest">Kriteria / Deskripsi</span>
+                        <button onclick="openAddDescriptionModal({{ $indicator->id }})" class="text-[11px] bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-blue-100">
+                            <i class="fas fa-plus mr-1"></i> Tambah
                         </button>
                     </div>
-                    <ul class="space-y-3">
+                    <ul class="space-y-2.5">
                         @forelse($indicator->descriptions as $desc)
-                            <li class="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-transparent hover:border-gray-200 transition-all group/item">
-                                <span class="text-gray-700 font-medium">{{ $desc->name }}</span>
+                            <li class="flex justify-between items-center bg-gray-50/50 p-4 rounded-xl border border-gray-100 hover:border-gray-300 transition-all group/item">
+                                <span class="text-gray-700 font-medium text-sm">{{ $desc->name }}</span>
                                 <div class="flex gap-1 opacity-0 group-hover/item:opacity-100 transition-opacity">
-                                    <button onclick="openEditDescriptionModal({{ $desc->id }}, '{{ $desc->name }}')" class="text-blue-500 hover:text-blue-700 p-1">
-                                        <i class="fas fa-pencil-alt text-xs"></i>
+                                    <button onclick="openEditDescriptionModal({{ $desc->id }}, '{{ $desc->name }}')" class="text-gray-400 hover:text-blue-500 p-1.5 rounded-lg hover:bg-white transition-all">
+                                        <i class="fas fa-pencil-alt text-[10px]"></i>
                                     </button>
                                     <form action="{{ route('boss.evaluation-descriptions.destroy', $desc->id) }}" method="POST" onsubmit="return confirm('Hapus item penilaian ini?')">
                                         @csrf
@@ -93,10 +93,10 @@
             @csrf
             <input type="hidden" name="_method" id="indicatorMethod" value="POST">
             <div class="mb-6">
-                <label class="block text-gray-500 text-[10px] font-black uppercase tracking-widest mb-2">Nama Indikator</label>
-                <input type="text" name="name" id="indicatorName" required class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all font-bold text-gray-800" placeholder="Contoh: Disiplin, Kerjasama, dll.">
+                <label class="block text-gray-500 text-[11px] font-bold uppercase tracking-widest mb-3">Nama Indikator</label>
+                <input type="text" name="name" id="indicatorName" required class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 outline-none focus:border-blue-500 transition-all font-bold text-gray-900 text-lg" placeholder="Contoh: Disiplin, Kerjasama, dll.">
             </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-100 transition-all active:scale-95">
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4.5 rounded-2xl font-bold shadow-lg shadow-blue-100 transition-all active:scale-95">
                 Simpan Indikator
             </button>
         </form>
@@ -114,10 +114,10 @@
             @csrf
             <input type="hidden" name="_method" id="descriptionMethod" value="POST">
             <div class="mb-6">
-                <label class="block text-gray-500 text-[10px] font-black uppercase tracking-widest mb-2">Nama Deskripsi / Item Penilaian</label>
-                <input type="text" name="name" id="descriptionName" required class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 outline-none focus:border-indigo-500 transition-all font-bold text-gray-800" placeholder="Contoh: Ketepatan Waktu, Komunikasi, dll.">
+                <label class="block text-gray-500 text-[11px] font-bold uppercase tracking-widest mb-3">Nama Deskripsi / Item Penilaian</label>
+                <input type="text" name="name" id="descriptionName" required class="w-full bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 outline-none focus:border-indigo-500 transition-all font-bold text-gray-900 text-lg" placeholder="Contoh: Ketepatan Waktu, Komunikasi, dll.">
             </div>
-            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-2xl font-black shadow-lg shadow-indigo-100 transition-all active:scale-95">
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4.5 rounded-2xl font-bold shadow-lg shadow-indigo-100 transition-all active:scale-95">
                 Simpan Deskripsi
             </button>
         </form>
