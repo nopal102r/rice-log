@@ -72,13 +72,32 @@ class EvaluationEmployeeController extends Controller
         $history = $evaluations->map(function ($ev) {
             $avg = $ev->ratings->count() > 0 ? round($ev->ratings->avg('rating'), 1) : 0;
             return [
+                'id' => $ev->id,
                 'month' => Carbon::create(null, $ev->month)->format('F'),
                 'year' => $ev->year,
                 'average' => $avg,
-                'feedback' => $ev->feedback
+                'feedback' => $ev->feedback,
+                'bonus' => $ev->bonus,
             ];
         });
 
         return view('employee.evaluations.index', compact('latestEvaluation', 'chartData', 'history'));
+    }
+
+    public function show(Evaluation $evaluation)
+    {
+        // Ensure user can only see their own evaluations
+        if ($evaluation->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $evaluation->load(['ratings.description.indicator']);
+
+        // Group ratings by indicator
+        $groupedRatings = $evaluation->ratings->groupBy(function($item) {
+            return $item->description->indicator->name;
+        });
+
+        return view('employee.evaluations.show', compact('evaluation', 'groupedRatings'));
     }
 }

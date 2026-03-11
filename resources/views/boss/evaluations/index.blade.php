@@ -15,33 +15,30 @@
     </div>
 
     <!-- Progress Summary Card -->
-    <div class="bg-white rounded-3xl shadow-xl shadow-blue-50/50 p-8 border border-gray-100 mb-8 overflow-hidden relative">
+    <div class="bg-white rounded-2xl shadow-sm p-5 border border-gray-100 mb-8 relative overflow-hidden">
         <div class="relative z-10">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex-1">
-                    <h2 class="text-xl font-black text-gray-800 uppercase tracking-tight mb-4">Progress Penilaian Bulan Ini</h2>
-                    <div class="relative w-full h-10 bg-gray-100 rounded-2xl overflow-hidden border-4 border-gray-50 shadow-inner">
-                        <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-indigo-500 rounded-r-xl transition-all duration-1000 ease-out flex items-center justify-end px-4" style="width: {{ $progress }}%">
-                            @if($progress > 10)
-                                <span class="text-[10px] font-black text-white uppercase tracking-widest">{{ number_format($progress, 0) }}%</span>
-                            @endif
-                        </div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-xs font-black text-gray-500 uppercase tracking-widest">Progress Penilaian</h2>
+                        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ $ratedCount }} / {{ $totalEmployees }} Karyawan</span>
+                    </div>
+                    <div class="relative w-full h-2.5 bg-gray-50 rounded-full overflow-hidden border border-gray-100 p-0.5">
+                        <div class="absolute top-0 left-0 h-full bg-blue-600 rounded-full transition-all duration-1000 ease-out" style="width: {{ $progress }}%"></div>
                     </div>
                 </div>
-                <div class="flex gap-4">
-                    <div class="bg-blue-50 px-6 py-4 rounded-2xl text-center border border-blue-100 min-w-[120px]">
-                        <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Sudah Dinilai</p>
-                        <p class="text-3xl font-black text-blue-700 leading-none">{{ $ratedCount }}</p>
+                <div class="flex gap-2">
+                    <div class="bg-blue-50/50 px-4 py-2 rounded-xl border border-blue-50/50">
+                        <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest leading-none mb-1">Sudah</p>
+                        <p class="text-lg font-black text-blue-700 leading-none">{{ $ratedCount }}</p>
                     </div>
-                    <div class="bg-gray-50 px-6 py-4 rounded-2xl text-center border border-gray-100 min-w-[120px]">
-                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Total Karyawan</p>
-                        <p class="text-3xl font-black text-gray-900 leading-none">{{ $totalEmployees }}</p>
+                    <div class="bg-gray-50/50 px-4 py-2 rounded-xl border border-gray-50/50">
+                        <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Total</p>
+                        <p class="text-lg font-black text-gray-900 leading-none">{{ $totalEmployees }}</p>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Decorative Background Element -->
-        <div class="absolute -right-8 -top-8 w-64 h-64 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
     </div>
 
 

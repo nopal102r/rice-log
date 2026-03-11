@@ -55,6 +55,7 @@ Route::middleware(['auth', 'employee'])->prefix('employee')->name('employee.')->
 
     // Evaluations
     Route::get('/evaluations', [EvaluationEmployeeController::class, 'index'])->name('evaluations.index');
+    Route::get('/evaluations/{evaluation}', [EvaluationEmployeeController::class, 'show'])->name('evaluations.show');
 });
 
 // Boss Routes

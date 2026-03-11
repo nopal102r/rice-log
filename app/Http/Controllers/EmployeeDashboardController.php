@@ -40,6 +40,13 @@ class EmployeeDashboardController extends Controller
         // Get deposits for current month
         $depositsData = Deposit::getTotalMonthDeposits($user->id, $currentMonth, $currentYear);
 
+        // Get evaluation bonus
+        $evaluation = \App\Models\Evaluation::where('user_id', $user->id)
+            ->where('month', $currentMonth)
+            ->where('year', $currentYear)
+            ->first();
+        $depositsData['bonus'] = $evaluation ? $evaluation->bonus : 0;
+
         // Get recent activities
         $recentActivities = [
             'absences' => Absence::where('user_id', $user->id)

@@ -103,7 +103,12 @@
                                     {{ $data->total_revenue > 0 ? 'Rp ' . number_format($data->total_revenue, 0, ',', '.') : '-' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-green-600">
-                                    Rp {{ number_format($data->total_wage, 0, ',', '.') }}
+                                    <div class="flex flex-col items-end">
+                                        <span>Rp {{ number_format($data->total_wage, 0, ',', '.') }}</span>
+                                        @if($data->bonus > 0)
+                                            <span class="text-[10px] text-blue-500 font-black uppercase tracking-widest">+ Rp {{ number_format($data->bonus, 0, ',', '.') }} Bonus</span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                     <a href="{{ route('boss.employees.show', $data->user->id) }}" class="text-indigo-600 hover:text-indigo-900">
