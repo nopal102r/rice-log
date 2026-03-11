@@ -57,6 +57,9 @@
                     <button type="submit" class="bg-gray-900 text-white px-6 py-2.5 rounded-xl font-black shadow-lg hover:bg-black transition active:scale-95">
                         Filter
                     </button>
+                    <button type="submit" formaction="{{ route('boss.reports.attendance.detail.export', $user->id) }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-black shadow-lg shadow-emerald-200 transition active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
                 </form>
             </div>
 

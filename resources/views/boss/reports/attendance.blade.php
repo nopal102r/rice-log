@@ -77,6 +77,9 @@
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-blue-200 transition active:scale-95 w-full sm:w-auto mt-2 sm:mt-0">
                         Filter
                     </button>
+                    <button type="submit" formaction="{{ route('boss.reports.attendance.export') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg shadow-emerald-200 transition active:scale-95 w-full sm:w-auto mt-2 sm:mt-0 flex items-center justify-center gap-2">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
                 </form>
             </div>
         </div>

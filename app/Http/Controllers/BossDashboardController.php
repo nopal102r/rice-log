@@ -48,15 +48,20 @@ class BossDashboardController extends Controller
                 $activeEmployees++;
             }
 
-            // Get today's activity
             $todayAbsence = Absence::where('user_id', $employee->id)
                 ->whereDate('created_at', now()->toDateString())
                 ->where('type', 'masuk')
+                ->where(function($query) {
+                    $query->where('is_manual_req', false)
+                          ->orWhere('status_approval', 'approved');
+                })
                 ->first();
             
             $activity = 'tidak hadir';
             if ($todayAbsence) {
                 $activity = $todayAbsence->status; // hadir, izin, sakit
+            } elseif (Absence::where('user_id', $employee->id)->whereDate('created_at', now()->toDateString())->where('is_manual_req', true)->where('status_approval', 'pending')->exists()) {
+                $activity = 'pending acc';
             }
 
             $employeeSummaries[] = [
@@ -78,6 +83,12 @@ class BossDashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $pendingManualAttendances = Absence::where('is_manual_req', true)
+            ->where('status_approval', 'pending')
+            ->with(['user'])
+            ->latest()
+            ->get();
+
         return view('boss.dashboard', [
             'totalEmployees' => $employees->count(),
             'activeEmployees' => $activeEmployees,
@@ -85,6 +96,7 @@ class BossDashboardController extends Controller
             'totalMonthlySalaryExpense' => $totalMonthlySalaryExpense, // Passed new variable
             'pendingLeaves' => $pendingLeaves,
             'pendingDeposits' => $pendingDeposits,
+            'pendingManualAttendances' => $pendingManualAttendances,
             'employeeSummaries' => $employeeSummaries,
         ]);
     }

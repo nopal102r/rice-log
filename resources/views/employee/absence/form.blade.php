@@ -161,7 +161,17 @@
                     <i class="fas fa-camera text-purple-600"></i> Verifikasi Wajah
                 </h3>
 
-                <div class="bg-gray-50 rounded-lg p-6">
+                <div class="mb-4">
+                    <label class="flex items-center cursor-pointer p-3 border-2 border-gray-200 rounded-lg hover:bg-gray-50">
+                        <input type="checkbox" name="is_manual" id="is_manual" value="1" class="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 mr-3">
+                        <div>
+                            <p class="font-bold text-gray-800">Ada kendala Saat Absen? Minta ACC Manual</p>
+                            <p class="text-sm text-gray-600">Pilih opsi ini jika ada kendala saat absen. Presensi akan menunggu persetujuan dari Atasan.</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-6" id="cameraBox">
                     <p class="text-gray-600 mb-4">
                         <i class="fas fa-info-circle text-blue-500 mr-2"></i>
                         Pastikan wajah Anda terlihat jelas di kamera. Sistem akan otomatis mendeteksi wajah Anda.
@@ -579,6 +589,22 @@
             });
         });
 
+        // Handle manual override
+        const isManualCheckbox = document.getElementById('is_manual');
+        if (isManualCheckbox) {
+            isManualCheckbox.addEventListener('change', function() {
+                const cameraBox = document.getElementById('cameraBox');
+                if (this.checked) {
+                    cameraBox.style.display = 'none';
+                    if (document.getElementById('stopCameraBtn')) {
+                         document.getElementById('stopCameraBtn').click();
+                    }
+                } else {
+                    cameraBox.style.display = 'block';
+                }
+            });
+        }
+
         // Handle form submission
         document.getElementById('absenceForm').addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -597,15 +623,18 @@
             const faceImage = document.getElementById('face_image').files;
 
             if (status === 'hadir') {
-                if (faceImage.length === 0) {
-                    Swal.fire('Error', 'Silakan ambil foto wajah terlebih dahulu', 'error');
-                    return;
-                }
-                
-                // If enrolled data exists, enforce verification success
-                if (enrolledFaceData && !isFaceVerified) {
-                     Swal.fire('Error', 'Verifikasi wajah gagal. Silakan coba lagi.', 'error');
-                     return;
+                const isManualReq = document.getElementById('is_manual')?.checked;
+                if (!isManualReq) {
+                    if (faceImage.length === 0) {
+                        Swal.fire('Error', 'Silakan ambil foto wajah terlebih dahulu', 'error');
+                        return;
+                    }
+                    
+                    // If enrolled data exists, enforce verification success
+                    if (enrolledFaceData && !isFaceVerified) {
+                         Swal.fire('Error', 'Verifikasi wajah gagal. Silakan coba lagi.', 'error');
+                         return;
+                    }
                 }
             }
 
