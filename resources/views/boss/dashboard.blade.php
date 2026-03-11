@@ -102,6 +102,14 @@
                 </div>
                 <span class="text-[11px] font-black uppercase tracking-widest">Pengaturan</span>
             </a>
+
+            <a href="{{ route('boss.attendance-approval.index') }}"
+                class="bg-white border-2 border-orange-100 hover:border-orange-500 hover:bg-orange-50 text-orange-600 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all group">
+                <div class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center group-hover:bg-orange-600 group-hover:text-white transition-all">
+                    <i class="fas fa-fingerprint"></i>
+                </div>
+                <span class="text-[11px] font-black uppercase tracking-widest">Absen Manual</span>
+            </a>
         </div>
 
         <!-- Pending Approvals -->
@@ -195,6 +203,40 @@
                 </a>
             </div>
         </div>
+
+        <!-- Pending Manual Attendances -->
+        @if($pendingManualAttendances->count() > 0)
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-fingerprint text-orange-600"></i> Request Absen Manual
+                <span class="bg-orange-100 text-orange-800 text-sm font-bold px-2 py-1 rounded">{{ $pendingManualAttendances->count() }}</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach($pendingManualAttendances as $absence)
+                    <div class="border-2 border-orange-100 bg-orange-50 p-4 rounded-xl">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="font-bold text-gray-800">{{ $absence->user->name }}</p>
+                                <p class="text-xs text-gray-600">Request: Absen {{ ucfirst($absence->type) }}</p>
+                                <p class="text-xs text-gray-500">{{ $absence->created_at->format('d M Y, H:i') }}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-4">
+                            <button onclick="approveAttendance({{ $absence->id }})"
+                                class="text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg font-bold flex-1">
+                                <i class="fas fa-check mr-1"></i> Setujui
+                            </button>
+                            <button onclick="rejectAttendance({{ $absence->id }})"
+                                class="text-xs bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg font-bold flex-1">
+                                <i class="fas fa-times mr-1"></i> Tolak
+                            </button>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
 
         <!-- Employee List Summary -->
         <div class="bg-white rounded-lg shadow p-6">
@@ -340,6 +382,48 @@
                         body: JSON.stringify({ reason: result.value })
                     }).then(r => r.json()).then(data => {
                         Swal.fire('Berhasil!', data.message, 'success').then(() => location.reload());
+                    });
+                }
+            });
+        }
+
+        function approveAttendance(id) {
+            Swal.fire({
+                title: 'Setujui Absensi Manual?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Setujui',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('{{ url("boss/attendance-approval") }}/' + id + '/approve', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'
+                        }
+                    }).then(r => r.json()).then(data => {
+                        Swal.fire('Berhasil', data.message, 'success').then(() => location.reload());
+                    });
+                }
+            });
+        }
+
+        function rejectAttendance(id) {
+            Swal.fire({
+                title: 'Tolak Absensi Manual?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Tolak',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('{{ url("boss/attendance-approval") }}/' + id + '/reject', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}'
+                        }
+                    }).then(r => r.json()).then(data => {
+                        Swal.fire('Ditolak', data.message, 'info').then(() => location.reload());
                     });
                 }
             });

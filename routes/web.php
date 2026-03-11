@@ -72,6 +72,11 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
     Route::post('/deposit-approval/{deposit}/verify', [DepositApprovalController::class, 'verify'])->name('deposit-approval.verify');
     Route::post('/deposit-approval/{deposit}/reject', [DepositApprovalController::class, 'reject'])->name('deposit-approval.reject');
 
+    // Attendance Approval
+    Route::get('/attendance-approval', [\App\Http\Controllers\AttendanceApprovalController::class, 'index'])->name('attendance-approval.index');
+    Route::post('/attendance-approval/{absence}/approve', [\App\Http\Controllers\AttendanceApprovalController::class, 'approve'])->name('attendance-approval.approve');
+    Route::post('/attendance-approval/{absence}/reject', [\App\Http\Controllers\AttendanceApprovalController::class, 'reject'])->name('attendance-approval.reject');
+
     // Payroll Settings
     Route::get('/payroll-settings', [PayrollSettingController::class, 'index'])->name('payroll-settings.index');
     Route::post('/payroll-settings', [PayrollSettingController::class, 'update'])->name('payroll-settings.update');

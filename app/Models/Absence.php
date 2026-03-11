@@ -20,6 +20,8 @@ class Absence extends Model
         'longitude',
         'distance_from_office',
         'checked_at',
+        'is_manual_req',
+        'status_approval',
     ];
 
     protected $casts = [

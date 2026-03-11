@@ -43,15 +43,24 @@ class AbsenceController extends Controller
     {
         $user = auth()->user();
 
-        $validated = $request->validate([
+        $rules = [
             'type' => 'required|in:masuk,keluar',
             'status' => 'required_if:type,masuk|in:hadir,sakit,izin',
             'description' => 'required_if:status,sakit,izin',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
-            'face_image' => 'required_if:status,hadir|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
+            'is_manual' => 'nullable|boolean',
+        ];
 
+        $isManual = $request->boolean('is_manual');
+
+        if ($request->input('status') === 'hadir' && !$isManual) {
+            $rules['face_image'] = 'required|image|mimes:jpeg,png,jpg|max:2048';
+        } else {
+            $rules['face_image'] = 'nullable|image|mimes:jpeg,png,jpg|max:2048';
+        }
+
+        $validated = $request->validate($rules);
         // Calculate distance from office
         $settings = PayrollSetting::getCurrent();
         $distance = $this->calculateDistance(
@@ -85,6 +94,8 @@ class AbsenceController extends Controller
             'distance_from_office' => $distance,
             'face_image' => $faceImagePath,
             'checked_at' => now(),
+            'is_manual_req' => $isManual,
+            'status_approval' => $isManual ? 'pending' : null,
         ]);
 
         // Update user's last_presence_at
@@ -92,7 +103,9 @@ class AbsenceController extends Controller
 
         // Build response message
         $message = $this->getSuccessMessage($validated['type'], $validated['status'] ?? 'hadir');
-        if ($faceVerified !== null) {
+        if ($isManual) {
+            $message = 'Request absen manual berhasil dikirim. Menunggu persetujuan Atasan.';
+        } elseif ($faceVerified !== null) {
             $message .= $faceVerified ? ' Wajah terverifikasi.' : ' (Wajah tidak match - perlu verifikasi manual).';
         }
 
@@ -252,24 +265,29 @@ class AbsenceController extends Controller
             // For a daily view, let's wrap it in an array to match a table loop,
             // or just render directly if preferred. We'll wrap to keep table logic simple.
             if ($in || $out) {
+                $statusDisplay = $in ? $in->status : '-';
+                if ($in && $in->is_manual_req) {
+                    if ($in->status_approval === 'pending') $statusDisplay = 'pending';
+                    elseif ($in->status_approval === 'rejected') $statusDisplay = 'rejected';
+                }
+
                 $reportData[] = (object) [
                     'date' => $date,
                     'in' => $in ? $in->created_at->format('H:i') : '-',
                     'out' => $out ? $out->created_at->format('H:i') : '-',
-                    'status' => $in ? $in->status : '-',
+                    'status' => $statusDisplay,
+                    'status_real' => $in ? $in->status : '-',
+                    'status_approval' => $in ? $in->status_approval : null,
                     'distance' => $in ? $in->distance_from_office : null,
                 ];
             }
         } elseif ($period === 'bulan' || $period === 'tahun') {
             $query = Absence::where('user_id', $user->id)
-                ->where('type', 'masuk');
-                
-            if ($period === 'bulan') {
-                $query->whereMonth('created_at', $month)
-                      ->whereYear('created_at', $year);
-            } else {
-                $query->whereYear('created_at', $year);
-            }
+                ->where('type', 'masuk')
+                ->where(function($q) {
+                    $q->where('is_manual_req', false)
+                      ->orWhere('status_approval', 'approved');
+                });
             
             $absences = $query->get();
             
@@ -311,11 +329,19 @@ class AbsenceController extends Controller
                         $in = $dayRecords->where('type', 'masuk')->first();
                         $out = $dayRecords->where('type', 'keluar')->first();
 
+                        $statusDisplay = $in ? $in->status : '-';
+                        if ($in && $in->is_manual_req) {
+                            if ($in->status_approval === 'pending') $statusDisplay = 'pending';
+                            elseif ($in->status_approval === 'rejected') $statusDisplay = 'rejected';
+                        }
+
                         $reportData[] = (object) [
                             'date' => \Carbon\Carbon::createFromDate($year, $month, $day),
                             'in' => $in ? $in->created_at->format('H:i') : '-',
                             'out' => $out ? $out->created_at->format('H:i') : '-',
-                            'status' => $in ? $in->status : '-',
+                            'status' => $statusDisplay,
+                            'status_real' => $in ? $in->status : '-',
+                            'status_approval' => $in ? $in->status_approval : null,
                             'distance' => $in ? $in->distance_from_office : '-',
                         ];
                     }
@@ -383,11 +409,17 @@ class AbsenceController extends Controller
                 $out = $absences->where('type', 'keluar')->first();
                 
                 if ($in || $out) {
+                    $statusDisplay = $in ? $in->status : '-';
+                    if ($in && $in->is_manual_req) {
+                        if ($in->status_approval === 'pending') $statusDisplay = 'pending';
+                        elseif ($in->status_approval === 'rejected') $statusDisplay = 'rejected';
+                    }
+
                     $rows[] = [
                         $date->format('d M Y'),
                         $in ? $in->created_at->format('H:i') : '-',
                         $out ? $out->created_at->format('H:i') : '-',
-                        $in ? $in->status : '-',
+                        $statusDisplay,
                         $in ? $in->distance_from_office : '-',
                     ];
                 }
@@ -409,13 +441,19 @@ class AbsenceController extends Controller
                         $in = $dayRecords->where('type', 'masuk')->first();
                         $out = $dayRecords->where('type', 'keluar')->first();
                         
+                        $statusDisplay = $in ? $in->status : '-';
+                        if ($in && $in->is_manual_req) {
+                            if ($in->status_approval === 'pending') $statusDisplay = 'pending';
+                            elseif ($in->status_approval === 'rejected') $statusDisplay = 'rejected';
+                        }
+
                         $rowDate = \Carbon\Carbon::createFromDate($year, $month, $day);
 
                         $rows[] = [
                             $rowDate->format('d M Y'),
                             $in ? $in->created_at->format('H:i') : '-',
                             $out ? $out->created_at->format('H:i') : '-',
-                            $in ? $in->status : '-',
+                            $statusDisplay,
                             $in ? $in->distance_from_office : '-',
                         ];
                     }
@@ -427,6 +465,10 @@ class AbsenceController extends Controller
             $absences = Absence::where('user_id', $user->id)
                 ->where('type', 'masuk')
                 ->whereYear('created_at', $year)
+                ->where(function($q) {
+                    $q->where('is_manual_req', false)
+                      ->orWhere('status_approval', 'approved');
+                })
                 ->get();
                 
             for ($m = 1; $m <= 12; $m++) {

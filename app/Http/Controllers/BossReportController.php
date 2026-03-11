@@ -64,6 +64,10 @@ class BossReportController extends Controller
             foreach ($employees as $employee) {
                 $absences = \App\Models\Absence::where('user_id', $employee->id)
                     ->whereDate('created_at', $date)
+                    ->where(function($q) {
+                        $q->where('is_manual_req', false)
+                          ->orWhere('status_approval', 'approved');
+                    })
                     ->get();
                 
                 $in = $absences->where('type', 'masuk')->first();
@@ -80,7 +84,11 @@ class BossReportController extends Controller
         } elseif ($period === 'bulan' || $period === 'tahun') {
             foreach ($employees as $employee) {
                 $query = \App\Models\Absence::where('user_id', $employee->id)
-                    ->where('type', 'masuk');
+                    ->where('type', 'masuk')
+                    ->where(function($q) {
+                        $q->where('is_manual_req', false)
+                          ->orWhere('status_approval', 'approved');
+                    });
                     
                 if ($period === 'bulan') {
                     $query->whereMonth('created_at', $month)
@@ -125,6 +133,10 @@ class BossReportController extends Controller
         $attendances = \App\Models\Absence::where('user_id', $user->id)
             ->whereMonth('created_at', $month)
             ->whereYear('created_at', $year)
+            ->where(function($q) {
+                $q->where('is_manual_req', false)
+                  ->orWhere('status_approval', 'approved');
+            })
             ->get()
             ->groupBy(function($absence) {
                 return \Carbon\Carbon::parse($absence->created_at)->format('d');
@@ -209,6 +221,10 @@ class BossReportController extends Controller
             foreach ($employees as $employee) {
                 $absences = \App\Models\Absence::where('user_id', $employee->id)
                     ->whereDate('created_at', $date)
+                    ->where(function($q) {
+                        $q->where('is_manual_req', false)
+                          ->orWhere('status_approval', 'approved');
+                    })
                     ->get();
                 
                 $in = $absences->where('type', 'masuk')->first();
@@ -227,7 +243,11 @@ class BossReportController extends Controller
             $columns = ['Nama Karyawan', 'Jabatan', 'Hadir', 'Sakit', 'Izin'];
             foreach ($employees as $employee) {
                 $query = \App\Models\Absence::where('user_id', $employee->id)
-                    ->where('type', 'masuk');
+                    ->where('type', 'masuk')
+                    ->where(function($q) {
+                        $q->where('is_manual_req', false)
+                          ->orWhere('status_approval', 'approved');
+                    });
                     
                 if ($period === 'bulan') {
                     $query->whereMonth('created_at', $month)
@@ -277,6 +297,10 @@ class BossReportController extends Controller
         $attendances = \App\Models\Absence::where('user_id', $user->id)
             ->whereMonth('created_at', $month)
             ->whereYear('created_at', $year)
+            ->where(function($q) {
+                $q->where('is_manual_req', false)
+                  ->orWhere('status_approval', 'approved');
+            })
             ->get()
             ->groupBy(function($absence) {
                 return \Carbon\Carbon::parse($absence->created_at)->format('d');
