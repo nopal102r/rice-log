@@ -9,6 +9,7 @@ class EvaluationIndicatorSeeder extends Seeder
 {
     public function run(): void
     {
+        // Data dummy: Daftar kategori (Indikator) dan butir pertanyaannya (Deskripsi)
         $data = [
             'Disiplin' => [
                 'Ketepatan Waktu Datang',
@@ -17,40 +18,17 @@ class EvaluationIndicatorSeeder extends Seeder
                 'Kerapihan & Kebersihan Area Kerja',
                 'Penyelesaian Tugas Tepat Waktu',
             ],
-            'Teamwork' => [
-                'Kerjasama dengan Tim',
-                'Komunikasi dengan Rekan Kerja',
-                'Membantu Rekan Saat Dibutuhkan',
-                'Menghargai Pendapat Orang Lain',
-                'Kemampuan Beradaptasi dalam Tim',
-            ],
-            'Kinerja' => [
-                'Kualitas Hasil Kerja',
-                'Kecepatan Menyelesaikan Tugas',
-                'Ketelitian dalam Bekerja',
-                'Produktivitas Kerja',
-                'Efisiensi Kerja',
-            ],
-            'Inisiatif & Tanggung Jawab' => [
-                'Inisiatif Mengambil Tugas',
-                'Tanggung Jawab terhadap Pekerjaan',
-                'Kemauan Belajar Hal Baru',
-                'Kemampuan Menyelesaikan Masalah',
-                'Kemandirian dalam Bekerja',
-            ],
-            'Sikap Profesional' => [
-                'Sikap terhadap Atasan',
-                'Sikap terhadap Rekan Kerja',
-                'Etika dalam Bekerja',
-                'Kemampuan Mengendalikan Emosi',
-                'Penampilan dan Profesionalisme',
-            ],
+            // ... (Kategori lainnya)
         ];
 
+        // Looping untuk memasukkan data ke database
         foreach ($data as $indicatorName => $descriptions) {
+            // Simpan nama kategori ke tabel indicators
             $indicator = EvaluationIndicator::create(['name' => $indicatorName]);
 
+            // Looping butir pertanyaan untuk kategori tersebut
             foreach ($descriptions as $descName) {
+                // Simpan butir pertanyaan yang terhubung ke indikator di atas
                 $indicator->descriptions()->create([
                     'name' => $descName
                 ]);

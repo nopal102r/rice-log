@@ -10,16 +10,17 @@ use Illuminate\View\View;
 class EvaluationIndicatorController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar semua kategori kriteria penilaian (Indikator).
      */
     public function index(): View
     {
+        // Mengambil semua indikator beserta butir-butir deskripsinya (Eager Loading)
         $indicators = EvaluationIndicator::with('descriptions')->get();
         return view('boss.evaluation-indicators.index', compact('indicators'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Menampilkan halaman form untuk menambah kategori kriteria baru.
      */
     public function create(): View
     {
@@ -27,21 +28,23 @@ class EvaluationIndicatorController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Menyimpan kategori kriteria (Indikator) baru ke database.
      */
     public function store(Request $request)
     {
+        // Validasi: nama indikator wajib diisi dan maksimal 255 karakter
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
+        // Membuat data baru di tabel evaluation_indicators
         EvaluationIndicator::create($validated);
 
         return redirect()->route('boss.evaluation-indicators.index')->with('success', 'Indikator berhasil ditambahkan.');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Menampilkan halaman edit untuk kategori kriteria tertentu.
      */
     public function edit(EvaluationIndicator $evaluationIndicator): View
     {
@@ -49,30 +52,33 @@ class EvaluationIndicatorController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memperbarui data kategori kriteria di database.
      */
     public function update(Request $request, EvaluationIndicator $evaluationIndicator)
     {
+        // Validasi input
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
+        // Proses update data ke row yang dipilih
         $evaluationIndicator->update($validated);
 
         return redirect()->route('boss.evaluation-indicators.index')->with('success', 'Indikator berhasil diperbarui.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus kategori kriteria dari database.
      */
     public function destroy(EvaluationIndicator $evaluationIndicator)
     {
+        // Hapus data (juga otomatis menghapus relasi jika diset cascade di database)
         $evaluationIndicator->delete();
         return redirect()->route('boss.evaluation-indicators.index')->with('success', 'Indikator berhasil dihapus.');
     }
 
     /**
-     * Show the form for creating a new description.
+     * Menampilkan form untuk menambah butir pertanyaan (deskripsi) di bawah kategori tertentu.
      */
     public function createDescription(EvaluationIndicator $indicator): View
     {
@@ -80,21 +86,23 @@ class EvaluationIndicatorController extends Controller
     }
 
     /**
-     * Store a new description for an indicator.
+     * Menyimpan butir pertanyaan baru untuk kategori yang dipilih.
      */
     public function storeDescription(Request $request, EvaluationIndicator $indicator)
     {
+        // Validasi input nama butir pertanyaan
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
+        // Simpan data deskripsi baru yang otomatis terhubung ke ID induk (Indikator)
         $indicator->descriptions()->create($validated);
 
         return redirect()->route('boss.evaluation-indicators.index')->with('success', 'Deskripsi berhasil ditambahkan.');
     }
 
     /**
-     * Show the form for editing a description.
+     * Menampilkan form edit untuk satu butir pertanyaan spesifik.
      */
     public function editDescription(EvaluationDescription $description): View
     {
@@ -102,7 +110,7 @@ class EvaluationIndicatorController extends Controller
     }
 
     /**
-     * Update a description.
+     * Memperbarui teks butir pertanyaan di database.
      */
     public function updateDescription(Request $request, EvaluationDescription $description)
     {
@@ -116,7 +124,7 @@ class EvaluationIndicatorController extends Controller
     }
 
     /**
-     * Delete a description.
+     * Menghapus butir pertanyaan spesifik.
      */
     public function destroyDescription(EvaluationDescription $description)
     {

@@ -1,0 +1,48 @@
+\doxysection{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}Face\+Verification\+Client\+Side\+Example Class Reference}
+\hypertarget{class_app_1_1_http_1_1_controllers_1_1_face_verification_client_side_example}{}\label{class_app_1_1_http_1_1_controllers_1_1_face_verification_client_side_example}\index{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationClientSideExample@{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationClientSideExample}}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \doxymbox{\hyperlink{class_app_1_1_http_1_1_controllers_1_1_face_verification_client_side_example_a54856c518c607048955db105b0891970}{example}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+OPTION 1:\+ CLIENT-\/\+SIDE VERIFICATION (CURRENT RECOMMENDED)
+
+Pros:\+
+\begin{DoxyItemize}
+\item No backend ML processing needed
+\item Faster verification
+\item Works entirely in browser
+\end{DoxyItemize}
+
+Cons:\+
+\begin{DoxyItemize}
+\item Descriptor must be captured and sent from client
+\item User could theoretically send false descriptor
+\end{DoxyItemize}
+
+Implementation:\+ 
+
+\label{doc-func-members}
+\Hypertarget{class_app_1_1_http_1_1_controllers_1_1_face_verification_client_side_example_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_app_1_1_http_1_1_controllers_1_1_face_verification_client_side_example_a54856c518c607048955db105b0891970}\index{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationClientSideExample@{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationClientSideExample}!example@{example}}
+\index{example@{example}!App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationClientSideExample@{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationClientSideExample}}
+\doxysubsubsection{\texorpdfstring{example()}{example()}}
+{\footnotesize\ttfamily \label{class_app_1_1_http_1_1_controllers_1_1_face_verification_client_side_example_a54856c518c607048955db105b0891970} 
+App\textbackslash{}\+Http\textbackslash{}\+Controllers\textbackslash{}\+Face\+Verification\+Client\+Side\+Example::\+example (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+Flow:\+
+\begin{DoxyEnumerate}
+\item Java\+Script captures face:\+ Face\+Recognition\+Helper.\+get\+Face\+Descriptors(video)
+\item Returns:\+ Float32\+Array (128 entries)
+\item Convert to JSON and send with image to backend
+\item Backend stores both image and descriptor
+\item On verification:\+ Compare descriptors using Euclidean distance 
+\end{DoxyEnumerate}
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+app/\+\+Http/\+\+Controllers/\+\doxymbox{\hyperlink{_face_verification_implementation_guide_8php}{Face\+Verification\+Implementation\+Guide.\+php}}\end{DoxyCompactItemize}

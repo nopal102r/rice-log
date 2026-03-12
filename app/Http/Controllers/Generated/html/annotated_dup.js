@@ -1,0 +1,34 @@
+var annotated_dup =
+[
+    [ "App", null, [
+      [ "Http", null, [
+        [ "Controllers", "namespace_app_1_1_http_1_1_controllers.html", [
+          [ "AbsenceController", "class_app_1_1_http_1_1_controllers_1_1_absence_controller.html", "class_app_1_1_http_1_1_controllers_1_1_absence_controller" ],
+          [ "AttendanceApprovalController", "class_app_1_1_http_1_1_controllers_1_1_attendance_approval_controller.html", "class_app_1_1_http_1_1_controllers_1_1_attendance_approval_controller" ],
+          [ "AuthController", "class_app_1_1_http_1_1_controllers_1_1_auth_controller.html", "class_app_1_1_http_1_1_controllers_1_1_auth_controller" ],
+          [ "BossDashboardController", "class_app_1_1_http_1_1_controllers_1_1_boss_dashboard_controller.html", "class_app_1_1_http_1_1_controllers_1_1_boss_dashboard_controller" ],
+          [ "BossReportController", "class_app_1_1_http_1_1_controllers_1_1_boss_report_controller.html", "class_app_1_1_http_1_1_controllers_1_1_boss_report_controller" ],
+          [ "Controller", "class_app_1_1_http_1_1_controllers_1_1_controller.html", null ],
+          [ "DepositApprovalController", "class_app_1_1_http_1_1_controllers_1_1_deposit_approval_controller.html", "class_app_1_1_http_1_1_controllers_1_1_deposit_approval_controller" ],
+          [ "DepositController", "class_app_1_1_http_1_1_controllers_1_1_deposit_controller.html", "class_app_1_1_http_1_1_controllers_1_1_deposit_controller" ],
+          [ "EmployeeDashboardController", "class_app_1_1_http_1_1_controllers_1_1_employee_dashboard_controller.html", "class_app_1_1_http_1_1_controllers_1_1_employee_dashboard_controller" ],
+          [ "EmployeeManagementController", "class_app_1_1_http_1_1_controllers_1_1_employee_management_controller.html", "class_app_1_1_http_1_1_controllers_1_1_employee_management_controller" ],
+          [ "EvaluationBossController", "class_app_1_1_http_1_1_controllers_1_1_evaluation_boss_controller.html", "class_app_1_1_http_1_1_controllers_1_1_evaluation_boss_controller" ],
+          [ "EvaluationEmployeeController", "class_app_1_1_http_1_1_controllers_1_1_evaluation_employee_controller.html", "class_app_1_1_http_1_1_controllers_1_1_evaluation_employee_controller" ],
+          [ "EvaluationIndicatorController", "class_app_1_1_http_1_1_controllers_1_1_evaluation_indicator_controller.html", "class_app_1_1_http_1_1_controllers_1_1_evaluation_indicator_controller" ],
+          [ "FaceVerificationClientSideExample", "class_app_1_1_http_1_1_controllers_1_1_face_verification_client_side_example.html", null ],
+          [ "FaceVerificationPythonMicroserviceExample", "class_app_1_1_http_1_1_controllers_1_1_face_verification_python_microservice_example.html", null ],
+          [ "FaceVerificationCloudAPIExample", "class_app_1_1_http_1_1_controllers_1_1_face_verification_cloud_a_p_i_example.html", null ],
+          [ "FaceVerificationNodeJSExample", "class_app_1_1_http_1_1_controllers_1_1_face_verification_node_j_s_example.html", null ],
+          [ "EuclideanDistanceExample", "class_app_1_1_http_1_1_controllers_1_1_euclidean_distance_example.html", null ],
+          [ "MigrationExample", "class_app_1_1_http_1_1_controllers_1_1_migration_example.html", null ],
+          [ "LeaveApprovalController", "class_app_1_1_http_1_1_controllers_1_1_leave_approval_controller.html", "class_app_1_1_http_1_1_controllers_1_1_leave_approval_controller" ],
+          [ "LeaveSubmissionController", "class_app_1_1_http_1_1_controllers_1_1_leave_submission_controller.html", "class_app_1_1_http_1_1_controllers_1_1_leave_submission_controller" ],
+          [ "NotificationController", "class_app_1_1_http_1_1_controllers_1_1_notification_controller.html", "class_app_1_1_http_1_1_controllers_1_1_notification_controller" ],
+          [ "PayrollSettingController", "class_app_1_1_http_1_1_controllers_1_1_payroll_setting_controller.html", "class_app_1_1_http_1_1_controllers_1_1_payroll_setting_controller" ],
+          [ "ProfileController", "class_app_1_1_http_1_1_controllers_1_1_profile_controller.html", "class_app_1_1_http_1_1_controllers_1_1_profile_controller" ],
+          [ "StockController", "class_app_1_1_http_1_1_controllers_1_1_stock_controller.html", "class_app_1_1_http_1_1_controllers_1_1_stock_controller" ]
+        ] ]
+      ] ]
+    ] ]
+];
