@@ -58,5 +58,13 @@
                 <span class="font-semibold">Hasil Penilaian</span>
             </a>
         </div>
+        <div class="mb-4">
+            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4 mb-2">Integritas</h3>
+            <a href="{{ route('employee.wallet.index') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('employee.wallet.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600' }}">
+                <i class="fas fa-wallet"></i>
+                <span class="font-semibold">Dompet Integritas</span>
+            </a>
+        </div>
     </nav>
 </aside>

@@ -53,6 +53,10 @@ Route::middleware(['auth', 'employee'])->prefix('employee')->name('employee.')->
     Route::post('/deposit', [DepositController::class, 'store'])->name('deposit.store');
     Route::get('/deposit/my-deposits', [DepositController::class, 'myDeposits'])->name('deposit.my-deposits');
 
+    // Integrity Wallet
+    Route::get('/wallet', [\App\Http\Controllers\WalletEmployeeController::class, 'index'])->name('wallet.index');
+    Route::post('/wallet/purchase/{item}', [\App\Http\Controllers\WalletEmployeeController::class, 'purchase'])->name('wallet.purchase');
+
     // Evaluations
     Route::get('/evaluations', [EvaluationEmployeeController::class, 'index'])->name('evaluations.index');
     Route::get('/evaluations/{evaluation}', [EvaluationEmployeeController::class, 'show'])->name('evaluations.show');
@@ -98,6 +102,18 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
 
     // Stock Inventory
     Route::get('/stock', [\App\Http\Controllers\StockController::class, 'index'])->name('stock.index');
+
+    // Integrity Wallet (Dompet Integritas)
+    Route::get('/wallet/rules', [\App\Http\Controllers\WalletBossController::class, 'rules'])->name('wallet.rules');
+    Route::post('/wallet/rules', [\App\Http\Controllers\WalletBossController::class, 'storeRule'])->name('wallet.storeRule');
+    Route::put('/wallet/rules/{rule}', [\App\Http\Controllers\WalletBossController::class, 'updateRule'])->name('wallet.updateRule');
+    Route::delete('/wallet/rules/{rule}', [\App\Http\Controllers\WalletBossController::class, 'destroyRule'])->name('wallet.destroyRule');
+    
+    Route::get('/wallet/catalog', [\App\Http\Controllers\WalletBossController::class, 'catalog'])->name('wallet.catalog');
+    Route::post('/wallet/catalog', [\App\Http\Controllers\WalletBossController::class, 'storeCatalog'])->name('wallet.storeCatalog');
+    Route::delete('/wallet/catalog/{item}', [\App\Http\Controllers\WalletBossController::class, 'destroyCatalog'])->name('wallet.destroyCatalog');
+
+    Route::get('/wallet/leaderboard', [\App\Http\Controllers\WalletBossController::class, 'leaderboard'])->name('wallet.leaderboard');
 
     // Evaluation Management
     Route::resource('evaluation-indicators', EvaluationIndicatorController::class);
