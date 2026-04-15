@@ -111,6 +111,31 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the integrity point ledgers for the user.
+     */
+    public function pointLedgers(): HasMany
+    {
+        return $this->hasMany(PointLedger::class);
+    }
+
+    /**
+     * Get the active/used tokens for the user.
+     */
+    public function userTokens(): HasMany
+    {
+        return $this->hasMany(UserToken::class);
+    }
+
+    /**
+     * Get current points from latest ledger securely.
+     */
+    public function getCurrentPoints(): int
+    {
+        $latest = $this->pointLedgers()->latest('id')->first();
+        return $latest ? $latest->current_balance : 0;
+    }
+
+    /**
      * Check if user is boss/manager
      */
     public function isBoss(): bool

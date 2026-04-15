@@ -98,6 +98,10 @@ class AbsenceController extends Controller
             'status_approval' => $isManual ? 'pending' : null,
         ]);
 
+        if (!$isManual) {
+            event(new \App\Events\AbsenceSaved($absence));
+        }
+
         // Update user's last_presence_at
         $user->update(['last_presence_at' => now()]);
 

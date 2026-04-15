@@ -1,0 +1,68 @@
+\doxysection{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}Migration\+Example Class Reference}
+\hypertarget{class_app_1_1_http_1_1_controllers_1_1_migration_example}{}\label{class_app_1_1_http_1_1_controllers_1_1_migration_example}\index{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}MigrationExample@{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}MigrationExample}}
+
+
+\doxysubsection{Detailed Description}
+RICE LOG CURRENT IMPLEMENTATION
+
+Current approach:\+ Hybrid
+
+
+\begin{DoxyEnumerate}
+\item Client-\/side:\+
+\begin{DoxyItemize}
+\item Capture face descriptor in Java\+Script
+\item Upload both image and descriptor to server
+\item Optional:\+ Verify on client-\/side before sending
+\end{DoxyItemize}
+\item Server-\/side:\+
+\begin{DoxyItemize}
+\item Store image in storage/\+faces/\+\+YYYY/\+\+MM/\+\+DD/\+
+\item Store descriptor comparison result in absences.\+face\+\_\+verified
+\item Check if user has enrolled face (boolean)
+\end{DoxyItemize}
+\item Database:\+
+\begin{DoxyItemize}
+\item users.\+face\+\_\+data:\+ Enrolled descriptor (JSON array)
+\item users.\+face\+\_\+enrolled:\+ Boolean flag
+\item absences.\+face\+\_\+image:\+ Path to captured image
+\item absences.\+face\+\_\+verified:\+ Verification result (bool/\+null)
+\end{DoxyItemize}
+\end{DoxyEnumerate}
+
+Migration path:\+
+\begin{DoxyItemize}
+\item Phase 1:\+ Store descriptor server-\/side (DONE)
+\item Phase 2:\+ Send descriptor client-\/side with image (TODO)
+\item Phase 3:\+ Implement actual comparison (TODO)
+\item Phase 4:\+ Add optional Python microservice (TODO) IMPLEMENTATION STEPS FOR PRODUCTION
+\end{DoxyItemize}
+\begin{DoxyEnumerate}
+\item Enable client-\/side descriptor transmission:\+
+\begin{DoxyItemize}
+\item Modify absence form to capture descriptor
+\item Send descriptor with form submission
+\item Update validation to accept descriptor
+\end{DoxyItemize}
+\item Store captured descriptor:\+
+\begin{DoxyItemize}
+\item Create migration to add absences.\+face\+\_\+descriptor column
+\item Store captured descriptor in database
+\end{DoxyItemize}
+\item Implement comparison:\+
+\begin{DoxyItemize}
+\item Update verify\+Face() method to compare descriptors
+\item Use PHP calculate\+Face\+Distance() method
+\item Compare against user.\+face\+\_\+data
+\end{DoxyItemize}
+\item Optional enhancements:\+
+\begin{DoxyItemize}
+\item Add liveness detection (client-\/side)
+\item Add multiple sample verification
+\item Setup Python microservice for extraction TODO MIGRATION 
+\end{DoxyItemize}
+\end{DoxyEnumerate}
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+app/\+\+Http/\+\+Controllers/\+\doxymbox{\hyperlink{_face_verification_implementation_guide_8php}{Face\+Verification\+Implementation\+Guide.\+php}}\end{DoxyCompactItemize}

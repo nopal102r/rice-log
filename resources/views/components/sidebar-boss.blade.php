@@ -57,6 +57,25 @@
         </div>
 
         <div class="mb-4">
+            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4 mb-2">Dompet Integritas</h3>
+            <a href="{{ route('boss.wallet.rules') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('boss.wallet.rules') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600' }}">
+                <i class="fas fa-gavel"></i>
+                <span class="font-semibold">Aturan Poin</span>
+            </a>
+            <a href="{{ route('boss.wallet.catalog') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('boss.wallet.catalog') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600' }}">
+                <i class="fas fa-store"></i>
+                <span class="font-semibold">Marketplace</span>
+            </a>
+            <a href="{{ route('boss.wallet.leaderboard') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('boss.wallet.leaderboard') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600' }}">
+                <i class="fas fa-trophy"></i>
+                <span class="font-semibold">Leaderboard</span>
+            </a>
+        </div>
+
+        <div class="mb-4">
             <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4 mb-2">Pengaturan</h3>
             <a href="{{ route('boss.payroll-settings.index') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('boss.payroll-settings.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600' }}">

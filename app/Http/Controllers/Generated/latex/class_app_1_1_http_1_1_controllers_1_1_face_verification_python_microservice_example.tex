@@ -1,0 +1,69 @@
+\doxysection{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}Face\+Verification\+Python\+Microservice\+Example Class Reference}
+\hypertarget{class_app_1_1_http_1_1_controllers_1_1_face_verification_python_microservice_example}{}\label{class_app_1_1_http_1_1_controllers_1_1_face_verification_python_microservice_example}\index{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationPythonMicroserviceExample@{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationPythonMicroserviceExample}}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static \doxymbox{\hyperlink{class_app_1_1_http_1_1_controllers_1_1_face_verification_python_microservice_example_a2854e5d9ff0734ba41e438d60f38e709}{php\+Caller}} (\$captured\+Descriptor, \$enrolled\+Descriptor)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+OPTION 2:\+ PYTHON MICROSERVICE
+
+Setup a separate Python service for face recognition
+
+Pros:\+
+\begin{DoxyItemize}
+\item Server-\/side extraction (more secure)
+\item Can use optimized face recognition libraries
+\item Can implement face liveness detection
+\end{DoxyItemize}
+
+Cons:\+
+\begin{DoxyItemize}
+\item Requires Python service running
+\item Network latency
+\item More complex setup
+\end{DoxyItemize}
+
+Example Python service (Flask):\+ 
+
+\label{doc-func-members}
+\Hypertarget{class_app_1_1_http_1_1_controllers_1_1_face_verification_python_microservice_example_doc-func-members}
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_app_1_1_http_1_1_controllers_1_1_face_verification_python_microservice_example_a2854e5d9ff0734ba41e438d60f38e709}\index{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationPythonMicroserviceExample@{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationPythonMicroserviceExample}!phpCaller@{phpCaller}}
+\index{phpCaller@{phpCaller}!App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationPythonMicroserviceExample@{App\textbackslash{}Http\textbackslash{}Controllers\textbackslash{}FaceVerificationPythonMicroserviceExample}}
+\doxysubsubsection{\texorpdfstring{phpCaller()}{phpCaller()}}
+{\footnotesize\ttfamily \label{class_app_1_1_http_1_1_controllers_1_1_face_verification_python_microservice_example_a2854e5d9ff0734ba41e438d60f38e709} 
+App\textbackslash{}\+Http\textbackslash{}\+Controllers\textbackslash{}\+Face\+Verification\+Python\+Microservice\+Example::\+php\+Caller (\begin{DoxyParamCaption}\item[{}]{\$captured\+Descriptor}{, }\item[{}]{\$enrolled\+Descriptor}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+Python service code example:\+
+
+from flask import Flask, request import face\+\_\+recognition import json import numpy as np from PIL import Image import io
+
+app = Flask({\bfseries{name}})
+
+@app.route(\textquotesingle{}/\+extract-\/descriptor\textquotesingle{}, methods=\+[\textquotesingle{}POST\textquotesingle{}]\+) def extract\+\_\+descriptor():\+ image = face\+\_\+recognition.\+load\+\_\+image\+\_\+file(request.\+files\+[\textquotesingle{}image\textquotesingle{}]\+) descriptors = face\+\_\+recognition.\+face\+\_\+encodings(image) if descriptors:\+ return \{\textquotesingle{}descriptor\textquotesingle{}:\+ descriptors\+[0]\+.tolist()\} return \{\textquotesingle{}error\textquotesingle{}:\+ \textquotesingle{}No face found\textquotesingle{}\}
+
+@app.route(\textquotesingle{}/\+verify-\/face\textquotesingle{}, methods=\+[\textquotesingle{}POST\textquotesingle{}]\+) def verify\+\_\+face():\+ data = request.\+json captured = np.\+array(data\+[\textquotesingle{}captured\+\_\+descriptor\textquotesingle{}]\+) enrolled = np.\+array(data\+[\textquotesingle{}enrolled\+\_\+descriptor\textquotesingle{}]\+) distance = np.\+linalg.\+norm(captured -\/ enrolled) threshold = 0.\+6 return \{\textquotesingle{}verified\textquotesingle{}:\+ distance \texorpdfstring{$<$}{<} threshold, \textquotesingle{}distance\textquotesingle{}:\+ float(distance)\} Call Python microservice for face verification
+
+
+\begin{DoxyParams}[1]{Parameters}
+array & {\em \$captured\+Descriptor} & -\/ Face descriptor from current capture \\
+\hline
+array & {\em \$enrolled\+Descriptor} & -\/ Stored face descriptor from database \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+bool -\/ True if match, false otherwise 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em } & \\
+\hline
+\end{DoxyExceptions}
+Exception -\/ If service call fails 
+
+The documentation for this class was generated from the following file:\+\begin{DoxyCompactItemize}
+\item 
+app/\+\+Http/\+\+Controllers/\+\doxymbox{\hyperlink{_face_verification_implementation_guide_8php}{Face\+Verification\+Implementation\+Guide.\+php}}\end{DoxyCompactItemize}

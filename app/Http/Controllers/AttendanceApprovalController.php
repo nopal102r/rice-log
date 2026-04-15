@@ -38,6 +38,8 @@ class AttendanceApprovalController extends Controller
             'status_approval' => 'approved'
         ]);
 
+        event(new \App\Events\AbsenceSaved($absence));
+
         return response()->json([
             'success' => true,
             'message' => 'Absensi manual berhasil disetujui.'
