@@ -20,7 +20,7 @@
             @method('PUT')
             
             <div class="mb-8">
-                <label for="name" class="block text-gray-500 text-[11px] font-bold uppercase tracking-widest mb-4">Nama Indikator</label>
+                <label for="name" class="block text-gray-500 text-[11px] font-bold uppercase tracking-widest mb-4">Indikator</label>
                 <div class="relative group">
                     <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
                         <i class="fas fa-tag"></i>
@@ -36,7 +36,7 @@
             </div>
 
             <div class="flex flex-col md:flex-row gap-4">
-                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black shadow-xl shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-3 text-lg">
+                <button type="submit" class="flex-1 bg-green-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black shadow-xl shadow-blue-100 transition-all active:scale-95 flex items-center justify-center gap-3 text-lg">
                     <i class="fas fa-save"></i>
                     Simpan Perubahan
                 </button>
