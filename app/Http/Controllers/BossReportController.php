@@ -129,6 +129,41 @@ class BossReportController extends Controller
     }
 
     /**
+     * Set user status to alpa manually.
+     */
+    public function markAlpa(Request $request, User $user): \Illuminate\Http\RedirectResponse
+    {
+        $date = \Carbon\Carbon::parse($request->input('date', now()->format('Y-m-d')));
+        
+        $existing = \App\Models\Absence::where('user_id', $user->id)
+            ->whereDate('created_at', $date)
+            ->where('type', 'masuk')
+            ->first();
+
+        if ($existing && $existing->status !== 'alpa') {
+            return back()->with('error', "Karyawan sudah tercatat {$existing->status} pada hari ini.");
+        }
+
+        if (!$existing) {
+            $absence = new \App\Models\Absence([
+                'user_id' => $user->id,
+                'type' => 'masuk',
+                'status' => 'alpa',
+                'status_approval' => 'approved',
+                'is_manual_req' => true,
+                'description' => 'Ditandai Alpa oleh Atasan',
+                'distance_from_office' => 0
+            ]);
+            $absence->created_at = clone $date->setTime(8, 0, 0);
+            $absence->save();
+
+            event(new \App\Events\AbsenceSaved($absence));
+        }
+
+        return back()->with('success', "Karyawan {$user->name} berhasil ditandai Alpa.");
+    }
+
+    /**
      * Show detailed monthly attendance for a specific employee.
      */
     public function attendanceDetail(Request $request, User $user): View

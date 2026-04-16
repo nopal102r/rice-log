@@ -13,6 +13,7 @@ class FlexibilityItem extends Model
     protected $fillable = [
         'item_name',
         'point_cost',
+        'tolerance_minutes',
         'stock_limit',
     ];
 

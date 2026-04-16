@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Absence;
 use App\Models\PayrollSetting;
+use App\Models\PointLedger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -107,15 +108,34 @@ class AbsenceController extends Controller
 
         // Build response message
         $message = $this->getSuccessMessage($validated['type'], $validated['status'] ?? 'hadir');
+        
         if ($isManual) {
             $message = 'Request absen manual berhasil dikirim. Menunggu persetujuan Atasan.';
         } elseif ($faceVerified !== null) {
             $message .= $faceVerified ? ' Wajah terverifikasi.' : ' (Wajah tidak match - perlu verifikasi manual).';
         }
 
+        $pointsMessage = null;
+        if (!$isManual) {
+            $recentLedgers = PointLedger::where('user_id', $user->id)
+                ->where('created_at', '>=', now()->subSeconds(5))
+                ->get();
+                
+            if ($recentLedgers->count() > 0) {
+                $pointsMessage = '<strong class="text-blue-600">Mutasi Poin Integritas:</strong><ul class="text-left mt-2 text-sm space-y-1">';
+                foreach($recentLedgers as $ledger) {
+                   $sign = $ledger->amount > 0 ? '+' : '';
+                   $color = $ledger->amount > 0 ? 'text-green-600' : 'text-red-600';
+                   $pointsMessage .= "<li>• {$ledger->description} : <strong class=\"{$color}\">{$sign}{$ledger->amount} PTS</strong></li>";
+                }
+                $pointsMessage .= '</ul>';
+            }
+        }
+
         return response()->json([
             'success' => true,
             'message' => $message,
+            'points_message' => $pointsMessage,
             'absence' => $absence,
             'face_verified' => $faceVerified,
         ]);

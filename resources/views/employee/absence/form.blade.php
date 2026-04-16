@@ -683,8 +683,22 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    Swal.fire('Berhasil!', data.message, 'success').then(() => {
-                        window.location.href = '{{ route("employee.dashboard") }}';
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        html: data.message,
+                        icon: 'success'
+                    }).then(() => {
+                        if (data.points_message) {
+                            Swal.fire({
+                                title: 'Info Poin',
+                                html: data.points_message,
+                                icon: 'info'
+                            }).then(() => {
+                                window.location.href = '{{ route("employee.dashboard") }}';
+                            });
+                        } else {
+                            window.location.href = '{{ route("employee.dashboard") }}';
+                        }
                     });
                 } else {
                     Swal.fire('Error', data.message, 'error');

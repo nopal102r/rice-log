@@ -36,11 +36,29 @@ class EvaluateIntegrityPoints
         $hasUsedLateToken = false;
 
         foreach ($matchedRules as $rule) {
-            if ($rule->point_modifier < 0) {
+            if ($rule->point_modifier < 0 && $rule->condition_operator === '>') {
                 if (!$hasUsedLateToken) {
-                    if ($this->interceptor->interceptLateness($absence)) {
+                    $interceptorResult = $this->interceptor->interceptLateness($absence, $rule);
+                    
+                    if ($interceptorResult['intercepted']) {
                         $hasUsedLateToken = true;
-                        continue; // Skip applying this penalty
+                        // Record a 0 point transaction to show it was tolerated
+                        $this->ledger->recordTransaction(
+                            $absence->user,
+                            'EARN',
+                            0,
+                            $interceptorResult['message']
+                        );
+                        continue; // Skip the penalty
+                    } else {
+                        // Penalty applied but with descriptive message
+                        $this->ledger->recordTransaction(
+                            $absence->user,
+                            'PENALTY',
+                            $rule->point_modifier,
+                            $interceptorResult['message']
+                        );
+                        continue;
                     }
                 }
             }

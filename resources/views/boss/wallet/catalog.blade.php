@@ -29,6 +29,10 @@
                     <label class="block text-sm font-bold text-gray-700 mb-1">Harga Poin</label>
                     <input type="number" name="point_cost" required class="w-full border-gray-300 rounded-xl focus:ring-purple-500 bg-gray-50" placeholder="Cth: 50">
                 </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Toleransi Waktu (Menit)</label>
+                    <input type="number" name="tolerance_minutes" class="w-full border-gray-300 rounded-xl focus:ring-purple-500 bg-gray-50" placeholder="Kosongkan jika bukan voucher telat. Cth: 30">
+                </div>
                 <div class="mb-6">
                     <label class="block text-sm font-bold text-gray-700 mb-1">Batas Stok (Opsional)</label>
                     <input type="number" name="stock_limit" class="w-full border-gray-300 rounded-xl focus:ring-purple-500 bg-gray-50" placeholder="Kosongi jika tak terbatas">
@@ -51,6 +55,9 @@
                         <span class="bg-orange-100 border border-orange-200 text-orange-800 font-black px-3 py-1 rounded-xl shadow-sm">⭐ {{ $item->point_cost }} PTS</span>
                     </div>
                     <h3 class="text-xl font-bold text-gray-800">{{ $item->item_name }}</h3>
+                    @if($item->tolerance_minutes)
+                        <p class="text-[11px] font-bold text-purple-600 mt-1"><i class="fas fa-clock mr-1"></i>Max Toleransi: {{ $item->tolerance_minutes }} Menit</p>
+                    @endif
                     
                     <p class="text-[11px] font-black uppercase mt-2 tracking-wider {{ $item->stock_left === 'unlimited' ? 'text-green-600' : ($item->stock_left > 0 ? 'text-blue-600' : 'text-red-500') }}">
                         <i class="fas fa-box-open mr-1"></i> Stok 

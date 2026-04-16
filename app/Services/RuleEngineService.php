@@ -16,8 +16,8 @@ class RuleEngineService
         if ($absence->type !== 'masuk') return [];
         // Skip rules if attendance is rejected
         if ($absence->status_approval === 'rejected') return [];
-        // Only evaluate if it's considered an attendance or manual approval that resulted in hadir
-        if (!in_array($absence->status, ['hadir', 'sakit', 'izin'])) return [];
+        // Only evaluate if it's considered an attendance or manual approval that resulted in hadir/sakit/izin/alpa
+        if (!in_array($absence->status, ['hadir', 'sakit', 'izin', 'alpa'])) return [];
 
         $user = $absence->user;
         $rules = PointRule::all();
@@ -30,7 +30,7 @@ class RuleEngineService
             // Wait, our User isBoss() and isEmployee() logic: Boss = 'bos', Employee = 'karyawan'
             if ($rule->target_role && $user->role !== $rule->target_role) continue;
             
-            if ($this->evaluateCondition($timeStr, $rule->condition_operator, $rule->condition_value)) {
+            if ($this->evaluateCondition($absence, $rule->condition_operator, $rule->condition_value)) {
                 $matched[] = $rule;
             }
         }
@@ -38,8 +38,13 @@ class RuleEngineService
         return $matched;
     }
 
-    private function evaluateCondition(string $timeStr, string $operator, string $value): bool
+    private function evaluateCondition(Absence $absence, string $operator, string $value): bool
     {
+        if ($operator === 'STATUS_EQUALS') {
+            return strtolower($absence->status) === strtolower($value);
+        }
+
+        $timeStr = $absence->created_at->timezone('Asia/Jakarta')->format('H:i');
         $checkTime = Carbon::createFromFormat('H:i', $timeStr);
         
         try {

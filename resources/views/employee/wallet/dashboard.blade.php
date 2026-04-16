@@ -66,6 +66,9 @@
                         <span class="bg-orange-100 text-orange-800 font-black px-3 py-1 rounded-xl shadow-sm border border-orange-200 border-b-4">⭐ {{ $item->point_cost }} PTS</span>
                     </div>
                     <h3 class="font-bold text-gray-800 text-lg">{{ $item->item_name }}</h3>
+                    @if($item->tolerance_minutes)
+                        <p class="text-[11px] font-bold text-indigo-600 mt-1"><i class="fas fa-clock mr-1"></i>Max Toleransi: {{ $item->tolerance_minutes }} Menit</p>
+                    @endif
                     <p class="text-[11px] font-black uppercase mt-2 tracking-wider {{ $item->stock_left === 'unlimited' ? 'text-green-600' : ($item->stock_left > 0 ? 'text-blue-600' : 'text-red-500') }}">
                         <i class="fas fa-box-open mr-1"></i> Stok Tersedia: {{ $item->stock_left === 'unlimited' ? '∞ Tak Terbatas' : $item->stock_left }}
                     </p>

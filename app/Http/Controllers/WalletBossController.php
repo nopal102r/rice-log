@@ -23,7 +23,7 @@ class WalletBossController extends Controller
         $validated = $request->validate([
             'rule_name' => 'required|string|max:255',
             'target_role' => 'nullable|string|in:karyawan,bos',
-            'condition_operator' => 'required|string|in:<,>,BETWEEN',
+            'condition_operator' => 'required|string|in:<,>,BETWEEN,STATUS_EQUALS',
             'condition_value' => 'required|string',
             'point_modifier' => 'required|integer',
         ]);
@@ -37,7 +37,7 @@ class WalletBossController extends Controller
         $validated = $request->validate([
             'rule_name' => 'required|string|max:255',
             'target_role' => 'nullable|string|in:karyawan,bos',
-            'condition_operator' => 'required|string|in:<,>,BETWEEN',
+            'condition_operator' => 'required|string|in:<,>,BETWEEN,STATUS_EQUALS',
             'condition_value' => 'required|string',
             'point_modifier' => 'required|integer',
         ]);
@@ -73,6 +73,7 @@ class WalletBossController extends Controller
         $validated = $request->validate([
             'item_name' => 'required|string|max:255',
             'point_cost' => 'required|integer|min:0',
+            'tolerance_minutes' => 'nullable|integer|min:1',
             'stock_limit' => 'nullable|integer|min:1',
         ]);
 

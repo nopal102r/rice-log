@@ -38,12 +38,13 @@
                         <option value="<">Kurang dari Jam (<)</option>
                         <option value=">">Lebih dari Jam (>)</option>
                         <option value="BETWEEN">Diantara Jam (Start,End)</option>
+                        <option value="STATUS_EQUALS">Berdasarkan Status (Hadir/Sakit/Izin/Alpa)</option>
                     </select>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-bold text-gray-700 mb-1">Nilai Kondisi (Jam)</label>
                     <input type="text" name="condition_value" required class="w-full border-gray-300 bg-gray-50 rounded-xl focus:ring-blue-500 focus:border-blue-500" placeholder="Cth: 08:00 atau 06:30,07:00">
-                    <p class="text-xs text-gray-400 mt-1 font-semibold">Gunakan format HH:MM</p>
+                    <p class="text-xs text-gray-400 mt-1 font-semibold">Gunakan format HH:MM, atau ketik 'alpa' jika mode status.</p>
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-bold text-gray-700 mb-1">Poin Modifier (+ / -)</label>
@@ -145,6 +146,7 @@
                     <option value="<">Kurang dari Jam (<)</option>
                     <option value=">">Lebih dari Jam (>)</option>
                     <option value="BETWEEN">Diantara Jam (Start,End)</option>
+                    <option value="STATUS_EQUALS">Berdasarkan Status (Hadir/Sakit/Izin/Alpa)</option>
                 </select>
             </div>
             <div class="mb-4">

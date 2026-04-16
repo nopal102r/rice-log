@@ -158,7 +158,7 @@
                                             {{ $data->status }}
                                         </span>
                                     @else
-                                        <span class="text-gray-300 font-bold">T/A</span>
+                                        <span class="text-orange-400 font-bold tracking-wider">Belum Absen</span>
                                     @endif
                                 </td>
                                 <td class="px-8 py-6 text-center whitespace-nowrap font-medium text-gray-600">
@@ -182,11 +182,22 @@
                                 </td>
                                 @endif
                                 <td class="px-8 py-6 text-right whitespace-nowrap">
-                                    <a href="{{ route('boss.reports.attendance.detail', $data->user->id) }}?month={{ $month }}&year={{ $year }}" 
-                                       class="inline-flex items-center justify-center px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600 rounded-xl font-bold text-xs transition-all shadow-sm active:scale-95 group-hover:shadow-md">
-                                       <i class="fas fa-chart-pie mr-2"></i>
-                                       Detail
-                                    </a>
+                                    <div class="flex items-center justify-end gap-2">
+                                        @if($period === 'hari' && $data->status === '-')
+                                        <form action="{{ route('boss.reports.attendance.markAlpa', $data->user->id) }}" method="POST" onsubmit="return confirm('Tandai karyawan ini sebagai Alpa?')">
+                                            @csrf
+                                            <input type="hidden" name="date" value="{{ $currentDate->format('Y-m-d') }}">
+                                            <button type="submit" class="inline-flex items-center justify-center px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border border-red-200 rounded-xl font-bold text-xs transition-all shadow-sm active:scale-95">
+                                                <i class="fas fa-user-times mr-2"></i> Tandai Alpa
+                                            </button>
+                                        </form>
+                                        @endif
+                                        <a href="{{ route('boss.reports.attendance.detail', $data->user->id) }}?month={{ $month }}&year={{ $year }}" 
+                                           class="inline-flex items-center justify-center px-4 py-2 bg-white text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600 rounded-xl font-bold text-xs transition-all shadow-sm active:scale-95 group-hover:shadow-md">
+                                           <i class="fas fa-chart-pie mr-2"></i>
+                                           Detail
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         @empty

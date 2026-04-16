@@ -96,6 +96,7 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
     // Reports
     Route::get('/reports', [\App\Http\Controllers\BossReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/attendance', [\App\Http\Controllers\BossReportController::class, 'attendance'])->name('reports.attendance');
+    Route::post('/reports/attendance/{user}/mark-alpa', [\App\Http\Controllers\BossReportController::class, 'markAlpa'])->name('reports.attendance.markAlpa');
     Route::get('/reports/attendance/export', [\App\Http\Controllers\BossReportController::class, 'exportAttendance'])->name('reports.attendance.export');
     Route::get('/reports/attendance/detail/{user}', [\App\Http\Controllers\BossReportController::class, 'attendanceDetail'])->name('reports.attendance.detail');
     Route::get('/reports/attendance/detail/{user}/export', [\App\Http\Controllers\BossReportController::class, 'exportAttendanceDetail'])->name('reports.attendance.detail.export');
