@@ -75,6 +75,7 @@
     let debounceTimer;
     const subjectInput = document.getElementById('subject');
     const descriptionInput = document.getElementById('description');
+    const submitButton = document.querySelector('button[type="submit"]');
     const duplicateContainer = document.getElementById('duplicate-container');
     const noDuplicateTip = document.getElementById('no-duplicate-tip');
     const duplicateList = document.getElementById('duplicate-list');
@@ -83,9 +84,12 @@
         const subject = subjectInput.value;
         const description = descriptionInput.value;
 
-        if (subject.length < 5 && description.length < 5) {
+        if (subject.length < 3 && description.length < 5) {
             duplicateContainer.classList.add('hidden');
             noDuplicateTip.classList.remove('hidden');
+            submitButton.disabled = false;
+            submitButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            submitButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
             return;
         }
 
@@ -101,24 +105,57 @@
             })
             .then(response => response.json())
             .then(data => {
+                const headerIcon = duplicateContainer.querySelector('i');
+                const headerText = duplicateContainer.querySelector('h3');
+                const headerWrapper = headerText.parentElement;
+
                 if (data.length > 0) {
                     duplicateList.innerHTML = '';
                     data.forEach(ticket => {
                         duplicateList.innerHTML += `
-                            <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-400">
+                            <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-red-500">
                                 <h4 class="text-xs font-bold text-gray-800 mb-1">${ticket.subject}</h4>
                                 <div class="flex justify-between items-center">
-                                    <span class="text-[10px] uppercase font-bold text-blue-500">${ticket.status}</span>
+                                    <span class="text-[10px] uppercase font-bold text-red-500">${ticket.status}</span>
                                     <a href="/employee/tickets/${ticket.id}" target="_blank" class="text-[10px] text-blue-600 underline">Lihat Detail</a>
                                 </div>
                             </div>
                         `;
                     });
-                    duplicateContainer.classList.remove('hidden');
+                    
+                    // Style as Warning
+                    duplicateContainer.classList.remove('hidden', 'bg-blue-50', 'border-blue-100');
+                    duplicateContainer.classList.add('bg-red-50', 'border-red-200');
+                    headerWrapper.classList.remove('text-blue-800');
+                    headerWrapper.classList.add('text-red-800');
+                    headerText.innerText = "DUPLIKASI TERDETEKSI!";
+                    headerIcon.classList.replace('fa-lightbulb', 'fa-exclamation-triangle');
+                    headerIcon.classList.replace('text-yellow-500', 'text-red-500');
+                    
                     noDuplicateTip.classList.add('hidden');
+                    
+                    // Disable submit button
+                    submitButton.disabled = true;
+                    submitButton.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    submitButton.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    
                 } else {
                     duplicateContainer.classList.add('hidden');
                     noDuplicateTip.classList.remove('hidden');
+                    
+                    // Reset to normal style
+                    duplicateContainer.classList.remove('bg-red-50', 'border-red-200');
+                    duplicateContainer.classList.add('bg-blue-50', 'border-blue-100');
+                    headerWrapper.classList.remove('text-red-800');
+                    headerWrapper.classList.add('text-blue-800');
+                    headerText.innerText = "Aduan Serupa yang Ditemukan";
+                    headerIcon.classList.replace('fa-exclamation-triangle', 'fa-lightbulb');
+                    headerIcon.classList.replace('text-red-500', 'text-yellow-500');
+
+                    // Enable submit button
+                    submitButton.disabled = false;
+                    submitButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                    submitButton.classList.add('bg-blue-600', 'hover:bg-blue-700');
                 }
             });
         }, 800);

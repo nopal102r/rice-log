@@ -22,7 +22,12 @@ var namespace_app_1_1_http_1_1_controllers =
     [ "LeaveApprovalController", "class_app_1_1_http_1_1_controllers_1_1_leave_approval_controller.html", "class_app_1_1_http_1_1_controllers_1_1_leave_approval_controller" ],
     [ "LeaveSubmissionController", "class_app_1_1_http_1_1_controllers_1_1_leave_submission_controller.html", "class_app_1_1_http_1_1_controllers_1_1_leave_submission_controller" ],
     [ "NotificationController", "class_app_1_1_http_1_1_controllers_1_1_notification_controller.html", "class_app_1_1_http_1_1_controllers_1_1_notification_controller" ],
+    [ "OperatorTicketController", "class_app_1_1_http_1_1_controllers_1_1_operator_ticket_controller.html", "class_app_1_1_http_1_1_controllers_1_1_operator_ticket_controller" ],
     [ "PayrollSettingController", "class_app_1_1_http_1_1_controllers_1_1_payroll_setting_controller.html", "class_app_1_1_http_1_1_controllers_1_1_payroll_setting_controller" ],
     [ "ProfileController", "class_app_1_1_http_1_1_controllers_1_1_profile_controller.html", "class_app_1_1_http_1_1_controllers_1_1_profile_controller" ],
-    [ "StockController", "class_app_1_1_http_1_1_controllers_1_1_stock_controller.html", "class_app_1_1_http_1_1_controllers_1_1_stock_controller" ]
+    [ "StockController", "class_app_1_1_http_1_1_controllers_1_1_stock_controller.html", "class_app_1_1_http_1_1_controllers_1_1_stock_controller" ],
+    [ "TicketAnalyticsController", "class_app_1_1_http_1_1_controllers_1_1_ticket_analytics_controller.html", "class_app_1_1_http_1_1_controllers_1_1_ticket_analytics_controller" ],
+    [ "TicketController", "class_app_1_1_http_1_1_controllers_1_1_ticket_controller.html", "class_app_1_1_http_1_1_controllers_1_1_ticket_controller" ],
+    [ "WalletBossController", "class_app_1_1_http_1_1_controllers_1_1_wallet_boss_controller.html", "class_app_1_1_http_1_1_controllers_1_1_wallet_boss_controller" ],
+    [ "WalletEmployeeController", "class_app_1_1_http_1_1_controllers_1_1_wallet_employee_controller.html", "class_app_1_1_http_1_1_controllers_1_1_wallet_employee_controller" ]
 ];

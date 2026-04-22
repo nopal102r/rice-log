@@ -5,7 +5,7 @@
 %%For: 
 %Magnification: 1.00
 %%Orientation: Portrait
-%%BoundingBox: 0 0 500 590.062134
+%%BoundingBox: 0 0 500 745.341614
 %%Pages: 0
 %%BeginSetup
 %%EndSetup
@@ -19,12 +19,12 @@
 /marginwidth 10 def
 /distx 20 def
 /disty 40 def
-/boundaspect 0.847368 def  % aspect ratio of the BoundingBox (width/height)
+/boundaspect 0.670833 def  % aspect ratio of the BoundingBox (width/height)
 /boundx 500 def
 /boundy boundx boundaspect div def
 /xspacing 0 def
 /yspacing 0 def
-/rows 19 def
+/rows 24 def
 /cols 2 def
 /scalefactor 0 def
 /boxfont /Times-Roman findfont fontheight scalefont def
@@ -189,9 +189,14 @@ boxfont setfont
 (App\Http\Controllers\LeaveApprovalController) cw
 (App\Http\Controllers\LeaveSubmissionController) cw
 (App\Http\Controllers\NotificationController) cw
+(App\Http\Controllers\OperatorTicketController) cw
 (App\Http\Controllers\PayrollSettingController) cw
 (App\Http\Controllers\ProfileController) cw
 (App\Http\Controllers\StockController) cw
+(App\Http\Controllers\TicketAnalyticsController) cw
+(App\Http\Controllers\TicketController) cw
+(App\Http\Controllers\WalletBossController) cw
+(App\Http\Controllers\WalletEmployeeController) cw
 /boxwidth boxwidth marginwidth 2 mul add def
 /xspacing boxwidth distx add def
 /yspacing boxheight disty add def
@@ -203,30 +208,45 @@ boundx scalefactor div boundy scalefactor div scale
 
 % ----- classes -----
 
- (App\Http\Controllers\Controller) 0.000000 18.000000 box
- (App\Http\Controllers\AbsenceController) 1.000000 17.000000 box
- (App\Http\Controllers\AttendanceApprovalController) 1.000000 16.000000 box
- (App\Http\Controllers\AuthController) 1.000000 15.000000 box
- (App\Http\Controllers\BossDashboardController) 1.000000 14.000000 box
- (App\Http\Controllers\BossReportController) 1.000000 13.000000 box
- (App\Http\Controllers\DepositApprovalController) 1.000000 12.000000 box
- (App\Http\Controllers\DepositController) 1.000000 11.000000 box
- (App\Http\Controllers\EmployeeDashboardController) 1.000000 10.000000 box
- (App\Http\Controllers\EmployeeManagementController) 1.000000 9.000000 box
- (App\Http\Controllers\EvaluationBossController) 1.000000 8.000000 box
- (App\Http\Controllers\EvaluationEmployeeController) 1.000000 7.000000 box
- (App\Http\Controllers\EvaluationIndicatorController) 1.000000 6.000000 box
- (App\Http\Controllers\LeaveApprovalController) 1.000000 5.000000 box
- (App\Http\Controllers\LeaveSubmissionController) 1.000000 4.000000 box
- (App\Http\Controllers\NotificationController) 1.000000 3.000000 box
- (App\Http\Controllers\PayrollSettingController) 1.000000 2.000000 box
- (App\Http\Controllers\ProfileController) 1.000000 1.000000 box
- (App\Http\Controllers\StockController) 1.000000 0.000000 box
+ (App\Http\Controllers\Controller) 0.000000 23.000000 box
+ (App\Http\Controllers\AbsenceController) 1.000000 22.000000 box
+ (App\Http\Controllers\AttendanceApprovalController) 1.000000 21.000000 box
+ (App\Http\Controllers\AuthController) 1.000000 20.000000 box
+ (App\Http\Controllers\BossDashboardController) 1.000000 19.000000 box
+ (App\Http\Controllers\BossReportController) 1.000000 18.000000 box
+ (App\Http\Controllers\DepositApprovalController) 1.000000 17.000000 box
+ (App\Http\Controllers\DepositController) 1.000000 16.000000 box
+ (App\Http\Controllers\EmployeeDashboardController) 1.000000 15.000000 box
+ (App\Http\Controllers\EmployeeManagementController) 1.000000 14.000000 box
+ (App\Http\Controllers\EvaluationBossController) 1.000000 13.000000 box
+ (App\Http\Controllers\EvaluationEmployeeController) 1.000000 12.000000 box
+ (App\Http\Controllers\EvaluationIndicatorController) 1.000000 11.000000 box
+ (App\Http\Controllers\LeaveApprovalController) 1.000000 10.000000 box
+ (App\Http\Controllers\LeaveSubmissionController) 1.000000 9.000000 box
+ (App\Http\Controllers\NotificationController) 1.000000 8.000000 box
+ (App\Http\Controllers\OperatorTicketController) 1.000000 7.000000 box
+ (App\Http\Controllers\PayrollSettingController) 1.000000 6.000000 box
+ (App\Http\Controllers\ProfileController) 1.000000 5.000000 box
+ (App\Http\Controllers\StockController) 1.000000 4.000000 box
+ (App\Http\Controllers\TicketAnalyticsController) 1.000000 3.000000 box
+ (App\Http\Controllers\TicketController) 1.000000 2.000000 box
+ (App\Http\Controllers\WalletBossController) 1.000000 1.000000 box
+ (App\Http\Controllers\WalletEmployeeController) 1.000000 0.000000 box
 
 % ----- relations -----
 
 solid
-1 0.000000 17.250000 out
+1 0.000000 22.250000 out
+solid
+0 0.000000 22.500000 hedge
+solid
+0 0.000000 21.500000 hedge
+solid
+0 0.000000 20.500000 hedge
+solid
+0 0.000000 19.500000 hedge
+solid
+0 0.000000 18.500000 hedge
 solid
 0 0.000000 17.500000 hedge
 solid
@@ -264,4 +284,4 @@ solid
 solid
 0 0.000000 0.500000 hedge
 solid
-0.000000 18.000000 0.500000 vedge
+0.000000 23.000000 0.500000 vedge

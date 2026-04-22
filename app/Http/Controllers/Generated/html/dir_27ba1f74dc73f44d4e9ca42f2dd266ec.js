@@ -17,7 +17,12 @@ var dir_27ba1f74dc73f44d4e9ca42f2dd266ec =
     [ "LeaveApprovalController.php", "_leave_approval_controller_8php.html", "_leave_approval_controller_8php" ],
     [ "LeaveSubmissionController.php", "_leave_submission_controller_8php.html", "_leave_submission_controller_8php" ],
     [ "NotificationController.php", "_notification_controller_8php.html", "_notification_controller_8php" ],
+    [ "OperatorTicketController.php", "_operator_ticket_controller_8php.html", "_operator_ticket_controller_8php" ],
     [ "PayrollSettingController.php", "_payroll_setting_controller_8php.html", "_payroll_setting_controller_8php" ],
     [ "ProfileController.php", "_profile_controller_8php.html", "_profile_controller_8php" ],
-    [ "StockController.php", "_stock_controller_8php.html", "_stock_controller_8php" ]
+    [ "StockController.php", "_stock_controller_8php.html", "_stock_controller_8php" ],
+    [ "TicketAnalyticsController.php", "_ticket_analytics_controller_8php.html", "_ticket_analytics_controller_8php" ],
+    [ "TicketController.php", "_ticket_controller_8php.html", "_ticket_controller_8php" ],
+    [ "WalletBossController.php", "_wallet_boss_controller_8php.html", "_wallet_boss_controller_8php" ],
+    [ "WalletEmployeeController.php", "_wallet_employee_controller_8php.html", "_wallet_employee_controller_8php" ]
 ];

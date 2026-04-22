@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['markasread_0',['markAsRead',['../class_app_1_1_http_1_1_controllers_1_1_notification_controller.html#a81304cf200ce617afda08204f0808e56',1,'App::Http::Controllers::NotificationController']]],
-  ['mydeposits_1',['myDeposits',['../class_app_1_1_http_1_1_controllers_1_1_deposit_controller.html#ab76fbd1de129a362a345880b53bcb829',1,'App::Http::Controllers::DepositController']]],
-  ['mysubmissions_2',['mySubmissions',['../class_app_1_1_http_1_1_controllers_1_1_leave_submission_controller.html#a0903a90c3aa0272fc2b4218266c23187',1,'App::Http::Controllers::LeaveSubmissionController']]]
+  ['leaderboard_0',['leaderboard',['../class_app_1_1_http_1_1_controllers_1_1_wallet_boss_controller.html#a14579f63525bbdb0c06f2567127e7714',1,'App::Http::Controllers::WalletBossController']]],
+  ['login_1',['login',['../class_app_1_1_http_1_1_controllers_1_1_auth_controller.html#ae3fb64d0c903780f00509c35b7592f4c',1,'App::Http::Controllers::AuthController']]],
+  ['logout_2',['logout',['../class_app_1_1_http_1_1_controllers_1_1_auth_controller.html#a49b098b5037e12eae28cd600d49f5832',1,'App::Http::Controllers::AuthController']]]
 ];

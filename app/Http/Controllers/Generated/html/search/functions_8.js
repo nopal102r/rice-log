@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['phpcaller_0',['phpCaller',['../class_app_1_1_http_1_1_controllers_1_1_face_verification_python_microservice_example.html#a2854e5d9ff0734ba41e438d60f38e709',1,'App::Http::Controllers::FaceVerificationPythonMicroserviceExample']]],
-  ['phpcode_1',['phpCode',['../class_app_1_1_http_1_1_controllers_1_1_euclidean_distance_example.html#af457236a5c205f0c60cc30e220189b85',1,'App::Http::Controllers::EuclideanDistanceExample']]]
+  ['markalpa_0',['markAlpa',['../class_app_1_1_http_1_1_controllers_1_1_boss_report_controller.html#a3cc6ac0871660b1b6a638975ca633d7b',1,'App::Http::Controllers::BossReportController']]],
+  ['markasread_1',['markAsRead',['../class_app_1_1_http_1_1_controllers_1_1_notification_controller.html#a81304cf200ce617afda08204f0808e56',1,'App::Http::Controllers::NotificationController']]],
+  ['mydeposits_2',['myDeposits',['../class_app_1_1_http_1_1_controllers_1_1_deposit_controller.html#ab76fbd1de129a362a345880b53bcb829',1,'App::Http::Controllers::DepositController']]],
+  ['mysubmissions_3',['mySubmissions',['../class_app_1_1_http_1_1_controllers_1_1_leave_submission_controller.html#a0903a90c3aa0272fc2b4218266c23187',1,'App::Http::Controllers::LeaveSubmissionController']]]
 ];

@@ -24,7 +24,7 @@
 */
 var NAVTREE =
 [
-  [ "rice-log", "index.html", [
+  [ "Sistem-Helpdesk", "index.html", [
     [ "Packages", "namespaces.html", [
       [ "Package List", "namespaces.html", "namespaces_dup" ]
     ] ],
@@ -45,7 +45,8 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"_absence_controller_8php.html"
+"_absence_controller_8php.html",
+"classes.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';
