@@ -76,6 +76,20 @@
         </div>
 
         <div class="mb-4">
+            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4 mb-2">Aduan & Tiket</h3>
+            <a href="{{ route('operator.tickets.index') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('operator.tickets.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600' }}">
+                <i class="fas fa-headset"></i>
+                <span class="font-semibold">Antrean Tiket</span>
+            </a>
+            <a href="{{ route('boss.tickets.analytics') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('boss.tickets.analytics') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600' }}">
+                <i class="fas fa-chart-line"></i>
+                <span class="font-semibold">Analitik Aduan</span>
+            </a>
+        </div>
+
+        <div class="mb-4">
             <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4 mb-2">Pengaturan</h3>
             <a href="{{ route('boss.payroll-settings.index') }}"
                 class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('boss.payroll-settings.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600' }}">

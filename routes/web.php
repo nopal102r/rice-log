@@ -14,6 +14,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EvaluationIndicatorController;
 use App\Http\Controllers\EvaluationBossController;
 use App\Http\Controllers\EvaluationEmployeeController;
+use App\Http\Controllers\TicketController;
+use App\Http\Controllers\OperatorTicketController;
+use App\Http\Controllers\TicketAnalyticsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -60,6 +63,15 @@ Route::middleware(['auth', 'employee'])->prefix('employee')->name('employee.')->
     // Evaluations
     Route::get('/evaluations', [EvaluationEmployeeController::class, 'index'])->name('evaluations.index');
     Route::get('/evaluations/{evaluation}', [EvaluationEmployeeController::class, 'show'])->name('evaluations.show');
+
+    // Tickets
+    Route::get('/tickets', [TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/create', [TicketController::class, 'create'])->name('tickets.create');
+    Route::post('/tickets', [TicketController::class, 'store'])->name('tickets.store');
+    Route::post('/tickets/check-duplicate', [TicketController::class, 'checkDuplicate'])->name('tickets.check-duplicate');
+    Route::get('/tickets/{ticket}', [TicketController::class, 'show'])->name('tickets.show');
+    Route::post('/tickets/{ticket}/message', [TicketController::class, 'sendMessage'])->name('tickets.message');
+    Route::post('/tickets/{ticket}/rate', [TicketController::class, 'rate'])->name('tickets.rate');
 });
 
 // Boss Routes
@@ -128,6 +140,18 @@ Route::middleware(['auth', 'boss'])->prefix('boss')->name('boss.')->group(functi
     Route::get('/evaluations', [EvaluationBossController::class, 'index'])->name('evaluations.index');
     Route::get('/evaluations/create/{user}', [EvaluationBossController::class, 'create'])->name('evaluations.create');
     Route::post('/evaluations', [EvaluationBossController::class, 'store'])->name('evaluations.store');
+
+    // Ticket Analytics
+    Route::get('/tickets/analytics', [TicketAnalyticsController::class, 'index'])->name('tickets.analytics');
+});
+
+// Operator & Admin Routes
+Route::middleware(['auth', 'operator'])->prefix('operator')->name('operator.')->group(function () {
+    Route::get('/tickets', [OperatorTicketController::class, 'index'])->name('tickets.index');
+    Route::get('/tickets/{ticket}', [OperatorTicketController::class, 'show'])->name('tickets.show');
+    Route::post('/tickets/{ticket}/reply', [OperatorTicketController::class, 'reply'])->name('tickets.reply');
+    Route::patch('/tickets/{ticket}/status', [OperatorTicketController::class, 'updateStatus'])->name('tickets.status');
+    Route::get('/tickets/api/suggestions/{category}', [OperatorTicketController::class, 'getSuggestions'])->name('tickets.suggestions');
 });
 
 // Authenticated Routes (both roles)

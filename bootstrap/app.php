@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureUserIsEmployee;
 use App\Http\Middleware\EnsureUserIsBoss;
+use App\Http\Middleware\EnsureUserIsOperator;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'employee' => EnsureUserIsEmployee::class,
             'boss' => EnsureUserIsBoss::class,
+            'operator' => EnsureUserIsOperator::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

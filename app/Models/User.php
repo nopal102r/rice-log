@@ -111,6 +111,22 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the tickets created by the user.
+     */
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'user_id');
+    }
+
+    /**
+     * Get the tickets handled by the user (as an operator).
+     */
+    public function handledTickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class, 'operator_id');
+    }
+
+    /**
      * Get the integrity point ledgers for the user.
      */
     public function pointLedgers(): HasMany
@@ -149,6 +165,22 @@ class User extends Authenticatable
     public function isEmployee(): bool
     {
         return $this->role === 'karyawan';
+    }
+
+    /**
+     * Check if user is operator
+     */
+    public function isOperator(): bool
+    {
+        return $this->role === 'operator';
+    }
+
+    /**
+     * Check if user can handle tickets (Admin/Operator)
+     */
+    public function isAdmin(): bool
+    {
+        return in_array($this->role, ['bos', 'operator']);
     }
 
     // Role Checks

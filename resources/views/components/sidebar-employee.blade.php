@@ -66,5 +66,13 @@
                 <span class="font-semibold">Dompet Integritas</span>
             </a>
         </div>
+        <div class="mb-4">
+            <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-4 mb-2">Pusat Bantuan</h3>
+            <a href="{{ route('employee.tickets.index') }}"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('employee.tickets.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600' }}">
+                <i class="fas fa-headset"></i>
+                <span class="font-semibold">Lapor Aduan</span>
+            </a>
+        </div>
     </nav>
 </aside>
